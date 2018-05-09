@@ -6,6 +6,7 @@ src_files = files([
 bind_files = files([
     'bindings.cpp',
     'bindsystem.cpp',
-    'bindmeanfield.cpp' ])
+    'bindmeanfield.cpp',
+    'bindcoupling.cpp' ])
 
 ext_files = src_files + bind_files
