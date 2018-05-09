@@ -1,0 +1,4 @@
+[wrap-git]
+directory=rzmcmt
+url=git@gitlab.com:raineszm/rzmcmt.git
+revision=master

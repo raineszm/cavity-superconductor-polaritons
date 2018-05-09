@@ -1,0 +1,3 @@
+#!/usr/bin/env zsh
+# vim: ft=zsh
+ipython --pylab --pprint -i $0:h/session.py
