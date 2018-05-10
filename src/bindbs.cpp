@@ -8,7 +8,7 @@ namespace py = pybind11;
 using namespace py::literals;
 
 void
-bind_sbs(py::module& m)
+bind_bs(py::module& m)
 {
   py::class_<BS>(m, "BS")
     .def(py::init<double, const System&, const State&>(),

@@ -9,8 +9,9 @@ cc = meson.get_compiler('cpp')
 # Library Dependencies
 m_dep = cc.find_library('m', required : false)
 #fmt = cc.find_library('fmt')
-eigen = dependency('eigen3')
+#eigen = dependency('eigen3')
 nlopt = dependency('nlopt')
+boost = dependency('boost', modules : ['math'])
 
 rzmcmtproj = subproject('rzmcmt')
 rzmcmt = rzmcmtproj.get_variable('rzmcmt')
@@ -35,6 +36,7 @@ deps = [
     rzmcmt,
     #fmt,
     nlopt,
+    boost
     ]
 
 py3.extension_module('bardasis_schrieffer',
