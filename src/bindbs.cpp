@@ -18,5 +18,6 @@ bind_bs(py::module& m)
     // Attributes
     .def_readwrite("mass", &BS::mass)
     .def("action_int", &BS::action_int)
-    .def("action", &BS::action);
+    .def("action", &BS::action)
+    .def_property_readonly("root", &BS::root);
 }

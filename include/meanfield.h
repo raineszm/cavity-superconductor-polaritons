@@ -2,7 +2,6 @@
 
 #include <cmath>
 #include <functional>
-#include <tuple>
 
 #include <nlopt.hpp>
 
@@ -69,8 +68,7 @@ public:
       v[0] = FMF_int(M_PI * k[0], M_PI * k[1]);
       return 0;
     };
-    std::array<double, 1> result, err;
-    std::tie(result, err) = rzmcmt::integrate<2, 1>(integrand, 0.);
+    auto [result, err] = rzmcmt::integrate<2, 1>(integrand, 0.);
 
     return result[0];
   }
@@ -87,8 +85,7 @@ public:
       v[0] = delta_ratio_int(M_PI * k[0], M_PI * k[1]);
       return 0;
     };
-    std::array<double, 1> result, err;
-    std::tie(result, err) = rzmcmt::integrate<2, 1>(integrand);
+    auto [result, err] = rzmcmt::integrate<2, 1>(integrand);
 
     return g * result[0];
   }

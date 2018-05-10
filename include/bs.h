@@ -1,10 +1,8 @@
 #pragma once
 #include "state.h"
 #include "system.h"
-#include <array>
 #include <boost/math/tools/roots.hpp>
 #include <cmath>
-#include <tuple>
 
 using boost::math::tools::bracket_and_solve_root;
 
@@ -44,17 +42,15 @@ public:
       v[0] = action_int(M_PI * k[0], M_PI * k[1], omega);
       return 0;
     };
-    std::array<double, 1> result, err;
-    std::tie(result, err) = rzmcmt::integrate<2, 1>(integrand, 0.);
+    auto [result, err] = rzmcmt::integrate<2, 1>(integrand, 0.);
 
     return mass - 4 * result[0];
   }
 
   double root() const
   {
-    double a, b;
     boost::uintmax_t max = 1e5;
-    std::tie(a, b) =
+    auto [a, b] =
       bracket_and_solve_root([this](double x) -> double { return action(x); },
                              state.delta,
                              2.,

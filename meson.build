@@ -1,5 +1,5 @@
 project('bardasis_schrieffer', 'cpp',
-        default_options : ['cpp_std=c++14',
+        default_options : ['cpp_std=c++17',
         'buildtype=release',
         'default_library=static',
         'b_lto=true'])
@@ -9,7 +9,7 @@ cc = meson.get_compiler('cpp')
 # Library Dependencies
 m_dep = cc.find_library('m', required : false)
 #fmt = cc.find_library('fmt')
-#eigen = dependency('eigen3')
+eigen = dependency('eigen3')
 nlopt = dependency('nlopt')
 boost = dependency('boost', modules : ['math'])
 
@@ -36,7 +36,8 @@ deps = [
     rzmcmt,
     #fmt,
     nlopt,
-    boost
+    boost,
+    eigen
     ]
 
 py3.extension_module('bardasis_schrieffer',

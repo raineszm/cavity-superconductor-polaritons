@@ -8,7 +8,8 @@ bind_files = files([
     'bindsystem.cpp',
     'bindmeanfield.cpp',
     'bindcoupling.cpp',
-    'bindbs.cpp'
+    'bindbs.cpp',
+    'bindpolariton.cpp'
      ])
 
 ext_files = src_files + bind_files
