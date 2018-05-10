@@ -24,8 +24,7 @@ public:
     , T(T_)
     , sys(sys_)
     , delta(D)
-  {
-  }
+  {}
 
   MeanField(double g_, double T_, const System& sys_)
     : g(g_)
@@ -94,47 +93,32 @@ public:
     return g * result[0];
   }
 
-  double ddt_delta_ratio() const
-  {
-    auto integrand = [this](double v[1], const double k[2]) -> int {
-      v[0] = ddt_delta_ratio_int(M_PI * k[0], M_PI * k[1]);
-      return 0;
-    };
-    std::array<double, 1> result, err;
-    std::tie(result, err) = rzmcmt::integrate<2, 1>(integrand);
-
-    return g * result[0];
-  }
-
   double xi(double kx, double ky) const { return sys.xi(kx, ky); }
 
   static double Tc(double g, const System& sys);
 
 private:
+  // TODO:
   double FMF_int(double kx, double ky) const
   {
     double x = std::abs(xi(kx, ky));
-    double E = std::hypot(x, delta);
+    double l = std::hypot(x, delta);
+    double drift = sys.drift(kx, ky);
 
-    return -(E - x +
-             2 * T *
-               (std::log1p(std::exp(-E / T)) - std::log1p(std::exp(-x / T))));
+    return -(l - drift - x +
+             T * (std::log1p(std::exp(-(l + drift) / T)) +
+                  std::log1p(std::exp(-(l - drift) / T)) -
+                  std::log1p(std::exp(-x / T))));
   }
 
   double delta_ratio_int(double kx, double ky) const
   {
 
     double x = xi(kx, ky);
-    double E = std::hypot(x, delta);
-    return std::tanh(E / (2 * T)) / (2 * E);
-  }
-
-  double ddt_delta_ratio_int(double kx, double ky) const
-  {
-
-    double x = xi(kx, ky);
-    double E = std::hypot(x, delta);
-    double cosh = std::cosh(E / (2 * T));
-    return 1 / (4 * E * T * cosh * cosh);
+    double l = std::hypot(x, delta);
+    double drift = sys.drift(kx, ky);
+    return (std::tanh((drift + l) / (2 * T)) -
+            std::tanh((drift - l) / (2 * T))) /
+           (4 * l);
   }
 };

@@ -16,6 +16,8 @@ void
 bind_meanfield(py::module&);
 void
 bind_coupling(py::module&);
+void
+bind_bs(py::module&);
 
 PYBIND11_MODULE(bardasis_schrieffer, m)
 {
@@ -28,6 +30,7 @@ PYBIND11_MODULE(bardasis_schrieffer, m)
   bind_system(m);
   bind_meanfield(m);
   bind_coupling(m);
+  bind_bs(m);
 
   py::enum_<OptResult>(m, "OptResult")
     .value("SUCCESS", OptResult::SUCCESS)

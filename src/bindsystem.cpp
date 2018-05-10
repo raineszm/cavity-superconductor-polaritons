@@ -15,6 +15,7 @@ bind_system(py::module& m)
     .def_readwrite("mu", &System::mu)
     .def_readwrite("As", &System::As)
     .def("xi", &System::xi)
+    .def("drift", &System::drift)
     .def_property_readonly("kf", &System::kf)
     .def_property_readonly("vf", &System::vf)
     // Pickle

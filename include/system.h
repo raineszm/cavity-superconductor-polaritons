@@ -19,4 +19,9 @@ public:
 
   double kf() const { return std::sqrt(2 * m * mu); }
   double vf() const { return kf() / m; }
+
+  double drift(double kx, double ky) const 
+  { 
+      return -kx/m*As;
+  }
 };
