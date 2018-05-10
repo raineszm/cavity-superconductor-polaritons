@@ -1,13 +1,15 @@
 #pragma once
 #include <cmath>
+#include <functional>
 
 #include <rzmcmt/fermi.h>
-#include <rzmcmt/integrate.h>
 
+#include "integrate.h"
 #include "state.h"
 #include "system.h"
 
 using rzmcmt::nf;
+using namespace std::placeholders;
 
 class Coupling
 {
@@ -29,12 +31,8 @@ public:
 
   double ImDA(double omega) const
   {
-    auto integrand = [this, omega](double v[1], const double k[2]) -> int {
-      v[0] = ImDA_int(M_PI * k[0], M_PI * k[1], omega);
-      return 0;
-    };
-    auto [result, err] = rzmcmt::integrate<2, 1>(integrand, 0.);
+    auto i = Integrand(std::bind(&Coupling::ImDA_int, this, _1, _2, omega));
 
-    return 4 * state.delta * result[0] * omega / sys.m;
+    return state.delta * omega / sys.m *  integrate(i);
   }
 };

@@ -1,8 +1,12 @@
 #pragma once
 #include "state.h"
 #include "system.h"
+#include "integrate.h"
 #include <boost/math/tools/roots.hpp>
 #include <cmath>
+#include <functional>
+
+using namespace std::placeholders;
 
 using boost::math::tools::bracket_and_solve_root;
 
@@ -38,13 +42,7 @@ public:
 
   double action(double omega) const
   {
-    auto integrand = [this, omega](double v[1], const double k[2]) -> int {
-      v[0] = action_int(M_PI * k[0], M_PI * k[1], omega);
-      return 0;
-    };
-    auto [result, err] = rzmcmt::integrate<2, 1>(integrand, 0.);
-
-    return mass - 4 * result[0];
+    return mass - integrate(std::bind(&BS::action_int, this, _1, _2, omega));
   }
 
   double root() const

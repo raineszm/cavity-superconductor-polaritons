@@ -7,7 +7,7 @@ class Cavity
 public:
   double omega0; // Cavity Frequency
 
-  Cavity(double omega0_)
+  explicit Cavity(double omega0_)
     : omega0(omega0_)
   {}
 

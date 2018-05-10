@@ -6,9 +6,10 @@
 #include <nlopt.hpp>
 
 #include "optimize.h"
-#include "rzmcmt/integrate.h"
-
+#include "integrate.h"
 #include "system.h"
+
+using namespace std::placeholders;
 
 class MeanField
 {
@@ -64,13 +65,7 @@ public:
 
   double FMF() const
   {
-    auto integrand = [this](double v[1], const double k[2]) -> int {
-      v[0] = FMF_int(M_PI * k[0], M_PI * k[1]);
-      return 0;
-    };
-    auto [result, err] = rzmcmt::integrate<2, 1>(integrand, 0.);
-
-    return result[0];
+    return integrate(std::bind(&MeanField::FMF_int, this, _1, _2));
   }
 
   double F() const
@@ -81,13 +76,7 @@ public:
 
   double delta_ratio() const
   {
-    auto integrand = [this](double v[1], const double k[2]) -> int {
-      v[0] = delta_ratio_int(M_PI * k[0], M_PI * k[1]);
-      return 0;
-    };
-    auto [result, err] = rzmcmt::integrate<2, 1>(integrand);
-
-    return g * result[0];
+    return g*integrate(std::bind(&MeanField::delta_ratio_int, this, _1, _2));
   }
 
   double xi(double kx, double ky) const { return sys.xi(kx, ky); }
