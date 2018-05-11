@@ -18,7 +18,6 @@ class Solver
 {
 public:
   virtual State state(double T) const = 0;
-  virtual double Tc() const = 0;
   virtual ~Solver() = default;
 };
 
@@ -26,23 +25,18 @@ class MeanFieldSolver : public Solver
 {
 
 public:
-  double g;
+  double Tc;
   System sys;
 
-  MeanFieldSolver(double g_, const System& sys_)
-    : g(g_)
+  MeanFieldSolver(double Tc_, const System& sys_)
+    : Tc(Tc_)
     , sys(sys_)
   {}
 
   State state(double T) const override
   {
-    double delta = MeanField(g, T, sys).delta;
+    double delta = MeanField(Tc, T, sys).delta;
     return State(T, delta);
-  }
-
-  double Tc() const override
-  {
-    return MeanField::Tc(g, sys);
   }
 
   virtual ~MeanFieldSolver() override = default;

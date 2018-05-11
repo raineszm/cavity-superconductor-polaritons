@@ -1,6 +1,4 @@
 src_files = files([
-  'optimize.cpp',
-  'meanfield.cpp'
   ])
 
 bind_files = files([

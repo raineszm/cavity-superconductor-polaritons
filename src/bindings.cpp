@@ -4,7 +4,9 @@
 #include <pybind11/pybind11.h>
 
 #include "cuba.h"
+#include <cmath>
 
+#include "integrate.h"
 #include "optimize.h"
 
 namespace py = pybind11;
@@ -28,6 +30,12 @@ PYBIND11_MODULE(bardasis_schrieffer, m)
   cubacores(0, 0);
 
   m.doc() = "A short description of the project";
+
+  m.def("test", [](double a) {
+    return integrate([a](double kx, double ky) {
+      return std::exp(-(kx * kx + ky * ky) / (a * a));
+    });
+  });
 
   bind_system(m);
   bind_meanfield(m);
