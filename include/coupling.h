@@ -15,9 +15,11 @@ public:
   const System sys;
   const State state;
 
-  double ImDA_int(double kx, double ky, double omega) const
+  double ImDA_int(double k, double theta, double omega) const
   {
-    double fd = std::sqrt(2) * std::cos(2 * std::atan2(ky, kx));
+    double fd = std::sqrt(2) * std::cos(2 * theta);
+    auto kx = k * std::cos(theta);
+    auto ky = k * std::sin(theta);
     double x = sys.xi(kx, ky);
 
     double l = std::hypot(x, state.delta);
@@ -30,8 +32,8 @@ public:
   double ImDA(double omega) const
   {
     return state.delta * omega / sys.m *
-           integrate([this, omega](double kx, double ky) -> double {
-             return ImDA_int(kx, ky, omega);
+           angular_integrate([this, omega](double k, double theta) {
+             return ImDA_int(k, theta, omega);
            });
   }
 };
