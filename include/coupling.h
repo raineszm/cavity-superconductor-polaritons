@@ -17,7 +17,7 @@ public:
 
   double ImDA_int(double kx, double ky, double omega) const
   {
-    double fd = std::sqrt(2) * std::cos(std::atan2(ky, ky));
+    double fd = std::sqrt(2) * std::cos(2 * std::atan2(ky, kx));
     double x = sys.xi(kx, ky);
 
     double l = std::hypot(x, state.delta);
