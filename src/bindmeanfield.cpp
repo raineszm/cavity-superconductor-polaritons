@@ -4,7 +4,6 @@
 #include <pybind11/pybind11.h>
 
 #include "meanfield.h"
-#include "state.h"
 
 namespace py = pybind11;
 using namespace py::literals;
@@ -30,8 +29,4 @@ bind_meanfield(py::module& m)
   py::class_<State>(m, "State")
     .def_readwrite("T", &State::T)
     .def_readwrite("delta", &State::delta);
-
-  py::class_<Solver>(m, "Solver").def("state", &Solver::state);
-  py::class_<MeanFieldSolver, Solver>(m, "MeanFieldSolver")
-    .def(py::init<double, const System&>(), "Tc"_a, "sys"_a);
 }

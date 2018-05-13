@@ -11,6 +11,18 @@
 using namespace std::placeholders;
 using boost::math::tools::bracket_and_solve_root;
 
+class State
+{
+public:
+  double T;
+  double delta;
+
+  State(double T_, double delta_)
+    : T(T_)
+    , delta(delta_)
+  {}
+};
+
 class MeanField
 {
 public:
@@ -69,4 +81,6 @@ public:
     double drift = sys.drift(kx, ky);
     return c(l, drift, T) - tanh_over(x, Tc) / 2;
   }
+
+  State to_state() const { return State(T, delta); }
 };

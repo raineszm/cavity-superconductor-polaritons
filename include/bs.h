@@ -1,7 +1,7 @@
 #pragma once
-#include "state.h"
-#include "system.h"
 #include "integrate.h"
+#include "meanfield.h"
+#include "system.h"
 #include <boost/math/tools/roots.hpp>
 #include <cmath>
 #include <functional>

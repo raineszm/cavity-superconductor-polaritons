@@ -1,7 +1,7 @@
 #include <pybind11/pybind11.h>
 
 #include "bs.h"
-#include "state.h"
+#include "meanfield.h"
 #include "system.h"
 
 namespace py = pybind11;

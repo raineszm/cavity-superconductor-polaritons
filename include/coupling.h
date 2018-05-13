@@ -5,7 +5,7 @@
 #include <rzmcmt/fermi.h>
 
 #include "integrate.h"
-#include "state.h"
+#include "meanfield.h"
 #include "system.h"
 
 using rzmcmt::nf;
