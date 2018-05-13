@@ -16,7 +16,7 @@ class MeanField
 public:
   double Tc;
   double T;
-  const System sys;
+  System sys;
   double delta;
 
   MeanField(double D, double Tc_, double T_, const System& sys_)
@@ -32,7 +32,7 @@ public:
     , sys(sys_)
     , delta(0.)
   {
-    // solve();
+    solve();
   }
 
   void solve()
@@ -67,9 +67,6 @@ public:
     double x = sys.xi(kx, ky);
     double l = std::hypot(x, delta);
     double drift = sys.drift(kx, ky);
-    // return (std::tanh((drift + l) / (2 * T)) -
-    //         std::tanh((drift - l) / (2 * T))) /
-    //          (4 * l) -
-    return tanh_over(l, T) / 2 - tanh_over(x, Tc) / 2;
+    return c(l, drift, T) - tanh_over(x, Tc) / 2;
   }
 };

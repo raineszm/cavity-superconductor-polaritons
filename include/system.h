@@ -7,21 +7,21 @@ class System
 public:
   double m;
   double mu;
-  double As;
+  double vs;
 
-  System(double m_, double mu_, double As_) 
-  : m(m_), mu(mu_), As(As_) {}
+  System(double m_, double mu_, double vs_)
+    : m(m_)
+    , mu(mu_)
+    , vs(vs_)
+  {}
 
   double xi(double kx, double ky) const
   {
-    return (kx * kx + ky * ky + As * As) / (2 * m) - mu;
+    return (kx * kx + ky * ky) / (2 * m) - mu + 0.5 * m * vs * vs;
   }
 
   double kf() const { return std::sqrt(2 * m * mu); }
   double vf() const { return kf() / m; }
 
-  double drift(double kx, double ky) const 
-  { 
-      return -kx/m*As;
-  }
+  double drift(double kx, double ky) const { return kx * vs; }
 };

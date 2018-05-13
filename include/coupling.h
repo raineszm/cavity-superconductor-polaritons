@@ -23,7 +23,7 @@ public:
     double x = sys.xi(kx, ky);
 
     double l = std::hypot(x, state.delta);
-    double drift = -sys.As / sys.m * kx; // TODO: fix angle of As
+    double drift = sys.drift(kx, ky);
 
     return fd * (nf(drift - l, state.T) - nf(drift + l, state.T)) /
            ((omega * omega - 4 * l * l) * l);
@@ -31,8 +31,7 @@ public:
 
   double ImDA(double omega) const
   {
-    auto i = Integrand(std::bind(&Coupling::ImDA_int, this, _1, _2, omega));
-
-    return state.delta * omega / sys.m *  integrate(i);
+    return state.delta * omega / sys.m *
+           integrate(std::bind(&Coupling::ImDA_int, this, _1, _2, omega));
   }
 };
