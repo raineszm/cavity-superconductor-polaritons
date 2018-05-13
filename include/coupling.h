@@ -1,6 +1,5 @@
 #pragma once
 #include <cmath>
-#include <functional>
 
 #include <rzmcmt/fermi.h>
 
@@ -9,7 +8,6 @@
 #include "system.h"
 
 using rzmcmt::nf;
-using namespace std::placeholders;
 
 class Coupling
 {
@@ -32,6 +30,8 @@ public:
   double ImDA(double omega) const
   {
     return state.delta * omega / sys.m *
-           integrate(std::bind(&Coupling::ImDA_int, this, _1, _2, omega));
+           integrate([this, omega](double kx, double ky) -> double {
+             return ImDA_int(kx, ky, omega);
+           });
   }
 };

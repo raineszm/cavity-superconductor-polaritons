@@ -6,8 +6,6 @@
 #include <cmath>
 #include <functional>
 
-using namespace std::placeholders;
-
 using boost::math::tools::bracket_and_solve_root;
 
 class BS
@@ -42,7 +40,9 @@ public:
 
   double action(double omega) const
   {
-    return mass - integrate(std::bind(&BS::action_int, this, _1, _2, omega));
+    return mass - integrate([this, omega](double kx, double ky) {
+             return action_int(kx, ky, omega);
+           });
   }
 
   double root() const

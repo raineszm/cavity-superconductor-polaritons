@@ -2,13 +2,11 @@
 
 #include <boost/math/tools/roots.hpp>
 #include <cmath>
-#include <functional>
 
 #include "integrate.h"
 #include "system.h"
 #include "utils.h"
 
-using namespace std::placeholders;
 using boost::math::tools::bracket_and_solve_root;
 
 class State
@@ -70,7 +68,8 @@ public:
 
   double gap_eq() const
   {
-    return integrate(std::bind(&MeanField::gap_eq_int, this, _1, _2));
+    return integrate(
+      [this](double kx, double ky) { return gap_eq_int(kx, ky); });
   }
 
   double gap_eq_int(double kx, double ky) const
