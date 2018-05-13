@@ -21,13 +21,13 @@ public:
     , state(state_)
   {}
 
-  double action_int(double kx, double ky, double omega) const
+  double action_int(double k, double theta, double omega) const
   {
+    double kx = k * std::cos(theta);
+    double ky = k * std::sin(theta);
     double x = sys.xi(kx, ky);
     double l = std::hypot(x, state.delta);
     double drift = sys.drift(kx, ky);
-
-    double theta = std::atan2(ky, kx);
 
     double Ep = drift + l;
     double Em = drift - l;
@@ -40,24 +40,23 @@ public:
 
   double action(double omega) const
   {
-    return mass - integrate([this, omega](double kx, double ky) {
-             return action_int(kx, ky, omega);
+    return mass + angular_integrate([this, omega](double k, double theta) {
+             return action_int(k, theta, omega);
            });
   }
 
   double root() const
   {
-    boost::uintmax_t max = 1e5;
-    auto [a, b] =
-      bracket_and_solve_root([this](double x) -> double { return action(x); },
-                             state.delta,
-                             2.,
-                             true,
-                             [](double a, double b) {
-                               double x = (a + b) / 2;
-                               return (b - a) <= 1e-6 * x;
-                             },
-                             max);
+    boost::uintmax_t max = 1e7;
+    auto [a, b] = bracket_and_solve_root([this](double x) { return action(x); },
+                                         mass,
+                                         2.,
+                                         false,
+                                         [this](double a, double b) {
+                                           double x = (a + b) / 2;
+                                           return std::fabs(action(x)) < 1e-8;
+                                         },
+                                         max);
     return (a + b) / 2;
   }
 };

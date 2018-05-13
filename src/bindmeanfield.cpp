@@ -24,7 +24,8 @@ bind_meanfield(py::module& m)
          "The integrand appearing in the self-consistency equation")
     .def("solve",
          &MeanField::solve,
-         "solve the gap equations for coupling g and temperature T");
+         "solve the gap equations for coupling g and temperature T")
+    .def("to_state", &MeanField::to_state);
 
   py::class_<State>(m, "State")
     .def_readwrite("T", &State::T)
