@@ -6,8 +6,9 @@
 #include <cmath>
 #include <complex>
 
-using boost::math::tools::bracket_and_solve_root, Eigen::Matrix2cd,
-  Eigen::Vector2cd;
+using boost::math::tools::bracket_and_solve_root;
+using Eigen::Matrix2cd;
+using Eigen::Vector2cd;
 
 #include "bs.h"
 #include "cavity.h"
@@ -31,7 +32,8 @@ public:
     Matrix2cd mat;
     double c = coupling.ImDA(omega);
     mat << bs.action(omega), std::complex<double>(0, c),
-      -std::complex<double>(0, c), cav.action(omega, qx, qy);
+      -std::complex<double>(0, c),
+      cav.action(omega, qx, qy) + coupling.photon_se(omega, qx, qy);
     return mat;
   }
 

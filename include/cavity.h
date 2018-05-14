@@ -1,6 +1,7 @@
 #pragma once
 #include <cmath>
 
+// Use Hartree units?
 const double C = 1.; // speed of light (FIXME)
 const double ALPHA = 1 / 137.;
 const double GPAR = std::sqrt(ALPHA / C);

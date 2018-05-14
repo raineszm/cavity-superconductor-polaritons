@@ -19,5 +19,6 @@ bind_coupling(py::module& m)
     .def_readonly("sys", &Coupling::sys)
     .def_readonly("state", &Coupling::state)
     // Functions
-    .def("ImDA", &Coupling::ImDA);
+    .def("ImDA", &Coupling::ImDA)
+    .def("photon_se", &Coupling::photon_se);
 }

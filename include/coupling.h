@@ -87,4 +87,12 @@ public:
            off_mix * (pi0(drift_p + l1, drift_m - l2, omega) -
                       pi0(drift_p - l1, drift_m + l2, omega));
   }
+
+  double photon_se(double omega, double qx, double qy) const
+  {
+    return 0.5 * GPAR * GPAR *
+           integrate([this, omega, qx, qy](double kx, double ky) {
+             return photon_se_int(kx, ky, omega, qx, qy);
+           });
+  }
 };
