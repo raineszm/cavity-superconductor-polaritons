@@ -6,7 +6,7 @@
 #include <cmath>
 #include <complex>
 
-using boost::math::tools::bracket_and_solve_root;
+using boost::math::tools::toms748_solve;
 using Eigen::Matrix3cd;
 using Eigen::Vector3cd;
 
@@ -51,13 +51,12 @@ public:
   double find_mode(double qx, double qy) const
   {
     boost::uintmax_t max = 1e5;
-    auto [a, b] = bracket_and_solve_root(
+    auto [a, b] = toms748_solve(
       [this, qx, qy](double omega) {
         return std::real(action(omega, qx, qy).determinant());
       },
-      bs.root(),
-      2.,
-      true,
+      1e-3,
+      1.99 * coupling.state.delta,
       [this, qx, qy](double a, double b) {
         double x = (a + b) / 2;
         return std::abs(action(x, qx, qy).determinant()) < 1e-6;

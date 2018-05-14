@@ -11,6 +11,10 @@
         "typeinfo": "cpp",
         "algorithm": "cpp",
         "cctype": "cpp",
-        "cstdlib": "cpp"
+        "cstdlib": "cpp",
+        "chrono": "cpp",
+        "limits": "cpp",
+        "ratio": "cpp",
+        "valarray": "cpp"
     }
 }
