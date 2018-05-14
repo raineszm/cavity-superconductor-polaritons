@@ -25,7 +25,7 @@ if get_option('buildtype') == 'release'
   add_project_arguments('-fvisibility=hidden', language : 'cpp')
 endif
 
-include_dirs = include_directories('include', 'third_party', pybind_dirs)
+include_dirs = include_directories('include', pybind_dirs)
 
 add_project_arguments('-ffast-math', language : 'cpp')
 

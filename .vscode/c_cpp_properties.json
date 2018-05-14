@@ -12,7 +12,6 @@
             "includePath": [
                 "${workspaceFolder}",
                 "${workspaceFolder}/include",
-                "${workspaceFolder}/third_party/include",
                 "${workspaceFolder}/subprojects/rzmcmt/include",
                 "${workspaceFolder}/subprojects/cuba/",
                 "/usr/include",
