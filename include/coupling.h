@@ -10,6 +10,16 @@
 
 using rzmcmt::nf;
 
+inline double
+angular(double theta, int i)
+{
+  if (i == 0) {
+    return std::cos(theta);
+  } else {
+    return std::sin(theta);
+  }
+}
+
 class Coupling
 {
 public:
@@ -47,7 +57,9 @@ public:
                        double ky,
                        double omega,
                        double qx,
-                       double qy) const
+                       double qy,
+                       int i,
+                       int j) const
   {
     auto kpx = kx + qx / 2;
     auto kpy = ky + qy / 2;
@@ -57,20 +69,19 @@ public:
     auto x1 = sys.xi(kpx, kpy);
     auto x2 = sys.xi(kmx, kmy);
 
-    auto k = std::hypot(kx, ky);
-    // auto theta = std::atan2(ky, kx);
+    auto ki = i == 0 ? kx : ky;
+    auto kj = j == 0 ? kx : ky;
+    auto vsi = sys.vs * angular(sys.theta_v, i);
+    auto vsj = sys.vs * angular(sys.theta_v, j);
 
-    // TODO: add alpha to copulings
     auto diagonal =
-      (state.l2(x1, x2) * k * k + state.n2(x1, x2) * sys.vs * sys.vs) /
-      (sys.m * sys.m); // INCLUDE ANGULAR FACTORS
-    auto off = (state.p2(x1, x2) * k * k + state.m2(x1, x2) * sys.vs * sys.vs) *
-               GPAR * GPAR / (sys.m * sys.m); // INCLUDE ANGULAR FACTORS
+      (state.l2(x1, x2) * ki * kj + state.n2(x1, x2) * vsi * vsj) /
+      (sys.m * sys.m);
+    auto off = (state.p2(x1, x2) * kj * kj + state.m2(x1, x2) * vsi * vsj) /
+               (sys.m * sys.m);
 
-    auto diagonal_mix =
-      state.ln(x1, x2) * k * sys.vs / sys.m; // INCLUDE ANGULAR FACTORS
-    auto off_mix =
-      state.mp(x1, x2) * k * sys.vs / sys.m; // INCLUDE ANGULAR FACTORS
+    auto diagonal_mix = state.ln(x1, x2) * (ki * vsj + vsi * kj) / sys.m;
+    auto off_mix = state.mp(x1, x2) * (ki * vsj + vsi * kj) / sys.m;
 
     auto drift_p = sys.drift(kpx, kpy);
     auto drift_m = sys.drift(kmx, kmy);
@@ -88,11 +99,11 @@ public:
                       pi0(drift_p - l1, drift_m + l2, omega));
   }
 
-  double photon_se(double omega, double qx, double qy) const
+  double photon_se(double omega, double qx, double qy, int i, int j) const
   {
     return 0.5 * GPAR * GPAR *
-           integrate([this, omega, qx, qy](double kx, double ky) {
-             return photon_se_int(kx, ky, omega, qx, qy);
+           integrate([this, omega, qx, qy, i, j](double kx, double ky) {
+             return photon_se_int(kx, ky, omega, qx, qy, i, j);
            });
   }
 };

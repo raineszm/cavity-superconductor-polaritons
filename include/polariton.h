@@ -7,8 +7,8 @@
 #include <complex>
 
 using boost::math::tools::bracket_and_solve_root;
-using Eigen::Matrix2cd;
-using Eigen::Vector2cd;
+using Eigen::Matrix3cd;
+using Eigen::Vector3cd;
 
 #include "bs.h"
 #include "cavity.h"
@@ -27,17 +27,23 @@ public:
     , coupling(c_)
   {}
 
-  Matrix2cd action(double omega, double qx, double qy) const
+  Matrix3cd action(double omega, double qx, double qy) const
   {
-    Matrix2cd mat;
-    double c = coupling.ImDA(omega);
-    mat << bs.action(omega), std::complex<double>(0, c),
-      -std::complex<double>(0, c),
-      cav.action(omega, qx, qy) + coupling.photon_se(omega, qx, qy);
+    Matrix3cd mat;
+    std::complex<double> c(0., coupling.ImDA(omega));
+    auto cs = std::cos(coupling.sys.theta_v);
+    auto sn = std::sin(coupling.sys.theta_v);
+    auto se00 = coupling.photon_se(omega, qx, qy, 0, 0);
+    auto se01 = coupling.photon_se(omega, qx, qy, 0, 1);
+    auto se10 = coupling.photon_se(omega, qx, qy, 1, 0);
+    auto se11 = coupling.photon_se(omega, qx, qy, 1, 1);
+    mat << bs.action(omega), c * cs, c * sn, -c * cs,
+      cav.action(omega, qx, qy) + se00, se01, -c * sn, se10,
+      cav.action(omega, qx, qy) + se11;
     return mat;
   }
 
-  Vector2cd eigen(double omega, double qx, double qy) const
+  Vector3cd eigen(double omega, double qx, double qy) const
   {
     return action(omega, qx, qy).eigenvalues();
   }
