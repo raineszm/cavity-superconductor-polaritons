@@ -1,19 +1,14 @@
 #pragma once
 
+#include "system.h"
 #include <boost/math/tools/roots.hpp>
 #include <cmath>
 
-#include "integrate.h"
-#include "system.h"
-#include "utils.h"
-
 using boost::math::tools::bracket_and_solve_root;
 
-class MeanField
+class State
 {
 public:
-  //! Critical temperature
-  double Tc;
   //! Temperature
   double T;
   //! associated system
@@ -21,56 +16,27 @@ public:
   //! Order parameter
   double delta;
 
-  MeanField(double D, double Tc_, double T_, const System& sys_)
-    : Tc(Tc_)
-    , T(T_)
+  State(const System& sys_, double T_, double D)
+    : T(T_)
     , sys(sys_)
     , delta(D)
   {}
 
-  MeanField(double Tc_, double T_, const System& sys_)
-    : Tc(Tc_)
-    , T(T_)
-    , sys(sys_)
-    , delta(0.)
+  inline static State solve(const System& sys, double T)
   {
-    solve();
-  }
-
-  void solve()
-  {
-    if (T >= Tc) {
-      delta = 0.;
-      return;
+    if (T >= sys.Tc) {
+      return State(sys, T, 0.);
     }
     boost::uintmax_t max = 1e5;
-    auto [a, b] = bracket_and_solve_root(
-      [this](double x) {
-        delta = x;
-        return gap_eq();
-      },
-      Tc,
-      2.,
-      false,
-      [](double a, double b) { return b - a < 1e-5; },
-      max);
+    auto [a, b] =
+      bracket_and_solve_root([sys, T](double x) { return sys.gap_eq(T, x); },
+                             sys.Tc,
+                             2.,
+                             false,
+                             [](double a, double b) { return b - a < 1e-5; },
+                             max);
 
-    delta = (a + b) / 2;
-  }
-
-  double gap_eq() const
-  {
-    return integrate(
-      [this](double kx, double ky) { return gap_eq_int(kx, ky); });
-  }
-
-  double gap_eq_int(double kx, double ky) const
-  {
-
-    double x = sys.xi(kx, ky);
-    double l = std::hypot(x, delta);
-    double drift = sys.drift(kx, ky);
-    return c(l, drift, T) - tanh_over(x, Tc) / 2;
+    return State(sys, T, (a + b) / 2);
   }
 
   double l2(double x1, double x2) const

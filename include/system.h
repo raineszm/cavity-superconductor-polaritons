@@ -1,5 +1,7 @@
 #pragma once
 
+#include "integrate.h"
+#include "utils.h"
 #include <cmath>
 
 class System
@@ -9,14 +11,17 @@ public:
   double m;
   //! The chemical potential
   double mu;
+  //! Critical temperature
+  double Tc;
   //! The superfluid velocity
   double vs;
   //! The angle that the superfluid velocity makes with the x axis
   double theta_v;
 
-  System(double m_, double mu_, double vs_, double theta_v_)
+  System(double m_, double mu_, double Tc_, double vs_, double theta_v_)
     : m(m_)
     , mu(mu_)
+    , Tc(Tc_)
     , vs(vs_)
     , theta_v(theta_v_)
   {}
@@ -33,5 +38,21 @@ public:
   {
     auto theta = std::atan2(ky, kx);
     return vs * std::hypot(kx, ky) * std::cos(theta - theta_v);
+  }
+
+  double gap_eq(double T, double delta) const
+  {
+    return integrate([this, delta, T](double kx, double ky) {
+      return gap_eq_int(kx, ky, T, delta);
+    });
+  }
+
+  double gap_eq_int(double kx, double ky, double T, double delta) const
+  {
+
+    double x = xi(kx, ky);
+    double l = std::hypot(x, delta);
+    double d = drift(kx, ky);
+    return c(l, d, T) - tanh_over(x, Tc) / 2;
   }
 };

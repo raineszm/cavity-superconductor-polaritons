@@ -8,7 +8,7 @@ import numpy as np
 import pushbullet
 import click
 
-import bardasis-schrieffer
+import bardasis_schrieffer
 from .defaults import *
 
 
@@ -31,47 +31,37 @@ def push_notification(fname, N, METADATA):
                             meta=METADATA)))
 
 
-class Runner(object):
+def run(fname, confirm=False, **kwargs):
 
-    @classmethod
-    def make(cls, **kwargs):
-        pass
+    if confirm:
+        get_confirmation(**kwargs)
 
-    @classmethod
-    def run(cls, fname, confirm=False, **kwargs):
-        if confirm:
-            get_confirmation(**kwargs)
+    N = 1
+    ts = [0.]
 
-        N = 1
-        ts = [0.]
+    with mp.Pool() as p:
+        with open(fname, 'w') as datafile:
+            writer = csv.DictWriter(
+                datafile,
+                fieldnames=[]
+            )
 
+            writer.writeheader()
 
-        with mp.Pool() as p:
-            with open(fname, 'w') as datafile:
-                writer = csv.DictWriter(
-                    datafile,
-                    fieldnames=cls.FIELDNAMES
-                )
+            with click.progressbar(
+                    length=N,
+                    fill_char=click.style('#', fg='green'),
+                    empty_char=click.style('-', fg='red')) as bar:
 
-                writer.writeheader()
+                generator = cls.make()
 
-                with click.progressbar(
-                        length=N,
-                        fill_char=click.style('#', fg='green'),
-                        empty_char=click.style('-', fg='red')) as bar:
+                for result in p.imap_unordered(generator, ts):
+                    writer.writerow(result)
+                    datafile.flush()
+                    bar.update(1)
 
-                    for result in p.imap_unordered(generator, ts):
-                        if isinstance(result, list):
-                            for row in result:
-                                write_result(
-                                    writer, row)
-                        else:
-                            write_result(writer, result)
-                        datafile.flush()
-                        bar.update(1)
-
-        if kwargs['notify']:
-            push_notification(fname, N, dict())
+    if kwargs['notify']:
+        push_notification(fname, N, dict())
 
 
 def show_param(name, value):
@@ -87,8 +77,3 @@ def get_confirmation(**params):
     for (k, v) in params.items():
         click.echo(show_param(k, v))
     click.confirm('Is this correct?', abort=True)
-
-
-def write_result(writer, result, **kwargs):
-    result.update(kwargs)
-    writer.writerow(result)

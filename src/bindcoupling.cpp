@@ -4,7 +4,7 @@
 #include <pybind11/pybind11.h>
 
 #include "coupling.h"
-#include "meanfield.h"
+#include "state.h"
 #include "system.h"
 
 namespace py = pybind11;
@@ -14,9 +14,8 @@ void
 bind_coupling(py::module& m)
 {
   py::class_<Coupling>(m, "Coupling")
-    .def(py::init<const System&, const MeanField&>(), "sys"_a, "state"_a)
+    .def(py::init<const State&>(), "state"_a)
     // Attributes
-    .def_readonly("sys", &Coupling::sys)
     .def_readonly("state", &Coupling::state)
     // Functions
     .def("ImDA", &Coupling::ImDA)

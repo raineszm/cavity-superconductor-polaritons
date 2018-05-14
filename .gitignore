@@ -19,3 +19,4 @@ mathematica/Derivs.nb
 python/.hypothesis/
 python/.cache/
 python/figures/
+.mypy_cache/*

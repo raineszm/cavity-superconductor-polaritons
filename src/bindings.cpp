@@ -12,7 +12,7 @@ using namespace py::literals;
 void
 bind_system(py::module&);
 void
-bind_meanfield(py::module&);
+bind_state(py::module&);
 void
 bind_coupling(py::module&);
 void
@@ -32,7 +32,7 @@ PYBIND11_MODULE(bardasis_schrieffer, m)
     "Calculate the hybridization of photons and Bardasis-Schrieffer modes";
 
   bind_system(m);
-  bind_meanfield(m);
+  bind_state(m);
   bind_coupling(m);
   bind_bs(m);
   bind_polariton(m);

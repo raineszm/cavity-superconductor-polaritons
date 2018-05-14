@@ -4,9 +4,7 @@
 #include <rzmcmt/fermi.h>
 
 #include "cavity.h"
-#include "integrate.h"
-#include "meanfield.h"
-#include "system.h"
+#include "state.h"
 
 using rzmcmt::nf;
 
@@ -23,18 +21,19 @@ angular(double theta, int i)
 class Coupling
 {
 public:
-  const System sys;
-  const MeanField state;
+  const State state;
+
+  explicit Coupling(const State& state_) : state(state_) {}
 
   double ImDA_int(double k, double theta, double omega) const
   {
     double fd = std::sqrt(2) * std::cos(2 * theta);
     auto kx = k * std::cos(theta);
     auto ky = k * std::sin(theta);
-    double x = sys.xi(kx, ky);
+    double x = state.sys.xi(kx, ky);
 
     double l = std::hypot(x, state.delta);
-    double drift = sys.drift(kx, ky);
+    double drift = state.sys.drift(kx, ky);
 
     return fd * (nf(drift - l, state.T) - nf(drift + l, state.T)) /
            ((omega * omega - 4 * l * l) * l);
@@ -42,7 +41,7 @@ public:
 
   double ImDA(double omega) const
   {
-    return state.delta * omega / sys.m *
+    return state.delta * omega / state.sys.m *
            angular_integrate([this, omega](double k, double theta) {
              return ImDA_int(k, theta, omega);
            });
@@ -66,25 +65,25 @@ public:
     auto kmx = kx - qx / 2;
     auto kmy = ky - qy / 2;
 
-    auto x1 = sys.xi(kpx, kpy);
-    auto x2 = sys.xi(kmx, kmy);
+    auto x1 = state.sys.xi(kpx, kpy);
+    auto x2 = state.sys.xi(kmx, kmy);
 
     auto ki = i == 0 ? kx : ky;
     auto kj = j == 0 ? kx : ky;
-    auto vsi = sys.vs * angular(sys.theta_v, i);
-    auto vsj = sys.vs * angular(sys.theta_v, j);
+    auto vsi = state.sys.vs * angular(state.sys.theta_v, i);
+    auto vsj = state.sys.vs * angular(state.sys.theta_v, j);
 
     auto diagonal =
       (state.l2(x1, x2) * ki * kj + state.n2(x1, x2) * vsi * vsj) /
-      (sys.m * sys.m);
+      (state.sys.m * state.sys.m);
     auto off = (state.p2(x1, x2) * kj * kj + state.m2(x1, x2) * vsi * vsj) /
-               (sys.m * sys.m);
+               (state.sys.m * state.sys.m);
 
-    auto diagonal_mix = state.ln(x1, x2) * (ki * vsj + vsi * kj) / sys.m;
-    auto off_mix = state.mp(x1, x2) * (ki * vsj + vsi * kj) / sys.m;
+    auto diagonal_mix = state.ln(x1, x2) * (ki * vsj + vsi * kj) / state.sys.m;
+    auto off_mix = state.mp(x1, x2) * (ki * vsj + vsi * kj) / state.sys.m;
 
-    auto drift_p = sys.drift(kpx, kpy);
-    auto drift_m = sys.drift(kmx, kmy);
+    auto drift_p = state.sys.drift(kpx, kpy);
+    auto drift_m = state.sys.drift(kmx, kmy);
 
     auto l1 = std::hypot(x1, state.delta);
     auto l2 = std::hypot(x2, state.delta);

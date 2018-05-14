@@ -1,7 +1,8 @@
 #pragma once
 #include "integrate.h"
-#include "meanfield.h"
+#include "state.h"
 #include "system.h"
+#include "state.h"
 #include <boost/math/tools/roots.hpp>
 #include <cmath>
 #include <functional>
@@ -12,12 +13,10 @@ class BS
 {
 public:
   double mass; // 1/g_d - 1/g_s
-  const System sys;
-  const MeanField state;
+  const State state;
 
-  BS(double mass_, const System& sys_, const MeanField& state_)
+  BS(double mass_, const State& state_)
     : mass(mass_)
-    , sys(sys_)
     , state(state_)
   {}
 
@@ -25,9 +24,9 @@ public:
   {
     double kx = k * std::cos(theta);
     double ky = k * std::sin(theta);
-    double x = sys.xi(kx, ky);
+    double x = state.sys.xi(kx, ky);
     double l = std::hypot(x, state.delta);
-    double drift = sys.drift(kx, ky);
+    double drift = state.sys.drift(kx, ky);
 
     double Ep = drift + l;
     double Em = drift - l;

@@ -31,8 +31,8 @@ public:
   {
     Matrix3cd mat;
     std::complex<double> c(0., coupling.ImDA(omega));
-    auto cs = std::cos(coupling.sys.theta_v);
-    auto sn = std::sin(coupling.sys.theta_v);
+    auto cs = std::cos(coupling.state.sys.theta_v);
+    auto sn = std::sin(coupling.state.sys.theta_v);
     auto se00 = coupling.photon_se(omega, qx, qy, 0, 0);
     auto se01 = coupling.photon_se(omega, qx, qy, 0, 1);
     auto se10 = coupling.photon_se(omega, qx, qy, 1, 0);

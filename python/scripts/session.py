@@ -1,3 +1,3 @@
 import path_helper
-import bardasis-schrieffer
+import bardasis_schrieffer
 from runner.defaults import *
