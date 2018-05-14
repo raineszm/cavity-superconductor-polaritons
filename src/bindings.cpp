@@ -6,9 +6,6 @@
 #include "cuba.h"
 #include <cmath>
 
-#include "integrate.h"
-#include "optimize.h"
-
 namespace py = pybind11;
 using namespace py::literals;
 
@@ -22,6 +19,8 @@ void
 bind_bs(py::module&);
 void
 bind_polariton(py::module&);
+void
+bind_cavity(py::module&);
 
 PYBIND11_MODULE(bardasis_schrieffer, m)
 {
@@ -29,25 +28,13 @@ PYBIND11_MODULE(bardasis_schrieffer, m)
   // This causes hangs when interfacing with python
   cubacores(0, 0);
 
-  m.doc() = "A short description of the project";
-
-  m.def("test", [](double a) {
-    return integrate([a](double kx, double ky) {
-      return std::exp(-(kx * kx + ky * ky) / (a * a));
-    });
-  });
+  m.doc() =
+    "Calculate the hybridization of photons and Bardasis-Schrieffer modes";
 
   bind_system(m);
   bind_meanfield(m);
   bind_coupling(m);
   bind_bs(m);
   bind_polariton(m);
-
-  py::enum_<OptResult>(m, "OptResult")
-    .value("SUCCESS", OptResult::SUCCESS)
-    .value("STOPVAL_REACHED", OptResult::STOPVAL_REACHED)
-    .value("FTOL_REACHED", OptResult::FTOL_REACHED)
-    .value("XTOL_REACHED", OptResult::XTOL_REACHED)
-    .value("MAXEVAL_REACHED", OptResult::MAXEVAL_REACHED)
-    .value("MAXTIME_REACHED", OptResult::MAXTIME_REACHED);
+  bind_cavity(m);
 }

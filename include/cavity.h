@@ -29,6 +29,6 @@ public:
 
   double action(double omega, double qx, double qy) const
   {
-    return omega * omega - C * C * (qx * qx + qy * qy) - omega0 * omega0;
+    return omega * omega - this->omega(qx, qy);
   }
 };
