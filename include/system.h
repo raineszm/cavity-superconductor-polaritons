@@ -5,9 +5,13 @@
 class System
 {
 public:
+  //! The electron effective mass in units of m_e
   double m;
+  //! The chemical potential
   double mu;
+  //! The superfluid velocity
   double vs;
+  //! The angle that the superfluid velocity makes with the x axis
   double theta_v;
 
   System(double m_, double mu_, double vs_, double theta_v_)

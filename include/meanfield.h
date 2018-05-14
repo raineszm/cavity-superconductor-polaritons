@@ -12,7 +12,9 @@ using boost::math::tools::bracket_and_solve_root;
 class State
 {
 public:
+  //! Temperature of the state
   double T;
+  //! Value of the order parameter
   double delta;
 
   State(double T_, double delta_)
@@ -72,9 +74,13 @@ public:
 class MeanField
 {
 public:
+  //! Critical temperature
   double Tc;
+  //! Temperature
   double T;
-  System sys;
+  //! associated system
+  const System sys;
+  //! Order parameter
   double delta;
 
   MeanField(double D, double Tc_, double T_, const System& sys_)
@@ -128,8 +134,6 @@ public:
     double drift = sys.drift(kx, ky);
     return c(l, drift, T) - tanh_over(x, Tc) / 2;
   }
-
-  // Coherence factors
 
   State to_state() const { return State(T, delta); }
 };

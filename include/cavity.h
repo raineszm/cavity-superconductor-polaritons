@@ -1,15 +1,22 @@
 #pragma once
 #include <cmath>
 
-// Use Hartree units?
-const double C = 1.; // speed of light (FIXME)
+// We use atomic units
+
+//! The fine structure constant
 const double ALPHA = 1 / 137.;
+
+//! The speed of light
+const double C = 1 / ALPHA;
+
+//! The paramagnetic coupling strength
 const double GPAR = std::sqrt(ALPHA / C);
 
 class Cavity
 {
 public:
-  double omega0; // Cavity Frequency
+  //! Cavity frequency
+  double omega0;
 
   explicit Cavity(double omega0_)
     : omega0(omega0_)
