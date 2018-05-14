@@ -9,68 +9,6 @@
 
 using boost::math::tools::bracket_and_solve_root;
 
-class State
-{
-public:
-  //! Temperature of the state
-  double T;
-  //! Value of the order parameter
-  double delta;
-
-  State(double T_, double delta_)
-    : T(T_)
-    , delta(delta_)
-  {}
-
-  double l2(double x1, double x2) const
-  {
-    auto l1 = std::hypot(x1, delta);
-    auto l2 = std::hypot(x2, delta);
-
-    return 0.5 * (1 + (x1 * x2 + delta * delta) / (l1 * l2));
-  }
-
-  double m2(double x1, double x2) const
-  {
-    auto l1 = std::hypot(x1, delta);
-    auto l2 = std::hypot(x2, delta);
-
-    return 0.5 * (1 + (-x1 * x2 + delta * delta) / (l1 * l2));
-  }
-
-  double n2(double x1, double x2) const
-  {
-    auto l1 = std::hypot(x1, delta);
-    auto l2 = std::hypot(x2, delta);
-
-    return 0.5 * (1 + (x1 * x2 - delta * delta) / (l1 * l2));
-  }
-
-  double p2(double x1, double x2) const
-  {
-    auto l1 = std::hypot(x1, delta);
-    auto l2 = std::hypot(x2, delta);
-
-    return 0.5 * (1 - (x1 * x2 + delta * delta) / (l1 * l2));
-  }
-
-  double ln(double x1, double x2) const
-  {
-    auto l1 = std::hypot(x1, delta);
-    auto l2 = std::hypot(x2, delta);
-
-    return 0.5 * (x1 / l1 + x2 / l2);
-  }
-
-  double mp(double x1, double x2) const
-  {
-    auto l1 = std::hypot(x1, delta);
-    auto l2 = std::hypot(x2, delta);
-
-    return 0.5 * (x1 / l1 - x2 / l2);
-  }
-};
-
 class MeanField
 {
 public:
@@ -135,5 +73,51 @@ public:
     return c(l, drift, T) - tanh_over(x, Tc) / 2;
   }
 
-  State to_state() const { return State(T, delta); }
+  double l2(double x1, double x2) const
+  {
+    auto l1 = std::hypot(x1, delta);
+    auto l2 = std::hypot(x2, delta);
+
+    return 0.5 * (1 + (x1 * x2 + delta * delta) / (l1 * l2));
+  }
+
+  double m2(double x1, double x2) const
+  {
+    auto l1 = std::hypot(x1, delta);
+    auto l2 = std::hypot(x2, delta);
+
+    return 0.5 * (1 + (-x1 * x2 + delta * delta) / (l1 * l2));
+  }
+
+  double n2(double x1, double x2) const
+  {
+    auto l1 = std::hypot(x1, delta);
+    auto l2 = std::hypot(x2, delta);
+
+    return 0.5 * (1 + (x1 * x2 - delta * delta) / (l1 * l2));
+  }
+
+  double p2(double x1, double x2) const
+  {
+    auto l1 = std::hypot(x1, delta);
+    auto l2 = std::hypot(x2, delta);
+
+    return 0.5 * (1 - (x1 * x2 + delta * delta) / (l1 * l2));
+  }
+
+  double ln(double x1, double x2) const
+  {
+    auto l1 = std::hypot(x1, delta);
+    auto l2 = std::hypot(x2, delta);
+
+    return 0.5 * (x1 / l1 + x2 / l2);
+  }
+
+  double mp(double x1, double x2) const
+  {
+    auto l1 = std::hypot(x1, delta);
+    auto l2 = std::hypot(x2, delta);
+
+    return 0.5 * (x1 / l1 - x2 / l2);
+  }
 };

@@ -11,7 +11,7 @@ void
 bind_bs(py::module& m)
 {
   py::class_<BS>(m, "BS")
-    .def(py::init<double, const System&, const State&>(),
+    .def(py::init<double, const System&, const MeanField&>(),
          "mass"_a,
          "sys"_a,
          "state"_a)

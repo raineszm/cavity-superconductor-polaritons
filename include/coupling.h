@@ -24,7 +24,7 @@ class Coupling
 {
 public:
   const System sys;
-  const State state;
+  const MeanField state;
 
   double ImDA_int(double k, double theta, double omega) const
   {

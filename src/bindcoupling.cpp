@@ -14,7 +14,7 @@ void
 bind_coupling(py::module& m)
 {
   py::class_<Coupling>(m, "Coupling")
-    .def(py::init<const System&, const State&>(), "sys"_a, "state"_a)
+    .def(py::init<const System&, const MeanField&>(), "sys"_a, "state"_a)
     // Attributes
     .def_readonly("sys", &Coupling::sys)
     .def_readonly("state", &Coupling::state)

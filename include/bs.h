@@ -13,9 +13,9 @@ class BS
 public:
   double mass; // 1/g_d - 1/g_s
   const System sys;
-  const State state;
+  const MeanField state;
 
-  BS(double mass_, const System& sys_, const State& state_)
+  BS(double mass_, const System& sys_, const MeanField& state_)
     : mass(mass_)
     , sys(sys_)
     , state(state_)
