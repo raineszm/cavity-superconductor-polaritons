@@ -63,3 +63,34 @@ angular_integrate(const F& f)
   auto [result, err] = rzmcmt::integrate<2, 1>(i);
   return result[0] / (2 * M_PI);
 }
+
+template<class F>
+class XiIntegrand
+{
+  const F _f;
+  const double _a;
+
+public:
+  XiIntegrand(const F& f, double a)
+    : _f(f)
+    , _a(a)
+  {}
+
+  int operator()(double v[1], const double t[2]) const
+  {
+    auto x = _a + (1 - t[0]) / t[0];
+    auto jac = 1 / (t[0] * t[0]);
+    auto theta = 2 * M_PI * t[1];
+    v[0] = _f(x, theta) * jac;
+    return 0;
+  }
+};
+
+template<class F>
+double
+xi_integrate(const F& f, double a)
+{
+  auto i = XiIntegrand(f, a);
+  auto [result, err] = rzmcmt::integrate<2, 1>(i);
+  return result[0];
+}

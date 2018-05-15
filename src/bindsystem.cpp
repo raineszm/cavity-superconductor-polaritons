@@ -26,7 +26,9 @@ bind_system(py::module& m)
          &System::gap_eq_int,
          "The integrand appearing in the self-consistency equation")
     .def("xi", &System::xi)
+    .def("xi_k", &System::xi_k)
     .def("drift", &System::drift)
+    .def("drift_theta", &System::drift_theta)
     .def_property_readonly("kf", &System::kf)
     .def_property_readonly("vf", &System::vf)
     // Pickle
@@ -39,7 +41,6 @@ bind_system(py::module& m)
                           t[1].cast<double>(),
                           t[2].cast<double>(),
                           t[3].cast<double>(),
-                          t[4].cast<double>()
-                          );
+                          t[4].cast<double>());
       }));
 }

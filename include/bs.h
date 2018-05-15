@@ -19,11 +19,9 @@ public:
     , state(state_)
   {}
 
-  double action_int(double k, double theta, double omega) const
+  double action_int(double l, double theta, double omega) const
   {
-    double x = state.sys.xi_k(k);
-    double l = std::hypot(x, state.delta);
-    double drift = state.sys.drift_theta(k, theta);
+    double drift = state.sys.drift_theta(state.sys.kf(), theta);
 
     double Ep = drift + l;
     double Em = drift - l;
@@ -36,9 +34,13 @@ public:
 
   double action(double omega) const
   {
-    return mass + angular_integrate([this, omega](double k, double theta) {
-             return action_int(k, theta, omega);
-           });
+    return mass + 2 * state.sys.m * M_PI *
+                    xi_integrate(
+                      [this, omega](double l, double theta) {
+                        return action_int(l, theta, omega) * l /
+                               std::sqrt(l * l - state.delta * state.delta);
+                      },
+                      state.delta);
   }
 
   double root() const
