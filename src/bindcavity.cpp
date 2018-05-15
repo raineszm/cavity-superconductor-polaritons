@@ -14,4 +14,7 @@ bind_cavity(py::module& m)
     .def_readwrite("omega0", &Cavity::omega0)
     .def("action", &Cavity::action)
     .def("omega", &Cavity::omega);
+  m.attr("GPAR") = GPAR;
+  m.attr("ALPHA") = ALPHA;
+  m.attr("C") = C;
 }

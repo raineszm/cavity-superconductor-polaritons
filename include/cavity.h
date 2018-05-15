@@ -1,13 +1,13 @@
 #pragma once
 #include <cmath>
 
-// We use atomic units
+// We use natural Gaussian Units
 
 //! The fine structure constant
 const double ALPHA = 1 / 137.;
 
 //! The speed of light
-const double C = 1 / ALPHA;
+const double C = 1.;
 
 //! The paramagnetic coupling strength
 const double GPAR = std::sqrt(ALPHA / C);

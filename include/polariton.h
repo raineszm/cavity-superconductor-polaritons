@@ -55,11 +55,12 @@ public:
       [this, qx, qy](double omega) {
         return std::real(action(omega, qx, qy).determinant());
       },
-      1e-3,
+      1e-3 * coupling.state.delta,
       1.99 * coupling.state.delta,
       [this, qx, qy](double a, double b) {
         double x = (a + b) / 2;
-        return std::abs(action(x, qx, qy).determinant()) < 1e-6;
+        return std::abs(action(x, qx, qy).determinant()) <
+               1e-6 * coupling.state.delta;
       },
       max);
     return (a + b) / 2;

@@ -18,6 +18,9 @@ bind_polariton(py::module& m)
          "cav"_a,
          "coupling"_a)
     // Attributes
+    .def_readonly("bs", &Polariton::bs)
+    .def_readonly("cav", &Polariton::cav)
+    .def_readonly("coupling", &Polariton::coupling)
     .def("action", &Polariton::action)
     .def("find_mode", &Polariton::find_mode);
 }

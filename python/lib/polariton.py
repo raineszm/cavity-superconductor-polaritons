@@ -1,10 +1,6 @@
 import bardasis_schrieffer as bsm
 
-NIOBIUM = dict(
-    Tc=3e-5,  # Hartrees
-    mu=0.1955,  # Hartress
-    m=1.6  # bare electron
-)
+from materials import NIOBIUM
 
 
 def build_polariton(m, mu, Tc, vs, theta_v, T):
