@@ -2,7 +2,6 @@
 #include "integrate.h"
 #include "state.h"
 #include "system.h"
-#include "state.h"
 #include <boost/math/tools/roots.hpp>
 #include <cmath>
 #include <functional>
@@ -22,11 +21,9 @@ public:
 
   double action_int(double k, double theta, double omega) const
   {
-    double kx = k * std::cos(theta);
-    double ky = k * std::sin(theta);
-    double x = state.sys.xi(kx, ky);
+    double x = state.sys.xi_k(k);
     double l = std::hypot(x, state.delta);
-    double drift = state.sys.drift(kx, ky);
+    double drift = state.sys.drift_theta(k, theta);
 
     double Ep = drift + l;
     double Em = drift - l;

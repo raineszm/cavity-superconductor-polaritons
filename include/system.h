@@ -31,28 +31,37 @@ public:
     return (kx * kx + ky * ky) / (2 * m) - mu + 0.5 * m * vs * vs;
   }
 
+  double xi_k(double k) const
+  {
+    return k * k / (2 * m) - mu + 0.5 * m * vs * vs;
+  }
+
   double kf() const { return std::sqrt(2 * m * mu); }
   double vf() const { return kf() / m; }
 
   double drift(double kx, double ky) const
   {
-    auto theta = std::atan2(ky, kx);
-    return vs * std::hypot(kx, ky) * std::cos(theta - theta_v);
+    return drift_theta(std::hypot(kx, ky), std::atan2(ky, kx));
+  }
+
+  double drift_theta(double k, double theta) const
+  {
+    return vs * k * std::cos(theta - theta_v);
   }
 
   double gap_eq(double T, double delta) const
   {
-    return integrate([this, delta, T](double kx, double ky) {
-      return gap_eq_int(kx, ky, T, delta);
+    return angular_integrate([this, delta, T](double k, double theta) {
+      return gap_eq_int(k, theta, T, delta);
     });
   }
 
-  double gap_eq_int(double kx, double ky, double T, double delta) const
+  double gap_eq_int(double k, double theta, double T, double delta) const
   {
 
-    double x = xi(kx, ky);
+    double x = xi_k(k);
     double l = std::hypot(x, delta);
-    double d = drift(kx, ky);
+    double d = drift_theta(k, theta);
     return c(l, d, T) - tanh_over(x, Tc) / 2;
   }
 };

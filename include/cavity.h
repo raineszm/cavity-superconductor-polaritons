@@ -1,13 +1,13 @@
 #pragma once
 #include <cmath>
 
-// We use natural Gaussian Units
+// We use Gaussian Hartree Units
 
 //! The fine structure constant
-const double ALPHA = 1 / 137.;
+const double ALPHA = 7.2973525664e-3;
 
 //! The speed of light
-const double C = 1.;
+const double C = 1 / ALPHA;
 
 //! The paramagnetic coupling strength
 const double GPAR = std::sqrt(ALPHA / C);
@@ -24,7 +24,7 @@ public:
 
   double omega(double qx, double qy) const
   {
-    return std::sqrt(omega0 * omega0 + C * C * qx * qx + C * C * qy * qy);
+    return std::sqrt(omega0 * omega0 + C * C * (qx * qx + qy * qy));
   }
 
   double action(double omega, double qx, double qy) const

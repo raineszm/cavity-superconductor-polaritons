@@ -15,7 +15,8 @@
         "chrono": "cpp",
         "limits": "cpp",
         "ratio": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "*.ipp": "cpp"
     },
     "python.pythonPath": "/Users/raineszm/anaconda3/bin/python"
 }

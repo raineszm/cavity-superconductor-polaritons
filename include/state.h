@@ -28,13 +28,13 @@ public:
       return State(sys, T, 0.);
     }
     boost::uintmax_t max = 1e5;
-    auto [a, b] =
-      bracket_and_solve_root([sys, T](double x) { return sys.gap_eq(T, x); },
-                             sys.Tc,
-                             2.,
-                             false,
-                             [](double a, double b) { return b - a < 1e-5; },
-                             max);
+    auto [a, b] = bracket_and_solve_root(
+      [sys, T](double x) { return sys.gap_eq(T, x); },
+      sys.Tc,
+      2.,
+      false,
+      [sys](double a, double b) { return b - a < 1e-4 * sys.Tc; },
+      max);
 
     return State(sys, T, (a + b) / 2);
   }

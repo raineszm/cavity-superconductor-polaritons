@@ -1,7 +1,8 @@
 from units import ureg, Q_
 
+# Atomic units in meV
 NIOBIUM = dict(  # meV
-    Tc=.816,
-    mu=5000,
-    m=1.6*0.511*1e8
+    Tc=Q_(9.5, 'kelvin').to('meV', 'boltzmann').magnitude,
+    mu=Q_(6.18e4, 'kelvin').to('meV', 'boltzmann').magnitude,
+    m=1.6  # bare electron mass
 )

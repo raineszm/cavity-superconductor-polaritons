@@ -25,20 +25,14 @@ public:
     return 0;
   }
 };
-template<class F>
-double
-integrate(const Integrand<F>& i)
-{
-  auto [result, err] = rzmcmt::integrate<2, 1>(i);
-  return result[0] / (4 * M_PI * M_PI);
-}
 
 template<class F>
 double
 integrate(const F& f)
 {
   auto i = Integrand(f);
-  return integrate(i);
+  auto [result, err] = rzmcmt::integrate<2, 1>(i);
+  return result[0] / (4 * M_PI * M_PI);
 }
 
 template<class F>
