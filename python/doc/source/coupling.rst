@@ -1,0 +1,4 @@
+Coupling
+=========
+
+.. autodoxygenfile:: coupling.h

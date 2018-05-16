@@ -4,29 +4,41 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "taskName": "ninja",
+            "label": "ninja",
             "type": "process",
             "command": "ninja",
             "options": {
-                "cwd": "${workspaceRoot}/build"
+                "cwd": "${workspaceFolder}/build"
             },
-            "group":{
+            "group": {
                 "kind": "build",
                 "isDefault": true
             }
-
         },
         {
-            "taskName": "pytest",
+            "label": "pytest",
             "type": "process",
             "command": "py.test",
             "options": {
-                "cwd": "${workspaceRoot}/python"
+                "cwd": "${workspaceFolder}/python"
             },
             "group": {
                 "kind": "test",
                 "isDefault": true
             }
+        },
+        {
+            "label": "sphinx",
+            "type": "process",
+            "command": "make",
+            "args": [
+                "html"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/python/doc"
+            },
+            "group": "build",
+            "problemMatcher": []
         }
     ]
 }

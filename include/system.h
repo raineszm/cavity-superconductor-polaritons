@@ -4,6 +4,9 @@
 #include "utils.h"
 #include <cmath>
 
+//! The material properties of the system
+
+//! This class is the first instantiated in any code.
 class System
 {
 public:
@@ -50,7 +53,7 @@ public:
     return drift_theta(std::hypot(kx, ky), std::atan2(ky, kx));
   }
 
-  //! The Doppler shift term \f[\mathbf{v}_s \cdot \mathbf{k}\f]
+  //! The Doppler shift term \f$\mathbf{v}_s \cdot \mathbf{k}\f$
   double drift_theta(double k, double theta) const
   {
     return vs * k * std::cos(theta - theta_v);

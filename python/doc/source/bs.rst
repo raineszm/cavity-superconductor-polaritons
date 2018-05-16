@@ -1,0 +1,4 @@
+BS
+===
+
+.. autodoxygenfile:: bs.h

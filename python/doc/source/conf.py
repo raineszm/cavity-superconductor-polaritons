@@ -35,7 +35,9 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.imgmath',
               'breathe']
 
-breathe_projects = {"bardasis_schrieffer": "../xml/"}
+# breathe_projects = {"bardasis_schrieffer": "../xml/"}
+breathe_projects_source = {
+    "bardasis_schrieffer": ("../../../include", ['system.h', 'bs.h', 'coupling.h', 'cavity.h'])}
 
 breathe_default_project = "bardasis_schrieffer"
 

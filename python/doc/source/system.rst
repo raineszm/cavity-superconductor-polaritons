@@ -1,4 +1,4 @@
 System
 =======
 
-.. doxygenfile:: system.h
+.. autodoxygenfile:: system.h
