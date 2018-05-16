@@ -52,7 +52,7 @@ public:
   double gap_eq(double T, double delta) const
   {
     return 2 * m / M_PI *
-           xi_integrate(
+           gsl_xi_integrate(
              [this, delta, T](double x, double theta) {
                return gap_eq_int(x, theta, T, delta);
              },

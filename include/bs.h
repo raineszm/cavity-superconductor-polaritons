@@ -35,9 +35,9 @@ public:
   double action(double omega) const
   {
     return mass + 2 * state.sys.m / M_PI *
-                    xi_integrate(
+                    gsl_xi_integrate(
                       [this, omega](double l, double theta) {
-                        return action_int(l, theta, omega) * 1 /
+                        return action_int(l, theta, omega) /
                                std::sqrt(l * l - state.delta * state.delta);
                       },
                       state.delta);

@@ -1,5 +1,8 @@
 #pragma once
 
+#include <memory>
+
+#include <gsl/gsl_integration.h>
 #include <rzmcmt/integrate.h>
 
 template<class F>
@@ -35,33 +38,78 @@ integrate(const F& f)
   return result[0] / (4 * M_PI * M_PI);
 }
 
-template<class F>
-class AngularIntegrand
+using workspace = std::unique_ptr<gsl_integration_workspace,
+                                  decltype(&gsl_integration_workspace_free)>;
+
+class IntegrationWorkspace
 {
-  const F _f;
+  workspace wsp;
 
 public:
-  explicit AngularIntegrand(const F& f)
-    : _f(f)
+  IntegrationWorkspace(const size_t n = 1000)
+    : wsp(gsl_integration_workspace_alloc(n), &gsl_integration_workspace_free)
   {}
 
-  int operator()(double v[1], const double t[2]) const
-  {
-    auto x = (1 - t[0]) / t[0];
-    auto jac = 1 / (t[0] * t[0]);
-    auto theta = 2 * M_PI * t[1];
-    v[0] = _f(x, theta) * x * jac;
-    return 0;
-  }
+  operator gsl_integration_workspace*() { return wsp.get(); }
 };
 
-template<class F>
-double
-angular_integrate(const F& f)
+// Build gsl_function from lambda
+template<typename F>
+class gsl_function_pp : public gsl_function
 {
-  auto i = AngularIntegrand(f);
-  auto [result, err] = rzmcmt::integrate<2, 1>(i);
-  return result[0] / (2 * M_PI);
+  const F func;
+  static double invoke(double x, void* params)
+  {
+    return static_cast<gsl_function_pp*>(params)->func(x);
+  }
+
+public:
+  gsl_function_pp(const F& f)
+    : func(f)
+  {
+    function = &gsl_function_pp::invoke; // inherited from gsl_function
+    params = this;                       // inherited from gsl_function
+  }
+  operator gsl_function*() { return this; }
+};
+
+// Helper function for template construction
+template<typename F>
+gsl_function_pp<F>
+make_gsl_function(const F& func)
+{
+  return gsl_function_pp<F>(func);
+}
+
+template<typename F>
+double
+gsl_xi_integrate(const F& f, double a)
+{
+  double result, abserr, inner_result, inner_abserr;
+
+  const size_t limit = 1000;
+
+  IntegrationWorkspace wsp1(limit);
+  IntegrationWorkspace wsp2(limit);
+
+  auto outer = make_gsl_function([&](double x) {
+    auto inner = make_gsl_function([&](double theta) { return f(x, theta); });
+    gsl_integration_qag(inner,
+                        0,
+                        2 * M_PI,
+                        EPSABS,
+                        EPSREL,
+                        limit,
+                        GSL_INTEG_GAUSS21,
+                        wsp1,
+                        &inner_result,
+                        &inner_abserr);
+    return inner_result / (2 * M_PI);
+  });
+  gsl_integration_qagiu(
+    outer, a, EPSABS, EPSREL, limit, wsp2, &result, &abserr);
+
+  return result;
 }
 
 template<class F>

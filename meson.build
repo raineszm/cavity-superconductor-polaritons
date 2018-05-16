@@ -12,6 +12,7 @@ m_dep = cc.find_library('m', required : false)
 eigen = dependency('eigen3')
 nlopt = dependency('nlopt')
 boost = dependency('boost', modules : ['math'])
+gsl = dependency('gsl')
 
 rzmcmtproj = subproject('rzmcmt')
 rzmcmt = rzmcmtproj.get_variable('rzmcmt')
@@ -37,7 +38,8 @@ deps = [
     #fmt,
     nlopt,
     boost,
-    eigen
+    eigen,
+    gsl
     ]
 
 py3.extension_module('bardasis_schrieffer',
