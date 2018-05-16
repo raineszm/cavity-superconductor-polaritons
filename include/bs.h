@@ -46,6 +46,9 @@ public:
    * \Delta^2}} \int_0^{2\pi}\frac{d\theta}{2\pi} f(\lambda, \theta,
    * \omega^2)\f] In particular we group the factor of the quasiparticle density
    * of states into the integrand.
+   * \verbatim embed:rst:leading-asterisk
+   * For more on the :math:`\xi` approx see :ref:`xi-approx`
+   * \endverbatim
    *
    * \sa action()
    */
