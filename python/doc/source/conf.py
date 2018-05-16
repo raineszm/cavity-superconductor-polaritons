@@ -37,7 +37,7 @@ extensions = ['sphinx.ext.autodoc',
 
 # breathe_projects = {"bardasis_schrieffer": "../xml/"}
 breathe_projects_source = {
-    "bardasis_schrieffer": ("../../../include", ['system.h', 'bs.h', 'coupling.h', 'cavity.h'])}
+    "bardasis_schrieffer": ("../../../include", ['system.h', 'bs.h', 'coupling.h', 'cavity.h', 'state.h'])}
 
 breathe_default_project = "bardasis_schrieffer"
 

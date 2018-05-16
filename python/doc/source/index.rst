@@ -6,11 +6,14 @@
 Welcome to Bardasis Schrieffer Polaritons's documentation!
 ==========================================================
 
+Calculations performed using `atomic units <https://en.wikipedia.org/wiki/Atomic_units>`_ with the energy unit as `meV` instead of `Hartrees`.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    system
+   state
    bs
    cavity
    coupling

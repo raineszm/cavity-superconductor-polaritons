@@ -6,12 +6,13 @@
 
 using boost::math::tools::bracket_and_solve_root;
 
+//! Mean Field solution
 class State
 {
 public:
-  //! Temperature
+  //! Temperature of the State we are describing
   double T;
-  //! associated system
+  //! Associated System object
   const System sys;
   //! Order parameter
   double delta;
@@ -22,6 +23,9 @@ public:
     , delta(D)
   {}
 
+  //! Solve the mean field problem for System sys at temperature \f$T\f$
+
+  //! This includes the effects of the superfluid velocity \f$v_s\f$
   inline static State solve(const System& sys, double T)
   {
     if (T >= sys.Tc) {
@@ -39,6 +43,18 @@ public:
     return State(sys, T, (a + b) / 2);
   }
 
+  /** @name Coherence functions
+
+    These methods evaluate the products of the coherence functions
+    \f[
+    l = u u' + v v'\\
+    m = u v' + v u'\\
+    n = u u' - v v'\\
+    p = u v' - v u'
+    \f]
+
+    @{
+  */
   double l2(double x1, double x2) const
   {
     auto l1 = std::hypot(x1, delta);
@@ -86,4 +102,6 @@ public:
 
     return 0.5 * (x1 / l1 - x2 / l2);
   }
+
+  //! @}
 };
