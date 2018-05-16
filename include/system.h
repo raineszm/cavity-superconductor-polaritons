@@ -42,7 +42,7 @@ public:
   double kf() const { return std::sqrt(2 * m * mu); }
   //! The Fermi velocity
   double vf() const { return kf() / m; }
-  //! The density of states per spin in 2D
+  //! The density of states per spin in 2D \f[\nu=\frac{m}{2\pi}\f]
   double dos() const { return m / (2 * M_PI); }
 
   double drift(double kx, double ky) const
@@ -56,6 +56,12 @@ public:
     return vs * k * std::cos(theta - theta_v);
   }
 
+  /** The gap equation for the s-wave state written in the form
+  \f[2\nu \int_0^\infty d\xi \left(\left[
+  \int \frac{d\theta}{2\pi} \frac{\tanh\frac{v_s \cdot k + E}{2T} -
+  \tanh\frac{v_s \cdot k - E}{2T}}{4E} \right] -
+  \frac{\tanh\frac{\xi}{2T_c}}{2\xi}\right)\f]
+  */
   double gap_eq(double T, double delta) const
   {
     return 2 * dos() *
@@ -66,6 +72,7 @@ public:
              0.);
   }
 
+  //! The integrand of the gap equation
   double gap_eq_int(double x, double theta, double T, double delta) const
   {
 
