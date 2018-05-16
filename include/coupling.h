@@ -14,9 +14,13 @@ angular(double theta, int i)
   }
 }
 
+//! The coupling between the Superconductor and Cavity
 class Coupling
 {
 public:
+  //! The associated mean field state
+
+  //! This also holds the related System
   const State state;
 
   explicit Coupling(const State& state_)
@@ -36,6 +40,17 @@ public:
             std::sqrt(l * l - state.delta * state.delta));
   }
 
+  /** The coupling between the Bardasis Schrieffer mode and photons
+   *
+   * This enters the action
+   *  \f[ i\sum_q g_q \left(A^\parallel_q \ \bar{d}_{\perp,q} -
+   * A^{\parallel\ast}_q \ d_{\perp,q}\right)\f]
+   * with
+   * \f[
+   *  g_q = -e v_s \Omega\Delta \sum_{\vec{k}}
+   * \frac{n_F(E^-_\mathbf{k})-n_F(E^+_\mathbf{k}) }{(\Omega + i0^+)^2 -
+   * (2\lambda_k)^2}\frac{f_d(\mathbf{k})}{\lambda_k} \f]
+   */
   double ImDA(double omega) const
   {
     return 2 * omega * state.delta * state.sys.m * GPAR * state.sys.dos() *
