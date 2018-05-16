@@ -31,19 +31,26 @@ public:
     return (kx * kx + ky * ky) / (2 * m) - mu + 0.5 * m * vs * vs;
   }
 
+  //! The "bare" energy plus the superfluid term
+  //! \f[\xi_{\mathbf k} = \frac{k^2}{2m} - \mu + \frac{1}{2} m v_s^2\f]
   double xi_k(double k) const
   {
     return k * k / (2 * m) - mu + 0.5 * m * vs * vs;
   }
 
+  //! The Fermi momentum
   double kf() const { return std::sqrt(2 * m * mu); }
+  //! The Fermi velocity
   double vf() const { return kf() / m; }
+  //! The density of states per spin in 2D
+  double dos() const { return m / (2 * M_PI); }
 
   double drift(double kx, double ky) const
   {
     return drift_theta(std::hypot(kx, ky), std::atan2(ky, kx));
   }
 
+  //! The Doppler shift term \f[\mathbf{v}_s \cdot \mathbf{k}\f]
   double drift_theta(double k, double theta) const
   {
     return vs * k * std::cos(theta - theta_v);
@@ -51,7 +58,7 @@ public:
 
   double gap_eq(double T, double delta) const
   {
-    return 2 * m / M_PI *
+    return 2 * dos() *
            gsl_xi_integrate(
              [this, delta, T](double x, double theta) {
                return gap_eq_int(x, theta, T, delta);

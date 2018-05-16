@@ -7,7 +7,8 @@
 const double EPSABS = 1e-8;
 const double EPSREL = 1e-5;
 
-using workspace = class IntegrationWorkspace
+// https://stackoverflow.com/a/43636411/267610
+class IntegrationWorkspace
 {
   std::unique_ptr<gsl_integration_workspace,
                   decltype(&gsl_integration_workspace_free)>

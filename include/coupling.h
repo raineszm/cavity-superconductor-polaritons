@@ -38,7 +38,7 @@ public:
 
   double ImDA(double omega) const
   {
-    return state.delta * omega / M_PI *
+    return 2 * omega * state.delta * state.sys.m * GPAR * state.sys.dos() *
            gsl_xi_integrate(
              [this, omega](double l, double theta) {
                return ImDA_int(l, theta, omega);
@@ -101,7 +101,7 @@ public:
 
   double photon_se(double omega, double qx, double qy, int i, int j) const
   {
-    return state.sys.m / M_PI * GPAR * GPAR *
+    return 2 * state.sys.dos() * GPAR * GPAR *
            gsl_xi_integrate(
              [this, omega, qx, qy, i, j](double x, double theta) {
                auto k = std::sqrt(2 * state.sys.m * x);

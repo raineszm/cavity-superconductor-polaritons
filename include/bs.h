@@ -34,7 +34,7 @@ public:
 
   double action(double omega) const
   {
-    return mass + 2 * state.sys.m / M_PI *
+    return mass + 2 * state.sys.dos() *
                     gsl_xi_integrate(
                       [this, omega](double l, double theta) {
                         return action_int(l, theta, omega) /

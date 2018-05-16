@@ -44,3 +44,7 @@ py3.extension_module('bardasis_schrieffer',
     install : true,
     install_dir : join_paths(meson.build_root(), '..', 'python', 'lib'),
     cpp_args : '-DDOCTEST_CONFIG_DISABLE')
+
+subdir('include')
+cdata = configuration_data()
+subdir('doc')

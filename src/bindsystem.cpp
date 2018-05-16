@@ -31,6 +31,7 @@ bind_system(py::module& m)
     .def("drift_theta", &System::drift_theta)
     .def_property_readonly("kf", &System::kf)
     .def_property_readonly("vf", &System::vf)
+    .def_property_readonly("dos", &System::dos)
     // Pickle
     .def(py::pickle(
       [](const System& sys) {
