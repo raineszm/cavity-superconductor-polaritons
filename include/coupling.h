@@ -23,28 +23,31 @@ class Coupling
 public:
   const State state;
 
-  explicit Coupling(const State& state_) : state(state_) {}
+  explicit Coupling(const State& state_)
+    : state(state_)
+  {}
 
-  double ImDA_int(double k, double theta, double omega) const
+  double ImDA_int(double l, double theta, double omega) const
   {
     double fd = std::sqrt(2) * std::cos(2 * theta);
-    auto kx = k * std::cos(theta);
-    auto ky = k * std::sin(theta);
-    double x = state.sys.xi(kx, ky);
+    double drift = state.sys.drift_theta(state.sys.kf(), theta);
+    double Ep = drift + l;
+    double Em = drift - l;
 
-    double l = std::hypot(x, state.delta);
-    double drift = state.sys.drift(kx, ky);
-
-    return fd * (nf(drift - l, state.T) - nf(drift + l, state.T)) /
-           ((omega * omega - 4 * l * l) * l);
+    return fd *
+           (std::tanh(Ep / (2 * state.T)) - std::tanh(Em / (2 * state.T))) /
+           ((omega * omega - 4 * l * l) *
+            std::sqrt(l * l - state.delta * state.delta));
   }
 
   double ImDA(double omega) const
   {
-    return state.delta * omega / state.sys.m *
-           angular_integrate([this, omega](double k, double theta) {
-             return ImDA_int(k, theta, omega);
-           });
+    return state.delta * omega / M_PI *
+           xi_integrate(
+             [this, omega](double l, double theta) {
+               return ImDA_int(l, theta, omega);
+             },
+             state.delta);
   }
 
   double pi0(double E1, double E2, double omega) const
@@ -100,9 +103,13 @@ public:
 
   double photon_se(double omega, double qx, double qy, int i, int j) const
   {
-    return 0.5 * GPAR * GPAR *
-           integrate([this, omega, qx, qy, i, j](double kx, double ky) {
-             return photon_se_int(kx, ky, omega, qx, qy, i, j);
-           });
+    return state.sys.m / M_PI * GPAR * GPAR *
+           xi_integrate(
+             [this, omega, qx, qy, i, j](double x, double theta) {
+               auto k = std::sqrt(2 * state.sys.m * x);
+               return photon_se_int(
+                 k * std::cos(theta), k * std::sin(theta), omega, qx, qy, i, j);
+             },
+             0);
   }
 };

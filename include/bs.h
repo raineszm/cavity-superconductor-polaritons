@@ -29,15 +29,15 @@ public:
     double F1 =
       (std::tanh(Ep / (2 * state.T)) - std::tanh(Em / (2 * state.T))) /
       (omega * omega - 4 * l * l);
-    return F1 * (omega * omega / (2 * l) + 2 * l * std::cos(4 * theta));
+    return F1 * (omega * omega / 2 + 2 * l * l * std::cos(4 * theta));
   }
 
   double action(double omega) const
   {
-    return mass + 2 * state.sys.m * M_PI *
+    return mass + 2 * state.sys.m / M_PI *
                     xi_integrate(
                       [this, omega](double l, double theta) {
-                        return action_int(l, theta, omega) * l /
+                        return action_int(l, theta, omega) * 1 /
                                std::sqrt(l * l - state.delta * state.delta);
                       },
                       state.delta);

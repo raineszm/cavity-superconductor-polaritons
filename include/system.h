@@ -51,17 +51,19 @@ public:
 
   double gap_eq(double T, double delta) const
   {
-    return angular_integrate([this, delta, T](double k, double theta) {
-      return gap_eq_int(k, theta, T, delta);
-    });
+    return 2 * m / M_PI *
+           xi_integrate(
+             [this, delta, T](double x, double theta) {
+               return gap_eq_int(x, theta, T, delta);
+             },
+             0.);
   }
 
-  double gap_eq_int(double k, double theta, double T, double delta) const
+  double gap_eq_int(double x, double theta, double T, double delta) const
   {
 
-    double x = xi_k(k);
     double l = std::hypot(x, delta);
-    double d = drift_theta(k, theta);
+    double d = drift_theta(kf(), theta);
     return c(l, d, T) - tanh_over(x, Tc) / 2;
   }
 };

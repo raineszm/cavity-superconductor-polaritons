@@ -19,5 +19,7 @@ bind_coupling(py::module& m)
     .def_readonly("state", &Coupling::state)
     // Functions
     .def("ImDA", &Coupling::ImDA)
-    .def("photon_se", &Coupling::photon_se);
+    .def("ImDA_int", &Coupling::ImDA_int)
+    .def("photon_se", &Coupling::photon_se)
+    .def("photon_se_int", &Coupling::photon_se_int);
 }
