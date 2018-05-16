@@ -1,12 +1,8 @@
 #pragma once
 #include <cmath>
 
-#include <rzmcmt/fermi.h>
-
 #include "cavity.h"
 #include "state.h"
-
-using rzmcmt::nf;
 
 inline double
 angular(double theta, int i)
@@ -52,7 +48,9 @@ public:
 
   double pi0(double E1, double E2, double omega) const
   {
-    return 0.5 * (nf(E2, state.T) - nf(E1, state.T)) / (omega - E1 + E2);
+    return 0.25 *
+           (std::tanh(E1 / (2 * state.T)) - std::tanh(E2 / (2 * state.T))) /
+           (omega - E1 + E2);
   }
 
   double photon_se_int(double kx,

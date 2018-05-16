@@ -14,9 +14,6 @@ nlopt = dependency('nlopt')
 boost = dependency('boost', modules : ['math'])
 gsl = dependency('gsl')
 
-rzmcmtproj = subproject('rzmcmt')
-rzmcmt = rzmcmtproj.get_variable('rzmcmt')
-
 #pybind11 stuff
 py3 = import('python3')
 pybind_dirs = run_command('python', '-c',
@@ -34,8 +31,6 @@ subdir('src')
 
 deps = [
     m_dep,
-    rzmcmt,
-    #fmt,
     nlopt,
     boost,
     eigen,

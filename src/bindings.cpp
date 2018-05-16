@@ -3,7 +3,6 @@
 /* #include <pybind11/eigen.h> */
 #include <pybind11/pybind11.h>
 
-#include "cuba.h"
 #include <cmath>
 
 namespace py = pybind11;
@@ -24,10 +23,6 @@ bind_cavity(py::module&);
 
 PYBIND11_MODULE(bardasis_schrieffer, m)
 {
-  // Disable forking in cuba
-  // This causes hangs when interfacing with python
-  cubacores(0, 0);
-
   m.doc() =
     "Calculate the hybridization of photons and Bardasis-Schrieffer modes";
 
