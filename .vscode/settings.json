@@ -17,7 +17,8 @@
         "ratio": "cpp",
         "valarray": "cpp",
         "*.ipp": "cpp",
-        "__locale": "cpp"
+        "__locale": "cpp",
+        "__functional_base": "cpp"
     },
     "python.pythonPath": "/Users/raineszm/anaconda3/bin/python"
 }

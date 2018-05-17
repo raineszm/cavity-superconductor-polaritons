@@ -43,7 +43,8 @@ public:
     return State(sys, T, (a + b) / 2);
   }
 
-  /** @name Coherence functions
+  /**
+   * @name Coherence functions
 
     These methods evaluate the products of the coherence functions
     \f[
