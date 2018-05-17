@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include <cmath>
 
 #include "cavity.h"
@@ -108,6 +109,28 @@ public:
            (omega - E1 + E2);
   }
 
+  /**
+   * The traces of pi0() with the pauli matrices.
+   * Specifically we return
+   * \f[\{\operatorname{tr}\pi_0\tau_0, \operatorname{tr}\pi_0\tau_1,
+   * -i\operatorname{tr}\pi_0\tau_2, \operatorname{tr}\pi_0\tau_3\}\f]
+   *
+   * \sa pi0(), photon_se()
+   */
+  std::array<double, 4> pi0_elems(double d1,
+                                  double d2,
+                                  double l1,
+                                  double l2,
+                                  double omega) const
+  {
+    auto p00 = pi0(d1 + l1, d1 + l2, omega);
+    auto p01 = pi0(d1 + l1, d1 - l2, omega);
+    auto p10 = pi0(d1 - l1, d1 + l2, omega);
+    auto p11 = pi0(d1 - l1, d1 - l2, omega);
+
+    return { { p00 + p11, p01 + p10, p01 - p10, p00 - p11 } };
+  }
+
   /** The photon self-energy due to renormalization by the s-wave state
    *
    * This term can be written in the form
@@ -136,18 +159,28 @@ public:
                        int i,
                        int j) const
   {
-    auto kpx = kx + qx / 2;
-    auto kpy = ky + qy / 2;
-    auto kmx = kx - qx / 2;
-    auto kmy = ky - qy / 2;
+    auto xp = state.sys.xi(kx + qx / 2, ky + qy / 2);
+    auto xm = state.sys.xi(kx - qx / 2, ky - qy / 2);
 
-    auto x1 = state.sys.xi(kpx, kpy);
-    auto x2 = state.sys.xi(kmx, kmy);
-
-    auto ki = i == 0 ? kx : ky;
-    auto kj = j == 0 ? kx : ky;
+    auto vi = (i == 0 ? kx : ky) / state.sys.m;
+    auto vj = (j == 0 ? kx : ky) / state.sys.m;
     auto vsi = state.sys.vs * angular(state.sys.theta_v, i);
     auto vsj = state.sys.vs * angular(state.sys.theta_v, j);
+
+    auto T0 = state.l2(xp, xm) * vi * vj + state.n2(xp, xm) * vsi * vsj;
+    auto T1 = state.p2(xp, xm) * vi * vj + state.m2(xp, xm) * vsi * vsj;
+    auto iT2 = state.mp(xp, xm) * (vsi * vj + vi * vsj);
+    auto T3 = state.ln(xp, xm) * (vsi * vj + vi * vsj);
+
+    auto lp = std::hypot(xp, state.delta);
+    auto lm = std::hypot(xm, state.delta);
+
+    auto dp = state.sys.drift(kx + qx / 2, ky + qy / 2);
+    auto dm = state.sys.drift(kx - qx / 2, ky - qy / 2);
+
+    auto pl = pi0_elems(dp, dm, lp, lm, omega);
+
+    return T0 * pl[0] + T1 * pl[1] + iT2 * pl[2] + T3 * pl[3];
   }
 
   /** Evaluates the photon self-energy
@@ -184,6 +217,7 @@ public:
    */
   double photon_se(double omega, double qx, double qy, int i, int j) const
   {
+    // TODO: Diamagnetic term
     return 0.5 * state.sys.dos() * GPAR * GPAR *
            gsl_xi_integrate(
              [this, omega, qx, qy, i, j](double x, double theta) {
