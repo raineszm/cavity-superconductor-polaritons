@@ -1,0 +1,4 @@
+Polariton
+=========
+
+.. autodoxygenfile:: polariton.h
