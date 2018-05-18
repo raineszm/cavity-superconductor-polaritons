@@ -16,6 +16,18 @@
             }
         },
         {
+            "label": "install",
+            "type": "process",
+            "command": "ninja",
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
+            "args": [
+                "install"
+            ],
+            "group": "build"
+        },
+        {
             "label": "pytest",
             "type": "process",
             "command": "py.test",

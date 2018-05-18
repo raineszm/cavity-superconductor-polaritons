@@ -33,9 +33,10 @@ public:
   //! The Lagrangian of the photon modes
 
   //! \f[\mathcal{L} = \omega^2 - \omega_0^2 - c^2q^2\f]
-  //! gives rise to action \f$S = \int A_q\mathcal{L} A_{-q}\f$
+  //! gives rise to action \f$S = \frac{1}{8\pi c^2}\int A_q\mathcal{L}
+  //! A_{-q}\f$
   double action(double omega, double qx, double qy) const
   {
-    return omega * omega - this->omega(qx, qy);
+    return (omega * omega - this->omega(qx, qy)) / (8 * M_PI * C * C);
   }
 };

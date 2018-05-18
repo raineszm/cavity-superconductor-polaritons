@@ -5,10 +5,11 @@
 #include <boost/math/tools/roots.hpp>
 #include <cmath>
 #include <complex>
+#include <gsl/gsl_poly.h>
 
 using boost::math::tools::toms748_solve;
 using Eigen::Matrix3cd;
-using Eigen::Vector3cd;
+using Eigen::Vector3d;
 
 #include "bs.h"
 #include "cavity.h"
@@ -73,9 +74,9 @@ public:
 
   /** The eigenvalues of action()
    */
-  Vector3cd eigval(double omega, double qx, double qy) const
+  Vector3d eigval(double omega, double qx, double qy) const
   {
-    return action(omega, qx, qy).eigenvalues();
+    return action(omega, qx, qy).selfadjointView<Eigen::Upper>().eigenvalues();
   }
 
   /** Find a zero of action()
