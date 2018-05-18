@@ -5,16 +5,6 @@
 #include "cavity.h"
 #include "state.h"
 
-inline double
-angular(double theta, int i)
-{
-  if (i == 0) {
-    return std::cos(theta);
-  } else {
-    return std::sin(theta);
-  }
-}
-
 //! The coupling between the Superconductor and Cavity
 class Coupling
 {
@@ -131,6 +121,27 @@ public:
     return { { p00 + p11, p01 + p10, p01 - p10, p00 - p11 } };
   }
 
+  double vs_comp(double i) const
+  {
+    assert(i < 2 and i >= 0);
+    if (i == 0) {
+      return state.sys.vs;
+    } else {
+      return 0.;
+    }
+  }
+  double v_comp(double kx, double ky, double i) const
+  {
+    assert(i < 2 and i >= 0);
+    auto v = std::hypot(kx, ky) / state.sys.m;
+    auto theta = std::atan2(ky, kx);
+    if (i == 0) {
+      return v * std::cos(theta - state.sys.theta_v);
+    } else {
+      return v * std::sin(theta - state.sys.theta_v);
+    }
+  }
+
   /** The photon self-energy due to renormalization by the s-wave state
    *
    * This term can be written in the form
@@ -149,7 +160,27 @@ public:
    * T^{ij}_3 = \ell_\mathbf{k,q}n_\mathbf{k,q}\left(v_s^i v^j +
    * v^i v_s^j\right) \f]
    *
-   * \sa State::, photon_se()
+   * For covenience we take the the components \f$i=\{0,1\}\f$ and be along and
+   * perpendicular to \f$\mathbf{v}_s\f$ respectively. Specifically, if
+   * \f$\theta_s\f$ is the angle that \f$\mathbf{v}_s\f$ makes with the
+   * \f$x\f$-axis, we define the new photon operators \f[ \begin{pmatrix}
+   * A_\parallel\\
+   * A_\perp
+   * \end{pmatrix}
+   * = \hat{R}(\theta_s)
+   * \begin{pmatrix}
+   * A_x\\
+   * A_y
+   * \end{pmatrix}
+   * \f]
+   * where \f$\hat{R}\f$ is a rotation matrix.
+   * This induces the transformation \f$\mathbf{v} \to
+   * R^{-1}(\theta_s)\mathbf{v}\f$ on the velocities. Concretely then \f[
+   * \mathbf{v}_s &\to (v_s, 0)^T\\
+   * \mathbf{v} &\to \frac{k}{m} (\cos(\theta - \theta_s),
+   * \sin(\theta-\theta_s))^T \f]
+   *
+   * \sa State::, photon_se(), Polarition::action_int()
    */
   double photon_se_int(double kx,
                        double ky,
@@ -162,10 +193,10 @@ public:
     auto xp = state.sys.xi(kx + qx / 2, ky + qy / 2);
     auto xm = state.sys.xi(kx - qx / 2, ky - qy / 2);
 
-    auto vi = (i == 0 ? kx : ky) / state.sys.m;
-    auto vj = (j == 0 ? kx : ky) / state.sys.m;
-    auto vsi = state.sys.vs * angular(state.sys.theta_v, i);
-    auto vsj = state.sys.vs * angular(state.sys.theta_v, j);
+    auto vi = v_comp(kx, ky, i);
+    auto vj = v_comp(kx, ky, j);
+    auto vsi = vs_comp(i);
+    auto vsj = vs_comp(j);
 
     auto T0 = state.l2(xp, xm) * vi * vj + state.n2(xp, xm) * vsi * vsj;
     auto T1 = state.p2(xp, xm) * vi * vj + state.m2(xp, xm) * vsi * vsj;
@@ -218,35 +249,40 @@ public:
    */
   double photon_se(double omega, double qx, double qy, int i, int j) const
   {
-    return 0.5 * GPAR * GPAR *
-           (state.sys.n() / state.sys.m // Diamagnetic term
-            + state.sys.dos() *
-                gsl_xi_integrate(
-                  [this, omega, qx, qy, i, j](double x, double theta) {
-                    auto k1 = std::sqrt(
-                      2 * state.sys.m *
+    auto ret =
+      state.sys.dos() *
+      gsl_xi_integrate(
+        [this, omega, qx, qy, i, j](double x, double theta) {
+          auto k1 =
+            std::sqrt(2 * state.sys.m *
                       (x + state.sys.mu -
                        0.5 * state.sys.m * state.sys.vs * state.sys.vs));
-                    auto k2 = std::sqrt(
-                      2 * state.sys.m *
+          auto k2 =
+            std::sqrt(2 * state.sys.m *
                       (-x + state.sys.mu -
                        0.5 * state.sys.m * state.sys.vs * state.sys.vs));
-                    return photon_se_int(k1 * std::cos(theta),
-                                         k1 * std::sin(theta),
-                                         omega,
-                                         qx,
-                                         qy,
-                                         i,
-                                         j) +
-                           photon_se_int(k2 * std::cos(theta),
-                                         k2 * std::sin(theta),
-                                         omega,
-                                         qx,
-                                         qy,
-                                         i,
-                                         j);
-                    ;
-                  },
-                  0));
+          return photon_se_int(k1 * std::cos(theta),
+                               k1 * std::sin(theta),
+                               omega,
+                               qx,
+                               qy,
+                               i,
+                               j) +
+                 photon_se_int(k2 * std::cos(theta),
+                               k2 * std::sin(theta),
+                               omega,
+                               qx,
+                               qy,
+                               i,
+                               j);
+          ;
+        },
+        0);
+
+    if (i == j) {
+      ret += state.sys.n() / state.sys.m; // Diamagnetic term
+    }
+
+    return 0.5 * GPAR * GPAR * ret;
   }
 };

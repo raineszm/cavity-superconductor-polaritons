@@ -36,38 +36,39 @@ public:
    * \f[
    * S_\text{pol} = \sum_q
    * \begin{pmatrix}
-   * d_\perp(-q)& A^x(-q)& A^y(-q)
+   * d_\perp(-q)& A_\parallel(-q)& A_\perp(-q)
    * \end{pmatrix}
    * \begin{pmatrix}
-   * S^{-1}(\Omega)&ig^x(\Omega)&ig^y(\Omega)\\
-   * -ig^x(\Omega)& D_0^{-1}(q) - \Pi^{00}(q)& -\Pi^{01}(q)\\
-   * -ig^y(\Omega)& -\Pi^{10}(q)& D_0^{-1}(q) - \Pi^{11}(q)
-   * \end{pmatrix}
-   * \begin{pmatrix}
-   * d_\perp(q)\\ A^x(q)\\ A^y(q)
-   * \end{pmatrix}
-   * \f]
-   * This method calculates the central matrix of the above.
-   * Here \f$D^{-1}\f$ is the bare cavity inverse GF and \f$S^{-1}\f$ is the BS
-   * inverse GF.
+   * S^{-1}(\Omega)&ig(\Omega)&0\\
+   * -ig(\Omega)& D_0^{-1}(q) - \Pi_{\parallel,\parallel}(q)&
+   * -\Pi^{\parallel,\perp}(q)\\ 0 & -\Pi^{\perp,\parallel}(q)& D_0^{-1}(q) -
+   * \Pi^{\perp,\perp}(q) \end{pmatrix} \begin{pmatrix} d_\perp(q)\\
+   * A_\parallel(q)\\ A_\perp(q) \end{pmatrix} \f] This method calculates the
+   * central matrix of the above. Here \f$D^{-1}\f$ is the bare cavity inverse
+   * GF and \f$S^{-1}\f$ is the BS inverse GF.
+   * \f$A_\parallel\f$ and \f$A_\perp\f$ are the components of \f$\mathbf{A}\f$
+   * parallel and perpendicular to the supercurrent.
    *
    * \sa Coupling::ImDA(), Coupling::photon_se(), BS::action(),
    * Cavity::action();
    */
   Matrix3cd action(double omega, double qx, double qy) const
   {
-    Matrix3cd mat;
     std::complex<double> c(0., coupling.ImDA(omega));
-    auto cs = std::cos(coupling.state.sys.theta_v);
-    auto sn = std::sin(coupling.state.sys.theta_v);
     auto se00 = coupling.photon_se(omega, qx, qy, 0, 0);
     auto se01 = coupling.photon_se(omega, qx, qy, 0, 1);
     auto se10 = coupling.photon_se(omega, qx, qy, 1, 0);
     auto se11 = coupling.photon_se(omega, qx, qy, 1, 1);
-    mat << bs.action(omega), c * cs, c * sn, -c * cs,
-      cav.action(omega, qx, qy) + se00, se01, -c * sn, se10,
-      cav.action(omega, qx, qy) + se11;
-    return mat;
+    return (Matrix3cd() << bs.action(omega),
+            c,
+            0,
+            -c,
+            cav.action(omega, qx, qy) + se00,
+            se01,
+            0,
+            se10,
+            cav.action(omega, qx, qy) + se11)
+      .finished();
   }
 
   /** The eigenvalues of action()
