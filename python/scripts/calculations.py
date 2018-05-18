@@ -5,7 +5,7 @@ import click
 import path_helper
 
 
-@click.group()
+@click.command()
 def main():
     pass
 

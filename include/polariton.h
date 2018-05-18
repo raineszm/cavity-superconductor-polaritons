@@ -72,7 +72,7 @@ public:
 
   /** The eigenvalues of action()
    */
-  Vector3cd eigen(double omega, double qx, double qy) const
+  Vector3cd eigval(double omega, double qx, double qy) const
   {
     return action(omega, qx, qy).eigenvalues();
   }

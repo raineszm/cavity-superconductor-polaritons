@@ -32,6 +32,7 @@ bind_system(py::module& m)
     .def_property_readonly("kf", &System::kf)
     .def_property_readonly("vf", &System::vf)
     .def_property_readonly("dos", &System::dos)
+    .def_property_readonly("n", &System::n)
     // Pickle
     .def(py::pickle(
       [](const System& sys) {

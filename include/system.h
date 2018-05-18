@@ -47,6 +47,14 @@ public:
   double vf() const { return kf() / m; }
   //! The density of states per spin in 2D \f[\nu=\frac{m}{2\pi}\f]
   double dos() const { return m / (2 * M_PI); }
+  /** The density of electrons.
+   *
+   * For low temperatures we can neglect the distinction between \f$E_f\f$ and
+   * \f$\mu\f$. In that case the density is \f[ n = 2 \int
+   * \frac{d\mathbf{k}}{2\pi} \Theta(-\xi_\mathbf{k}) \approx 2 \nu
+   * \int_{-E_f}^0 d\xi = 2\nu E_f \f]
+   */
+  constexpr double n() const { return 2 * dos() * mu; }
 
   double drift(double kx, double ky) const
   {
