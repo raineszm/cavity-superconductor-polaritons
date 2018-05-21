@@ -30,6 +30,7 @@ public:
     return std::sqrt(omega0 * omega0 + C * C * (qx * qx + qy * qy));
   }
 
+  // TODO: handle polarization stuff
   //! The Lagrangian of the photon modes
 
   //! \f[\mathcal{L} = \omega^2 - \omega_0^2 - c^2q^2\f]

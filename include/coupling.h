@@ -219,7 +219,6 @@ public:
    * The self-energy is given by
    * \f[
    * -\Pi^{ij}(\mathbf{q}, \Omega) =
-   * \frac{n e^2}{2mc^2}\delta_{ij} +
    * \frac{e^2}{2c^2} \sum_\mathbf{k}
    * \sum_l \operatorname{tr}\left[\hat\pi_0(\mathbf{k} + \mathbf{q}/2,
    * \mathbf{k} - \mathbf{q}/2, \Omega) \hat\tau_l\right]T^{ij}_l(\mathbf{k},
@@ -228,8 +227,8 @@ public:
    *
    * Numerically it is convenient to evaluate this integral in polar coordinates
    * via the change of variables \f$k=\sqrt{2m(\xi + \mu - \frac{1}{2}m
-   * v_s^2)}\f$ \f[ -\Pi^{ij}(\mathbf{q}, \Omega) = \frac{n
-   * e^2}{2mc^2}\delta_{ij} + \frac{e^2}{2c^2} \nu \int_{-\mu + \frac{1}{2}m
+   * v_s^2)}\f$ \f[ -\Pi^{ij}(\mathbf{q}, \Omega) =
+   *  \frac{e^2}{2c^2} \nu \int_{-\mu + \frac{1}{2}m
    * v_s^2}^\infty d\xi \int_0^{2\pi}\frac{d\theta}{2\pi} \sum_l
    * \operatorname{tr}\left[\hat\pi_0(\mathbf{k} + \mathbf{q}/2, \mathbf{k} -
    * \mathbf{q}/2, \Omega) \hat\tau_l\right]T^{ij}_l(\mathbf{k}, \mathbf{q}) \f]
@@ -241,7 +240,7 @@ public:
    * \mathbf{q}/2, \mathbf{k} - \mathbf{q}/2, \Omega)
    * \hat\tau_l\right]T^{ij}_l(\mathbf{k}, \mathbf{q}) \f] i.e. photon_se_int(),
    * we can express the integral as \f[ -\Pi^{ij}(\mathbf{q}, \Omega)\approx
-   * \frac{n e^2}{2mc^2}\delta_{ij} +\frac{e^2}{2c^2} \nu \int_0^\infty d\xi
+   * \frac{e^2}{2c^2} \nu \int_0^\infty d\xi
    * \int_0^{2\pi}\frac{d\theta}{2\pi} \left[ g(\xi, \theta, \mathbf{q}) +
    * g(-\xi, \theta, \mathbf{q})\right] \f]
    *
@@ -278,10 +277,6 @@ public:
           ;
         },
         0);
-
-    if (i == j) {
-      ret += state.sys.n() / state.sys.m; // Diamagnetic term
-    }
 
     return 0.5 * GPAR * GPAR * ret;
   }

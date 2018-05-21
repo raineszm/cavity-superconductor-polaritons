@@ -35,6 +35,13 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.imgmath',
               'breathe']
 
+# imgmath settings
+
+imgmath_latex_preamble = \
+    r'''
+\usepackage{braket}
+'''
+
 # breathe_projects = {"bardasis_schrieffer": "../xml/"}
 breathe_projects_source = {
     "bardasis_schrieffer": ("../../../include", ['system.h', 'bs.h', 'coupling.h', 'cavity.h', 'state.h', 'polariton.h'])}
