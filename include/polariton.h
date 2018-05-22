@@ -8,7 +8,9 @@
 #include <complex>
 #include <gsl/gsl_poly.h>
 #include <tuple>
+#include <vector>
 
+using boost::math::tools::newton_raphson_iterate;
 using boost::math::tools::toms748_solve;
 using Eigen::Matrix3cd;
 using Eigen::Vector3d;
@@ -107,36 +109,39 @@ public:
     return action(omega, qx, qy).selfadjointView<Eigen::Upper>().eigenvalues();
   }
 
-  template<typename F>
-  double find_a_root(const F& f, double xl, double xu) const
-  {
-    boost::uintmax_t max = 1e5;
-    auto [a, b] =
-      toms748_solve(f,
-                    xl,
-                    xu,
-                    [this](double a, double b) {
-                      return (a + b) / (2 * coupling.state.delta) < 1e-4;
-                    },
-                    max);
-    return (a + b) / 2;
-  }
-
   /** Find zeroes of action()
    */
   std::array<double, 3> find_modes(double qx, double qy) const
   {
-    auto f = [this, qx, qy](double omega) {
-      return std::real(action(omega, qx, qy).determinant());
-    };
+    auto g = [this, qx, qy](double omega) { return det_and_d(omega, qx, qy); };
 
     std::array<double, 3> roots;
     double xl = 1e-3 * coupling.state.delta;
     double xu = 1.99 * coupling.state.delta;
+    const double DX = 1e-3 * coupling.state.delta;
 
-    // const double slope0 = f(xu) - f(xl);
+    boost::uintmax_t max = 1e5;
+    roots[0] = newton_raphson_iterate(g, bs.root(), xl, xu, 12, max);
 
-    roots[0] = find_a_root(f, xl, xu);
+    std::vector<std::tuple<double, double>> intervals = {
+      { xl, roots[0] - DX }, { roots[0] + DX, xu }
+    };
+
+    int count = 1;
+
+    while (count < 3 && !intervals.empty()) {
+      boost::uintmax_t max = 1e5;
+      auto [xl, xu] = intervals.back();
+      intervals.pop_back();
+      auto root = newton_raphson_iterate(g, (xl + xu) / 2, xl, xu, 12, max);
+
+      if (max != 1e5) {
+        roots[count] = root;
+        ++count;
+        intervals.emplace_back(root + DX, xu);
+        intervals.emplace_back(xl, root - DX);
+      }
+    }
 
     return roots;
   }
