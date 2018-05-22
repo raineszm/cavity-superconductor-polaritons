@@ -33,8 +33,22 @@ public:
     return std::sqrt(omega0 * omega0 + C * C * (qx * qx + qy * qy));
   }
 
-  /** The inverse GF of the photon modes
+  Matrix2d matrix_structure(double qx, double qy, double theta_s) const
+  {
+    auto wq = this->omega(qx, qy);
+    auto q = std::hypot(qx, qy);
+    auto theta_q = q == 0 ? 0. : std::atan2(qy, qx);
 
+    auto P0 = 1 + wq * wq / (omega0 * omega0);
+    auto P1 =
+      C * C * q * q / (omega0 * omega0) * std::sin(2 * (theta_q - theta_s));
+    auto P3 =
+      -C * C * q * q / (omega0 * omega0) * std::cos(2 * (theta_q - theta_s));
+
+    return (Matrix2d() << P0 + P3, P1, P1, P0 - P3).finished();
+  }
+
+  /** The inverse GF of the photon modes
 
   \f[
     S_A = \frac{1}{16 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 -
@@ -48,18 +62,16 @@ public:
   **/
   Matrix2d action(double omega, double qx, double qy, double theta_s) const
   {
-    auto wq = this->omega(qx, qy);
-    auto q = std::hypot(qx, qy);
-    auto theta_q = q == 0 ? 0. : std::atan2(qy, qx);
     auto prefactor =
       (omega * omega - this->omega(qx, qy)) / (16 * M_PI * C * C);
 
-    auto P0 = 1 + wq * wq / (omega0 * omega0);
-    auto P1 =
-      C * C * q * q / (omega0 * omega0) * std::sin(2 * (theta_q - theta_s));
-    auto P3 =
-      -C * C * q * q / (omega0 * omega0) * std::cos(2 * (theta_q - theta_s));
+    return prefactor * matrix_structure(qx, qy, theta_s);
+  }
 
-    return prefactor * (Matrix2d() << P0 + P3, P1, P1, P0 - P3).finished();
+  Matrix2d d_action(double omega, double qx, double qy, double theta_s) const
+  {
+    auto prefactor = omega / (8 * M_PI * C * C);
+
+    return prefactor * matrix_structure(qx, qy, theta_s);
   }
 };

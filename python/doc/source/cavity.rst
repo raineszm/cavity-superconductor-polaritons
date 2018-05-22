@@ -180,7 +180,7 @@ Suppose we wish to write the theory such that the paramagnetic coupling is
 
 .. math::
 
-    \mathbf{v} \cdot \begin{pmatrix}A_x(q)\\A_y(q)\end{pmatrix}
+    \sqrt{\frac{2}{L}}\mathbf{v} \cdot \begin{pmatrix}A_x(q)\\A_y(q)\end{pmatrix}
 
 We can do this by defining the transformation
 

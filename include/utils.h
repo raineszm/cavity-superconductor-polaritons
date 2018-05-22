@@ -1,6 +1,9 @@
 #pragma once
 
+#include <Eigen/Core>
 #include <cmath>
+
+using Eigen::Matrix3cd;
 
 inline double
 tanh_over(double x, double T)
@@ -24,4 +27,12 @@ c(double x1, double x2, double T)
               (24 * std::pow(T, 3) * std::pow(std::cosh(x2 / (2 * T)), 4))) /
            4;
   }
+}
+
+inline Matrix3cd
+adjugate(const Matrix3cd& m)
+{
+  auto m2 = m * m;
+  auto trm = m.trace();
+  return (trm * trm - m2.trace()) * Matrix3cd::Identity() / 2 - m * trm + m2;
 }

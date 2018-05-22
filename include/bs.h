@@ -64,7 +64,26 @@ public:
       (omega * omega - 4 * l * l);
     return F1 * (omega * omega / 2 + 2 * l * l * std::cos(4 * theta)) /
            std::sqrt(l * l - state.delta * state.delta);
-    ;
+  }
+
+  double d_action_int(double l, double theta, double omega) const
+  {
+    double drift = state.sys.drift_theta(state.sys.kf(), theta);
+
+    double Ep = drift + l;
+    double Em = drift - l;
+
+    double F1 =
+      (std::tanh(Ep / (2 * state.T)) - std::tanh(Em / (2 * state.T))) /
+      (omega * omega - 4 * l * l);
+
+    double dF1 =
+      -(std::tanh(Ep / (2 * state.T)) - std::tanh(Em / (2 * state.T))) /
+      std::pow(omega * omega - 4 * l * l, 2) * 2 * omega;
+
+    return (F1 * omega +
+            dF1 * (omega * omega / 2 + 2 * l * l * std::cos(4 * theta))) /
+           std::sqrt(l * l - state.delta * state.delta);
   }
 
   //! The value of the BS Mode inverse GF at frequency \f$\Omega\f$
@@ -76,6 +95,16 @@ public:
                         return action_int(l, theta, omega);
                       },
                       state.delta);
+  }
+
+  double d_action(double omega) const
+  {
+    return 2 * state.sys.dos() *
+           gsl_xi_integrate(
+             [this, omega](double l, double theta) {
+               return d_action_int(l, theta, omega);
+             },
+             state.delta);
   }
 
   //! The pole of the Bardasis Schrieffer mode GF

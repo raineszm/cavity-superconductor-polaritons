@@ -10,9 +10,9 @@ using Eigen::Matrix2cd;
 
 //! The coupling between the Superconductor and Cavity
 
-//! \note All values returned from this class are missing the factor of \f$\sqrt{2/L}\f$
-//! in the effective paramagnetic coupling. This factor is reinstanted in
-//! Polariton::action()
+//! \note All values returned from this class are missing the factor of
+//! \f$\sqrt{2/L}\f$ in the effective paramagnetic coupling. This factor is
+//! reinstanted in Polariton::action()
 class Coupling
 {
 public:
@@ -47,6 +47,19 @@ public:
     return fd *
            (std::tanh(Ep / (2 * state.T)) - std::tanh(Em / (2 * state.T))) /
            ((omega * omega - 4 * l * l) *
+            std::sqrt(l * l - state.delta * state.delta));
+  }
+
+  double d_ImDA_int(double l, double theta, double omega) const
+  {
+    double fd = std::sqrt(2) * std::cos(2 * theta);
+    double drift = state.sys.drift_theta(state.sys.kf(), theta);
+    double Ep = drift + l;
+    double Em = drift - l;
+
+    return -2 * omega * fd *
+           (std::tanh(Ep / (2 * state.T)) - std::tanh(Em / (2 * state.T))) /
+           (std::pow(omega * omega - 4 * l * l, 2) *
             std::sqrt(l * l - state.delta * state.delta));
   }
 
@@ -86,6 +99,22 @@ public:
              state.delta);
   }
 
+  double d_ImDA(double omega) const
+  {
+    return -2 * state.delta * state.sys.m * GPAR * state.sys.vs *
+           state.sys.dos() *
+           (gsl_xi_integrate(
+              [this, omega](double l, double theta) {
+                return ImDA_int(l, theta, omega);
+              },
+              state.delta) +
+            omega * gsl_xi_integrate(
+                      [this, omega](double l, double theta) {
+                        return d_ImDA_int(l, theta, omega);
+                      },
+                      state.delta));
+  }
+
   /** The polarization bubble entering into the photon self energy
    *
    * \f[\pi_0(E_1, E_2, \omega) =
@@ -99,11 +128,18 @@ public:
    *
    * \sa photon_se_int(), photon_se()
    */
-  double pi0(double E1, double E2, double omega) const
+  double pi0(double E1, double E2, double omega, bool deriv = false) const
   {
-    return 0.5 *
-           (std::tanh(E1 / (2 * state.T)) - std::tanh(E2 / (2 * state.T))) /
-           (omega - E1 + E2);
+    if (deriv) {
+      return -0.5 *
+             (std::tanh(E1 / (2 * state.T)) - std::tanh(E2 / (2 * state.T))) /
+             std::pow(omega - E1 + E2, 2);
+
+    } else {
+      return 0.5 *
+             (std::tanh(E1 / (2 * state.T)) - std::tanh(E2 / (2 * state.T))) /
+             (omega - E1 + E2);
+    }
   }
 
   /**
@@ -118,12 +154,13 @@ public:
                                   double d2,
                                   double l1,
                                   double l2,
-                                  double omega) const
+                                  double omega,
+                                  bool deriv = false) const
   {
-    auto p00 = pi0(d1 + l1, d1 + l2, omega);
-    auto p01 = pi0(d1 + l1, d1 - l2, omega);
-    auto p10 = pi0(d1 - l1, d1 + l2, omega);
-    auto p11 = pi0(d1 - l1, d1 - l2, omega);
+    auto p00 = pi0(d1 + l1, d1 + l2, omega, deriv);
+    auto p01 = pi0(d1 + l1, d1 - l2, omega, deriv);
+    auto p10 = pi0(d1 - l1, d1 + l2, omega, deriv);
+    auto p11 = pi0(d1 - l1, d1 - l2, omega, deriv);
 
     return { { p00 + p11, p01 + p10, p01 - p10, p00 - p11 } };
   }
@@ -195,7 +232,8 @@ public:
                        double qx,
                        double qy,
                        int i,
-                       int j) const
+                       int j,
+                       bool deriv = false) const
   {
     auto xp = state.sys.xi(kx + qx / 2, ky + qy / 2);
     auto xm = state.sys.xi(kx - qx / 2, ky - qy / 2);
@@ -216,7 +254,7 @@ public:
     auto dp = state.sys.drift(kx + qx / 2, ky + qy / 2);
     auto dm = state.sys.drift(kx - qx / 2, ky - qy / 2);
 
-    auto pl = pi0_elems(dp, dm, lp, lm, omega);
+    auto pl = pi0_elems(dp, dm, lp, lm, omega, deriv);
 
     return T0 * pl[0] + T1 * pl[1] + iT2 * pl[2] + T3 * pl[3];
   }
@@ -257,10 +295,20 @@ public:
    */
   double photon_se(double omega, double qx, double qy, int i, int j) const
   {
+    return _photon_se(omega, qx, qy, i, j);
+  }
+
+  double _photon_se(double omega,
+                    double qx,
+                    double qy,
+                    int i,
+                    int j,
+                    bool deriv = false) const
+  {
     auto ret =
       state.sys.dos() *
       gsl_xi_integrate(
-        [this, omega, qx, qy, i, j](double x, double theta) {
+        [this, omega, qx, qy, i, j, deriv](double x, double theta) {
           auto k1 =
             std::sqrt(2 * state.sys.m *
                       (x + state.sys.mu -
@@ -275,14 +323,16 @@ public:
                                qx,
                                qy,
                                i,
-                               j) +
+                               j,
+                               deriv) +
                  photon_se_int(k2 * std::cos(theta),
                                k2 * std::sin(theta),
                                omega,
                                qx,
                                qy,
                                i,
-                               j);
+                               j,
+                               deriv);
           ;
         },
         0);
@@ -296,6 +346,15 @@ public:
             photon_se(omega, qx, qy, 0, 1),
             photon_se(omega, qx, qy, 1, 0),
             photon_se(omega, qx, qy, 1, 1))
+      .finished();
+  }
+
+  Matrix2cd d_photon_se(double omega, double qx, double qy) const
+  {
+    return (Matrix2cd() << _photon_se(omega, qx, qy, 0, 0, true),
+            _photon_se(omega, qx, qy, 0, 1, true),
+            _photon_se(omega, qx, qy, 1, 0, true),
+            _photon_se(omega, qx, qy, 1, 1, true))
       .finished();
   }
   //@}

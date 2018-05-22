@@ -2,10 +2,12 @@
 
 #include <Eigen/Dense>
 #include <Eigen/Eigenvalues>
+#include <array>
 #include <boost/math/tools/roots.hpp>
 #include <cmath>
 #include <complex>
 #include <gsl/gsl_poly.h>
+#include <tuple>
 
 using boost::math::tools::toms748_solve;
 using Eigen::Matrix3cd;
@@ -73,6 +75,31 @@ public:
     return act;
   }
 
+  Matrix3cd d_action(double omega, double qx, double qy) const
+  {
+    auto L = M_PI * C / cav.omega0;
+    auto par_factor = std::sqrt(2 / L);
+    std::complex<double> c(0., par_factor * coupling.d_ImDA(omega));
+    auto d_se = par_factor * par_factor * coupling.d_photon_se(omega, qx, qy);
+    Matrix3cd ret;
+    ret(0, 0) = bs.d_action(omega);
+    ret(0, 1) = c;
+    ret(1, 0) = -c;
+    ret.bottomRightCorner(2, 2) =
+      cav.d_action(omega, qx, qy, coupling.state.sys.theta_v) + d_se;
+    return ret;
+  }
+
+  std::tuple<double, double> det_and_d(double omega, double qx, double qy) const
+  {
+
+    auto A = action(omega, qx, qy);
+    double det = std::real(A.determinant());
+    auto adj = adjugate(A);
+    double d_det = std::real((adj * d_action(omega, qx, qy)).trace());
+    return std::tuple(det, d_det);
+  }
+
   /** The eigenvalues of action()
    */
   Vector3d eigval(double omega, double qx, double qy) const
@@ -80,23 +107,37 @@ public:
     return action(omega, qx, qy).selfadjointView<Eigen::Upper>().eigenvalues();
   }
 
-  /** Find a zero of action()
-   */
-  double find_mode(double qx, double qy) const
+  template<typename F>
+  double find_a_root(const F& f, double xl, double xu) const
   {
     boost::uintmax_t max = 1e5;
-    auto [a, b] = toms748_solve(
-      [this, qx, qy](double omega) {
-        return std::real(action(omega, qx, qy).determinant());
-      },
-      1e-3 * coupling.state.delta,
-      1.99 * coupling.state.delta,
-      [this, qx, qy](double a, double b) {
-        double x = (a + b) / 2;
-        return std::abs(action(x, qx, qy).determinant()) <
-               1e-6 * coupling.state.delta;
-      },
-      max);
+    auto [a, b] =
+      toms748_solve(f,
+                    xl,
+                    xu,
+                    [this](double a, double b) {
+                      return (a + b) / (2 * coupling.state.delta) < 1e-4;
+                    },
+                    max);
     return (a + b) / 2;
+  }
+
+  /** Find zeroes of action()
+   */
+  std::array<double, 3> find_modes(double qx, double qy) const
+  {
+    auto f = [this, qx, qy](double omega) {
+      return std::real(action(omega, qx, qy).determinant());
+    };
+
+    std::array<double, 3> roots;
+    double xl = 1e-3 * coupling.state.delta;
+    double xu = 1.99 * coupling.state.delta;
+
+    // const double slope0 = f(xu) - f(xl);
+
+    roots[0] = find_a_root(f, xl, xu);
+
+    return roots;
   }
 };
