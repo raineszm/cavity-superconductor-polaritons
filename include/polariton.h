@@ -63,30 +63,32 @@ public:
   Matrix3cd action(double omega, double qx, double qy) const
   {
     auto L = M_PI * C / cav.omega0;
-    auto par_factor = std::sqrt(2 / L);
-    std::complex<double> c(0., par_factor * coupling.ImDA(omega));
-    auto se = par_factor * par_factor * coupling.photon_se(omega, qx, qy);
-    Matrix3cd act;
+    std::complex<double> c(0., std::sqrt(2 / L) * coupling.ImDA(omega));
+    auto se = 2 / L * coupling.photon_se(omega, qx, qy);
+
+    Matrix3cd act = Matrix3cd::Zero();
     act(0, 0) = bs.action(omega);
     act(0, 1) = c;
     act(1, 0) = -c;
-    act.bottomRightCorner(2, 2) =
-      cav.action(omega, qx, qy, coupling.state.sys.theta_v) + se;
+    act.bottomRightCorner<2, 2>() =
+      (cav.action(omega, qx, qy, coupling.state.sys.theta_v) + se)
+        .cast<std::complex<double>>();
     return act;
   }
 
   Matrix3cd d_action(double omega, double qx, double qy) const
   {
     auto L = M_PI * C / cav.omega0;
-    auto par_factor = std::sqrt(2 / L);
-    std::complex<double> c(0., par_factor * coupling.d_ImDA(omega));
-    auto d_se = par_factor * par_factor * coupling.d_photon_se(omega, qx, qy);
-    Matrix3cd ret;
+    std::complex<double> c(0., std::sqrt(2 / L) * coupling.d_ImDA(omega));
+    auto d_se = 2 / L * coupling.d_photon_se(omega, qx, qy);
+
+    Matrix3cd ret = Matrix3cd::Zero();
     ret(0, 0) = bs.d_action(omega);
     ret(0, 1) = c;
     ret(1, 0) = -c;
-    ret.bottomRightCorner(2, 2) =
-      cav.d_action(omega, qx, qy, coupling.state.sys.theta_v) + d_se;
+    ret.bottomRightCorner<2, 2>() =
+      (cav.d_action(omega, qx, qy, coupling.state.sys.theta_v) + d_se)
+        .cast<std::complex<double>>();
     return ret;
   }
 
@@ -94,10 +96,8 @@ public:
   {
 
     auto A = action(omega, qx, qy);
-    double det = std::real(A.determinant());
-    auto adj = adjugate(A);
-    double d_det = std::real((adj * d_action(omega, qx, qy)).trace());
-    return std::tuple(det, d_det);
+    double d_det = std::real((adjugate(A) * d_action(omega, qx, qy)).trace());
+    return std::tuple<double, double>(std::real(A.determinant()), d_det);
   }
 
   /** The eigenvalues of action()

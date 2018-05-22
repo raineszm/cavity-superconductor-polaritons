@@ -128,7 +128,7 @@ public:
    *
    * \sa photon_se_int(), photon_se()
    */
-  double pi0(double E1, double E2, double omega, bool deriv = false) const
+  double pi0(double E1, double E2, double omega, bool deriv) const
   {
     if (deriv) {
       return -0.5 *
@@ -155,7 +155,7 @@ public:
                                   double l1,
                                   double l2,
                                   double omega,
-                                  bool deriv = false) const
+                                  bool deriv) const
   {
     auto p00 = pi0(d1 + l1, d1 + l2, omega, deriv);
     auto p01 = pi0(d1 + l1, d1 - l2, omega, deriv);
@@ -233,7 +233,7 @@ public:
                        double qy,
                        int i,
                        int j,
-                       bool deriv = false) const
+                       bool deriv) const
   {
     auto xp = state.sys.xi(kx + qx / 2, ky + qy / 2);
     auto xm = state.sys.xi(kx - qx / 2, ky - qy / 2);
@@ -295,7 +295,7 @@ public:
    */
   double photon_se(double omega, double qx, double qy, int i, int j) const
   {
-    return _photon_se(omega, qx, qy, i, j);
+    return _photon_se(omega, qx, qy, i, j, false);
   }
 
   double _photon_se(double omega,
@@ -303,7 +303,7 @@ public:
                     double qy,
                     int i,
                     int j,
-                    bool deriv = false) const
+                    bool deriv) const
   {
     auto ret =
       state.sys.dos() *

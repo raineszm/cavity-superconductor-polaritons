@@ -1,5 +1,6 @@
 #include <functional>
 
+#include <pybind11/eigen.h>
 #include <pybind11/functional.h>
 #include <pybind11/pybind11.h>
 
@@ -19,6 +20,7 @@ bind_coupling(py::module& m)
     .def_readonly("state", &Coupling::state)
     // Functions
     .def("ImDA", &Coupling::ImDA)
+    .def("d_ImDA", &Coupling::d_ImDA)
     .def("ImDA_int", &Coupling::ImDA_int)
     .def("photon_se",
          py::overload_cast<double, double, double>(&Coupling::photon_se,
@@ -28,5 +30,7 @@ bind_coupling(py::module& m)
          py::overload_cast<double, double, double, int, int>(
            &Coupling::photon_se, py::const_),
          "Photon self energy matrix components")
+    .def("_photon_se", &Coupling::_photon_se)
+    .def("d_photon_se", &Coupling::d_photon_se)
     .def("photon_se_int", &Coupling::photon_se_int);
 }

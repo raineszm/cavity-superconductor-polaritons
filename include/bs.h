@@ -78,12 +78,15 @@ public:
       (omega * omega - 4 * l * l);
 
     double dF1 =
-      -(std::tanh(Ep / (2 * state.T)) - std::tanh(Em / (2 * state.T))) /
-      std::pow(omega * omega - 4 * l * l, 2) * 2 * omega;
+      -2 * omega *
+      (std::tanh(Ep / (2 * state.T)) - std::tanh(Em / (2 * state.T))) /
+      std::pow(omega * omega - 4 * l * l, 2);
 
-    return (F1 * omega +
-            dF1 * (omega * omega / 2 + 2 * l * l * std::cos(4 * theta))) /
-           std::sqrt(l * l - state.delta * state.delta);
+    double F2 = (omega * omega / 2 + 2 * l * l * std::cos(4 * theta));
+
+    double dF2 = omega;
+
+    return (F1 * dF2 + dF1 * F2) / std::sqrt(l * l - state.delta * state.delta);
   }
 
   //! The value of the BS Mode inverse GF at frequency \f$\Omega\f$

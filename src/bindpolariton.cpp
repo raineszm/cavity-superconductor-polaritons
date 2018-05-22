@@ -22,6 +22,8 @@ bind_polariton(py::module& m)
     .def_readonly("cav", &Polariton::cav)
     .def_readonly("coupling", &Polariton::coupling)
     .def("action", &Polariton::action)
+    .def("d_action", &Polariton::d_action)
+    .def("det_and_d", &Polariton::det_and_d)
     .def("eigval", &Polariton::eigval)
     .def("find_modes", &Polariton::find_modes);
 }

@@ -1,3 +1,4 @@
+#include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
 
 #include "cavity.h"
@@ -13,6 +14,7 @@ bind_cavity(py::module& m)
     // Attributes
     .def_readwrite("omega0", &Cavity::omega0)
     .def("action", &Cavity::action)
+    .def("d_action", &Cavity::d_action)
     .def("omega", &Cavity::omega);
   m.attr("GPAR") = GPAR;
   m.attr("ALPHA") = ALPHA;
