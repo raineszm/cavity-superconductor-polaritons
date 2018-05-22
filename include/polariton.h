@@ -31,7 +31,12 @@ public:
     : bs(bs_)
     , cav(cav_)
     , coupling(c_)
-  {}
+  {
+    if (bs.state != coupling.state) {
+      throw std::invalid_argument(
+        "bs and c must be constructed with the same state");
+    }
+  }
 
   /** The inverse GF of the polariton
    * \f[

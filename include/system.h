@@ -29,6 +29,12 @@ public:
     , theta_v(theta_v_)
   {}
 
+  bool operator==(const System& rhs) const
+  {
+    return m == rhs.m && mu == rhs.mu && Tc == rhs.Tc && vs == rhs.vs &&
+           theta_v == rhs.theta_v;
+  }
+
   double xi(double kx, double ky) const
   {
     return (kx * kx + ky * ky) / (2 * m) - mu + 0.5 * m * vs * vs;

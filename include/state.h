@@ -23,6 +23,13 @@ public:
     , delta(D)
   {}
 
+  bool operator==(const State& rhs) const
+  {
+    return T == rhs.T && sys == rhs.sys && delta == rhs.delta;
+  }
+
+  bool operator!=(const State& rhs) const { return !((*this) == rhs); }
+
   //! Solve the mean field problem for System sys at temperature \f$T\f$
 
   //! This includes the effects of the superfluid velocity \f$v_s\f$
