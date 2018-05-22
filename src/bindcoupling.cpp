@@ -20,6 +20,13 @@ bind_coupling(py::module& m)
     // Functions
     .def("ImDA", &Coupling::ImDA)
     .def("ImDA_int", &Coupling::ImDA_int)
-    .def("photon_se", &Coupling::photon_se)
+    .def("photon_se",
+         py::overload_cast<double, double, double>(&Coupling::photon_se,
+                                                   py::const_),
+         "Photon self energy matrix")
+    .def("photon_se",
+         py::overload_cast<double, double, double, int, int>(
+           &Coupling::photon_se, py::const_),
+         "Photon self energy matrix components")
     .def("photon_se_int", &Coupling::photon_se_int);
 }

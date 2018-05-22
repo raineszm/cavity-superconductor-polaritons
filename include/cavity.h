@@ -1,7 +1,10 @@
 //! \file cavity.h
 //!  We use Gaussian Hartree Units
 #pragma once
+#include <Eigen/Core>
 #include <cmath>
+
+using Eigen::Matrix2d;
 
 //! The fine structure constant \f$\alpha\f$
 const double ALPHA = 7.2973525664e-3;
@@ -30,14 +33,33 @@ public:
     return std::sqrt(omega0 * omega0 + C * C * (qx * qx + qy * qy));
   }
 
-  // TODO: handle polarization stuff
-  //! The Lagrangian of the photon modes
+  /** The inverse GF of the photon modes
 
-  //! \f[\mathcal{L} = \omega^2 - \omega_0^2 - c^2q^2\f]
-  //! gives rise to action \f$S = \frac{1}{8\pi c^2}\int A_q\mathcal{L}
-  //! A_{-q}\f$
-  double action(double omega, double qx, double qy) const
+
+  \f[
+    S_A = \frac{1}{16 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 -
+  \omega_\mathbf{q}^2\right] \left[ \left(1 +
+  \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
+  - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin
+  2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
+  \right]
+  \mathbf{A}(q)
+  \f]
+  **/
+  Matrix2d action(double omega, double qx, double qy, double theta_s) const
   {
-    return (omega * omega - this->omega(qx, qy)) / (8 * M_PI * C * C);
+    auto wq = this->omega(qx, qy);
+    auto q = std::hypot(qx, qy);
+    auto theta_q = q == 0 ? 0. : std::atan2(qy, qx);
+    auto prefactor =
+      (omega * omega - this->omega(qx, qy)) / (16 * M_PI * C * C);
+
+    auto P0 = 1 + wq * wq / (omega0 * omega0);
+    auto P1 =
+      C * C * q * q / (omega0 * omega0) * std::sin(2 * (theta_q - theta_s));
+    auto P3 =
+      -C * C * q * q / (omega0 * omega0) * std::cos(2 * (theta_q - theta_s));
+
+    return prefactor * (Matrix2d() << P0 + P3, P1, P1, P0 - P3).finished();
   }
 };

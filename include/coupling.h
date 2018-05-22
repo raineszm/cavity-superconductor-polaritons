@@ -1,11 +1,18 @@
 #pragma once
+#include <Eigen/Core>
 #include <array>
 #include <cmath>
 
 #include "cavity.h"
 #include "state.h"
 
+using Eigen::Matrix2cd;
+
 //! The coupling between the Superconductor and Cavity
+
+//! \note All values returned from this class are missing the factor of \f$\sqrt{2/L}\f$
+//! in the effective paramagnetic coupling. This factor is reinstanted in
+//! Polariton::action()
 class Coupling
 {
 public:
@@ -245,6 +252,8 @@ public:
    * g(-\xi, \theta, \mathbf{q})\right] \f]
    *
    * \sa photon_se_int(), System::xi_k(), System::n()
+   *
+   * @{
    */
   double photon_se(double omega, double qx, double qy, int i, int j) const
   {
@@ -280,4 +289,14 @@ public:
 
     return 0.5 * GPAR * GPAR * ret;
   }
+
+  Matrix2cd photon_se(double omega, double qx, double qy) const
+  {
+    return (Matrix2cd() << photon_se(omega, qx, qy, 0, 0),
+            photon_se(omega, qx, qy, 0, 1),
+            photon_se(omega, qx, qy, 1, 0),
+            photon_se(omega, qx, qy, 1, 1))
+      .finished();
+  }
+  //@}
 };

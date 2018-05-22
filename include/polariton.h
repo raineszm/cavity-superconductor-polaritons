@@ -55,21 +55,17 @@ public:
    */
   Matrix3cd action(double omega, double qx, double qy) const
   {
-    std::complex<double> c(0., coupling.ImDA(omega));
-    auto se00 = coupling.photon_se(omega, qx, qy, 0, 0);
-    auto se01 = coupling.photon_se(omega, qx, qy, 0, 1);
-    auto se10 = coupling.photon_se(omega, qx, qy, 1, 0);
-    auto se11 = coupling.photon_se(omega, qx, qy, 1, 1);
-    return (Matrix3cd() << bs.action(omega),
-            c,
-            0,
-            -c,
-            cav.action(omega, qx, qy) + se00,
-            se01,
-            0,
-            se10,
-            cav.action(omega, qx, qy) + se11)
-      .finished();
+    auto L = M_PI * C / cav.omega0;
+    auto par_factor = std::sqrt(2 / L);
+    std::complex<double> c(0., par_factor * coupling.ImDA(omega));
+    auto se = par_factor * par_factor * coupling.photon_se(omega, qx, qy);
+    Matrix3cd act;
+    act(0, 0) = bs.action(omega);
+    act(0, 1) = c;
+    act(1, 0) = -c;
+    act.bottomRightCorner(2, 2) =
+      cav.action(omega, qx, qy, coupling.state.sys.theta_v) + se;
+    return act;
   }
 
   /** The eigenvalues of action()
