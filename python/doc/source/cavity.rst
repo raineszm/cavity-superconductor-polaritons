@@ -88,35 +88,30 @@ On the other hand we have an equivalent description in terms of vector potential
 where :math:`D^{-1}` in the inverse photon propagator. We can relate the two actions by
 
 .. math::
+    :nowrap:
 
-    D_{\alpha\alpha'}(q) = \braket{A_\alpha(q) A_{\alpha'}(-q)} = \frac{2\pi c^2}{\omega_{\mathbf q}}
-    \Braket{\int dz \bm{\epsilon}^\ast_\alpha(\mathbf{q}, z)
-        \sum_{\beta}\left(\bm{\epsilon}_{\beta}(q, z) a_{\beta,q} + \bm{\epsilon}^\ast_{\beta}(-q, z) \bar{a}_{\beta, -q}\right)
+    \begin{multline}
+    D_{\alpha\alpha'}(q) = \braket{A_\alpha(q) A_{\alpha'}(-q)}\\
+     = \frac{2\pi c^2}{\omega_{\mathbf q}}
+    \left\langle\int dz \bm{\epsilon}^\ast_\alpha(\mathbf{q}, z)
+        \sum_{\beta}\left(\bm{\epsilon}_{\beta}(q, z) a_{\beta,q} + \bm{\epsilon}^\ast_{\beta}(-q, z) \bar{a}_{\beta, -q}\right)\right.\\
+        \times\left.
     \int dz' \bm{\epsilon}^\ast_{\alpha}(-\mathbf{q}, z')
-        \sum_{\beta'}\left(\bm{\epsilon}_{\beta'}(-q, z') a_{\beta',-q} + \bm{\epsilon}^\ast_{\beta'}(q, z') \bar{a}_{\beta', q}\right)}\\
+        \sum_{\beta'}\left(\bm{\epsilon}_{\beta'}(-q, z') a_{\beta',-q} + \bm{\epsilon}^\ast_{\beta'}(q, z') \bar{a}_{\beta', q}\right)\right\rangle\\
     =
     \frac{2\pi c^2}{\omega_{\mathbf q}}\int dz \epsilon^{i\ast}_\alpha(\mathbf{q}, z)\int dz' \epsilon^{j\ast}_{\alpha}(-\mathbf{q}, z')
     \sum_{\beta\beta'}
     \left(\epsilon^i_\beta(q, z) \epsilon^{\ast j}_{\beta'}(q, z')\braket{a_{\beta, q}\bar{a}_{\beta', q}})
     + \epsilon^{\ast i}_\beta(-q, z) \epsilon^{j}_{\beta'}(-q, z')\braket{\bar{a}_{\beta, -q}a_{\beta', q}})
     \right)
+    \end{multline}
 
-In Jon's notes he defines the polarizations
-
-.. math::
-
-    \bm{\epsilon}_1 &= \sqrt{\frac{2}{L}} \sin\left(\frac{n \pi z}{L}\right)\hat{\bm{z}} \times \hat{\bm{q}}\\
-    \bm{\epsilon}_2 &= \sqrt{\frac{2}{L}} \left(\cos\left(\frac{n \pi z}{L}\right)\hat{\bm{z}} 
-    - i \frac{\omega_0}{\omega_\mathbf{q}} \sin\left(\frac{n \pi z}{L}\right) \hat{\bm{q}}\right)
-
-However, the second polarization is not properly normalized. In order to do so we must divide it by :math:`\sqrt{1 + \tfrac{\omega_0^2}{\omega_q^2}}`.
-For convenience we also multiple the first polarization by i.
-With thse definitions we have
+The n-th harmonic TE and TM polarizations are respectively
 
 .. math::
 
     \bm{\epsilon}_1 &= i\sqrt{\frac{2}{L}} \sin\left(\frac{n \pi z}{L}\right)\hat{\bm{z}} \times \hat{\bm{q}}\\
-    \bm{\epsilon}_2 &= \sqrt{\frac{2}{L(\omega_q^2 + \omega_0^2)}} \left(\omega_\mathbf{q}\cos\left(\frac{n \pi z}{L}\right)\hat{\bm{z}} 
+    \bm{\epsilon}_2 &= \sqrt{\frac{2}{L}} \frac{1}{\omega_\mathbf{q}}\left(c q\cos\left(\frac{n \pi z}{L}\right)\hat{\bm{z}} 
     -i \omega_0 \sin\left(\frac{n \pi z}{L}\right) \hat{\bm{q}}\right)
 
 Note that both of these have the property :math:`\bm{\epsilon(-q, z)} = \bm{\epsilon}^\ast(q, z)`.
@@ -172,12 +167,77 @@ In the plane we then have
 
 .. math::
 
-    \mathbf{A}_q(L/2) = iA_1(q)\sqrt{\frac{2}{L}} \hat{\bm{z}}\times \hat{\bm{q}} + i A_2(q)\sqrt{\frac{2}{L(\omega_q^2 + \omega_0^2)}} \omega_0 \hat{\bm{q}}
+    \mathbf{A}_q(L/2)
     = i \sqrt{\frac{2}{L}}\left[
-        A_1(q) \hat{\bm{z}}\times \hat{\bm{q}} + A_2(q)\frac{\omega_0}{\sqrt{\omega_q^2 + \omega_0^2}} \hat{\bm{q}}\right]
+        A_1(q) \hat{\bm{z}}\times \hat{\bm{q}} - A_2(q)\frac{\omega_0}{\omega_q} \hat{\bm{q}}\right]
 
-This the in plane electrons couple to the two polarizations with different strengths.
+Thus the in plane electrons couple to the two polarizations with different strengths.
 This prevents us from performing a unitary transformation into a different basis in the plane.
 In other words, if we wish to represent :math:`A` as components along different axes, the photonic sector will become non diagonal.
+
+Suppose we wish to write the theory such that the paramagnetic coupling is
+
+
+.. math::
+
+    \mathbf{v} \cdot \begin{pmatrix}A_x(q)\\A_y(q)\end{pmatrix}
+
+We can do this by defining the transformation
+
+.. math::
+
+    \begin{pmatrix}
+    A_x
+    A_y
+    \end{pmatrix} = \underbrace{-i
+    \begin{pmatrix}
+    \sin \theta_q& \frac{\omega_0}{\omega_\mathbf{q}} \cos \theta_q \\
+    -\cos \theta_q&  \frac{\omega_0}{\omega_\mathbf{q}} \sin\theta_q
+    \end{pmatrix}}_{U(q)}
+    \begin{pmatrix}
+    A_1(q)\\
+    A_2(q)
+    \end{pmatrix}
+
+This is a non-unitary transformation but since it is linear the contribution to the Jacobian cancels out in any expectation value.
+However, the cavity action in this basis becomes
+
+.. math::
+
+    S_A = \frac{1}{8 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right](U^{-1}(-\mathbf q))^T U^{-1}(\mathbf q)\mathbf{A}(q)\\
+    = \frac{1}{8 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
+    \begin{pmatrix}
+    \left(\frac{\omega_q}{\omega_0}\right)^2 \cos^2 \theta_q + \sin^2 \theta_q& \left(\frac{\omega_q^2}{\omega_0^2} -1\right)\sin\theta_q \cos\theta_q\\
+    \left(\frac{\omega_q^2}{\omega_0^2} -1\right)\sin\theta_q \cos\theta_q&\left(\frac{\omega_q}{\omega_0}\right)^2 \sin^2 \theta_q + \cos^2 \theta_q
+    \end{pmatrix}
+    \mathbf{A}(q)
+
+Finally if we wish to transform to the basis along and perpendicular to the supercurrent
+
+.. math::
+
+    \begin{pmatrix}
+    A^x\\
+    A^y\\
+    \end{pmatrix}
+    = \underbrace{\begin{pmatrix}
+    \cos \theta_s& -\sin\theta_s\\
+    \sin\theta_s& \cos\theta_s
+    \end{pmatrix}}_R
+    \begin{pmatrix}
+    A_\parallel\\
+    A_\perp
+    \end{pmatrix}
+
+Upon this transformation the photon action becomes
+
+.. math::
+
+    S_A = \frac{1}{16 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
+    \left[
+    \left(1 + \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0 
+    - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin 2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
+    \right]
+    \mathbf{A}(q)
 
 .. autodoxygenfile:: cavity.h
