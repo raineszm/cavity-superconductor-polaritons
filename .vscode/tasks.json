@@ -25,7 +25,8 @@
             "args": [
                 "install"
             ],
-            "group": "build"
+            "group": "build",
+            "problemMatcher": []
         },
         {
             "label": "pytest",

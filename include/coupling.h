@@ -157,10 +157,10 @@ public:
                                   double omega,
                                   bool deriv) const
   {
-    auto p00 = pi0(d1 + l1, d1 + l2, omega, deriv);
-    auto p01 = pi0(d1 + l1, d1 - l2, omega, deriv);
-    auto p10 = pi0(d1 - l1, d1 + l2, omega, deriv);
-    auto p11 = pi0(d1 - l1, d1 - l2, omega, deriv);
+    auto p00 = pi0(d1 + l1, d2 + l2, omega, deriv);
+    auto p01 = pi0(d1 + l1, d2 - l2, omega, deriv);
+    auto p10 = pi0(d1 - l1, d2 + l2, omega, deriv);
+    auto p11 = pi0(d1 - l1, d2 - l2, omega, deriv);
 
     return { { p00 + p11, p01 + p10, p01 - p10, p00 - p11 } };
   }

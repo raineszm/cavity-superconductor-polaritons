@@ -14,10 +14,11 @@ void
 bind_polariton(py::module& m)
 {
   py::class_<Polariton>(m, "Polariton")
-    .def(py::init<const BS&, const Cavity&, const Coupling&>(),
+    .def(py::init<const BS&, const Cavity&, const Coupling&, double>(),
          "bs"_a,
          "cav"_a,
-         "coupling"_a)
+         "coupling"_a,
+         "big"_a = 1)
     // Attributes
     .def_readonly("bs", &Polariton::bs)
     .def_readonly("cav", &Polariton::cav)

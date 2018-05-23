@@ -3,6 +3,7 @@
 #include <pybind11/eigen.h>
 #include <pybind11/functional.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #include "coupling.h"
 #include "state.h"
@@ -22,6 +23,7 @@ bind_coupling(py::module& m)
     .def("ImDA", &Coupling::ImDA)
     .def("d_ImDA", &Coupling::d_ImDA)
     .def("ImDA_int", &Coupling::ImDA_int)
+    .def("pi0_elems", &Coupling::pi0_elems)
     .def("photon_se",
          py::overload_cast<double, double, double>(&Coupling::photon_se,
                                                    py::const_),

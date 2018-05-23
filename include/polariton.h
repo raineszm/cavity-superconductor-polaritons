@@ -3,21 +3,19 @@
 #include <Eigen/Dense>
 #include <Eigen/Eigenvalues>
 #include <array>
-#include <boost/math/tools/roots.hpp>
 #include <cmath>
 #include <complex>
-#include <gsl/gsl_poly.h>
+#include <gsl/gsl_errno.h>
 #include <tuple>
 #include <vector>
 
-using boost::math::tools::newton_raphson_iterate;
-using boost::math::tools::toms748_solve;
 using Eigen::Matrix3cd;
 using Eigen::Vector3d;
 
 #include "bs.h"
 #include "cavity.h"
 #include "coupling.h"
+#include "roots.h"
 
 /** The hybridized photon-Bardasis-Schrieffer object
  */
@@ -30,11 +28,16 @@ public:
   const Cavity cav;
   //! The fermionic contribution/coupling
   const Coupling coupling;
+  const double big;
 
-  Polariton(const BS& bs_, const Cavity& cav_, const Coupling& c_)
+  Polariton(const BS& bs_,
+            const Cavity& cav_,
+            const Coupling& c_,
+            double BIGUP = 1)
     : bs(bs_)
     , cav(cav_)
     , coupling(c_)
+    , big(BIGUP)
   {
     if (bs.state != coupling.state) {
       throw std::invalid_argument(
@@ -65,8 +68,8 @@ public:
   Matrix3cd action(double omega, double qx, double qy) const
   {
     auto L = M_PI * C / cav.omega0;
-    std::complex<double> c(0., std::sqrt(2 / L) * coupling.ImDA(omega));
-    auto se = 2 / L * coupling.photon_se(omega, qx, qy);
+    std::complex<double> c(0., big * std::sqrt(2 / L) * coupling.ImDA(omega));
+    auto se = 2 / L * big * big * coupling.photon_se(omega, qx, qy);
 
     Matrix3cd act = Matrix3cd::Zero();
     act(0, 0) = bs.action(omega);
@@ -78,11 +81,13 @@ public:
     return act;
   }
 
+  /** The derivative of the inverse GF
+   */
   Matrix3cd d_action(double omega, double qx, double qy) const
   {
     auto L = M_PI * C / cav.omega0;
-    std::complex<double> c(0., std::sqrt(2 / L) * coupling.d_ImDA(omega));
-    auto d_se = 2 / L * coupling.d_photon_se(omega, qx, qy);
+    std::complex<double> c(0., big * std::sqrt(2 / L) * coupling.d_ImDA(omega));
+    auto d_se = 2 / L * big * big * coupling.d_photon_se(omega, qx, qy);
 
     Matrix3cd ret = Matrix3cd::Zero();
     ret(0, 0) = bs.d_action(omega);
@@ -113,34 +118,59 @@ public:
    */
   std::array<double, 3> find_modes(double qx, double qy) const
   {
+    auto f = [this, qx, qy](double omega) {
+      return std::real(action(omega, qx, qy).determinant());
+    };
     auto g = [this, qx, qy](double omega) { return det_and_d(omega, qx, qy); };
 
     std::array<double, 3> roots;
-    double xl = 1e-3 * bs.root();
-    double xu = 1.99 * coupling.state.delta;
+    double xl = 0.5 * bs.root();
+    double xu = 2 * bs.root();
     const double DX = 1e-3 * bs.root();
 
-    boost::uintmax_t max = 1e5;
-    roots[0] = newton_raphson_iterate(g, bs.root(), xl, xu, 32, max);
+    auto solver = FDFSolver(gsl_root_fdfsolver_steffenson);
 
-    std::vector<std::tuple<double, double>> intervals = {
-      { xl, roots[0] - DX }, { roots[0] + DX, xu }
-    };
+    auto gsl_fdf = gsl_function_fdf_pp(f, g);
+    auto last = bs.root();
+    solver.set(gsl_fdf, last);
 
-    int count = 1;
+    const int NITER = 100;
 
-    while (count < 3 && !intervals.empty()) {
-      boost::uintmax_t max = 1e5;
-      auto [xl, xu] = intervals.back();
-      intervals.pop_back();
-      auto root = newton_raphson_iterate(g, (xl + xu) / 2, xl, xu, 32, max);
-
-      if (max != 1e5) {
-        roots[count] = root;
-        ++count;
-        intervals.emplace_back(root + DX, xu);
-        intervals.emplace_back(xl, root - DX);
+    for (int i = 0; i < NITER; i++) {
+      solver.step();
+      if (gsl_root_test_delta(solver.root(), last, 1e-3 * bs.root(), 1e-3) ==
+          GSL_SUCCESS) {
+        roots[0] = solver.root();
+        break;
       }
+
+      last = solver.step();
+    }
+
+    // last = 0.5 * bs.root();
+    // solver.set(gsl_fdf, last);
+    // for (int i = 0; i < NITER; i++) {
+    //   solver.step();
+    //   if (gsl_root_test_delta(solver.root(), last, 1e-3 * bs.root(), 1e-3) ==
+    //       GSL_SUCCESS) {
+    //     roots[1] = solver.root();
+    //     break;
+    //   }
+
+    //   last = solver.step();
+    // }
+
+    last = 1.5 * bs.root();
+    solver.set(gsl_fdf, last);
+    for (int i = 0; i < NITER; i++) {
+      solver.step();
+      if (gsl_root_test_delta(solver.root(), last, 1e-3 * bs.root(), 1e-3) ==
+          GSL_SUCCESS) {
+        roots[2] = solver.root();
+        break;
+      }
+
+      last = solver.step();
     }
 
     return roots;

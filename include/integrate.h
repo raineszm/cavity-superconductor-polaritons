@@ -1,5 +1,6 @@
 #pragma once
 
+#include "function.h"
 #include <memory>
 
 #include <gsl/gsl_integration.h>
@@ -21,34 +22,6 @@ public:
 
   operator gsl_integration_workspace*() { return wsp.get(); }
 };
-
-// Build gsl_function from lambda
-template<typename F>
-class gsl_function_pp : public gsl_function
-{
-  const F func;
-  static double invoke(double x, void* params)
-  {
-    return static_cast<gsl_function_pp*>(params)->func(x);
-  }
-
-public:
-  gsl_function_pp(const F& f)
-    : func(f)
-  {
-    function = &gsl_function_pp::invoke; // inherited from gsl_function
-    params = this;                       // inherited from gsl_function
-  }
-  operator gsl_function*() { return this; }
-};
-
-// Helper function for template construction
-template<typename F>
-gsl_function_pp<F>
-make_gsl_function(const F& func)
-{
-  return gsl_function_pp<F>(func);
-}
 
 template<typename F>
 double
