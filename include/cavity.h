@@ -62,8 +62,8 @@ public:
   **/
   Matrix2d action(double omega, double qx, double qy, double theta_s) const
   {
-    auto prefactor =
-      (omega * omega - this->omega(qx, qy)) / (16 * M_PI * C * C);
+    auto omega_q = this->omega(qx, qy);
+    auto prefactor = (omega * omega - omega_q * omega_q) / (16 * M_PI * C * C);
 
     return prefactor * matrix_structure(qx, qy, theta_s);
   }
