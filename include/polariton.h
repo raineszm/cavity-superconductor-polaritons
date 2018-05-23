@@ -116,12 +116,12 @@ public:
     auto g = [this, qx, qy](double omega) { return det_and_d(omega, qx, qy); };
 
     std::array<double, 3> roots;
-    double xl = 1e-3 * coupling.state.delta;
+    double xl = 1e-3 * bs.root();
     double xu = 1.99 * coupling.state.delta;
-    const double DX = 1e-3 * coupling.state.delta;
+    const double DX = 1e-3 * bs.root();
 
     boost::uintmax_t max = 1e5;
-    roots[0] = newton_raphson_iterate(g, bs.root(), xl, xu, 12, max);
+    roots[0] = newton_raphson_iterate(g, bs.root(), xl, xu, 32, max);
 
     std::vector<std::tuple<double, double>> intervals = {
       { xl, roots[0] - DX }, { roots[0] + DX, xu }
@@ -133,7 +133,7 @@ public:
       boost::uintmax_t max = 1e5;
       auto [xl, xu] = intervals.back();
       intervals.pop_back();
-      auto root = newton_raphson_iterate(g, (xl + xu) / 2, xl, xu, 12, max);
+      auto root = newton_raphson_iterate(g, (xl + xu) / 2, xl, xu, 32, max);
 
       if (max != 1e5) {
         roots[count] = root;
