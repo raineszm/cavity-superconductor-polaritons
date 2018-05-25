@@ -119,7 +119,7 @@ public:
    */
   Vector3d eigval(double omega, double qx, double qy) const
   {
-    return action(omega, qx, qy).selfadjointView<Eigen::Upper>().eigenvalues();
+    return action(omega, qx, qy).eigenvalues().real();
   }
 
   /** Find zeroes of action()
@@ -131,7 +131,7 @@ public:
     };
 
     auto phot_perp = [this, qx, qy](double omega) {
-      return std::real(action(omega, qx, qy)(2, 2));
+      return photon_sector(omega, qx, qy)(1, 1);
     };
 
     auto other = [this, qx, qy](double omega) {
@@ -144,19 +144,27 @@ public:
     double xl = 0.5 * bs.root();
     double xu = 2 * bs.root();
 
-    auto gsl_f = gsl_function_pp(phot_perp);
-    auto solver = FSolver::create(gsl_root_fsolver_brent, gsl_f, xl, xu);
+    auto gsl_f = gsl_function_pp<decltype(phot_perp)>(phot_perp);
+    auto solver = FSolver::create<decltype(phot_perp)>(
+      gsl_root_fsolver_brent, gsl_f, xl, xu);
 
-    auto perp_0 = solver.solve(1e-8 * bs.root(), 1e-6);
+    auto perp_0 = solver.solve(1e-8 * bs.root(), 0);
 
     if (gsl_root_test_residual(detphot(perp_0),
                                1e-8 * cav.omega0 * cav.omega0) == GSL_SUCCESS) {
       roots[0] = perp_0;
     }
 
-    auto gsl_other = gsl_function_pp(other);
+    auto gsl_other = gsl_function_pp<decltype(other)>(other);
     solver.set(gsl_other, xl, xu);
-    roots[1] = solver.solve(1e-8 * bs.root(), 1e-6);
+    roots[1] = solver.solve(1e-8 * bs.root(), 0);
+    if (gsl_root_test_residual(std::get<1>(det_and_d(roots[1], qx, qy)),
+                               1e-16) == GSL_SUCCESS) {
+      roots[2] = roots[1];
+    } else if (gsl_root_test_residual(std::get<1>(det_and_d(roots[0], qx, qy)),
+                                      1e-16) == GSL_SUCCESS) {
+      roots[2] = roots[1];
+    }
     return roots;
   }
 };

@@ -25,7 +25,6 @@ bind_cavity(py::module&);
 
 PYBIND11_MODULE(bardasis_schrieffer, m)
 {
-  // gsl_set_error_handler_off();
   gsl_set_error_handler(&gsl::error_handler);
   m.doc() =
     "Calculate the hybridization of photons and Bardasis-Schrieffer modes";

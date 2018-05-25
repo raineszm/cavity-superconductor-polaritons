@@ -26,7 +26,8 @@ public:
 [[noreturn]] inline void
 error_handler(const char* reason, const char* file, int line, int gsl_errno)
 {
-  if (gsl_errno == GSL_EBADFUNC || gsl_errno == GSL_EZERODIV) {
+  if (gsl_errno == GSL_EBADFUNC || gsl_errno == GSL_EZERODIV ||
+      gsl_errno == GSL_EINVAL) {
     throw RootException(reason, file, line, gsl_errno);
   } else {
     throw GSLException(reason, file, line, gsl_errno);
