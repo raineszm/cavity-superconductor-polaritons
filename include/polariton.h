@@ -9,6 +9,7 @@
 #include <tuple>
 #include <vector>
 
+using Eigen::Matrix2d;
 using Eigen::Matrix3cd;
 using Eigen::Vector3d;
 
@@ -43,6 +44,15 @@ public:
       throw std::invalid_argument(
         "bs and c must be constructed with the same state");
     }
+  }
+
+  Matrix2d photon_sector(double omega, double qx, double qy) const
+  {
+
+    auto L = M_PI * C / cav.omega0;
+    auto se = 2 / L * big * big * coupling.photon_se(omega, qx, qy);
+
+    return cav.action(omega, qx, qy, coupling.state.sys.theta_v) + se;
   }
 
   /** The inverse GF of the polariton
@@ -87,15 +97,13 @@ public:
   {
     auto L = M_PI * C / cav.omega0;
     std::complex<double> c(0., big * std::sqrt(2 / L) * coupling.d_ImDA(omega));
-    auto d_se = 2 / L * big * big * coupling.d_photon_se(omega, qx, qy);
 
     Matrix3cd ret = Matrix3cd::Zero();
     ret(0, 0) = bs.d_action(omega);
     ret(0, 1) = c;
     ret(1, 0) = -c;
     ret.bottomRightCorner<2, 2>() =
-      (cav.d_action(omega, qx, qy, coupling.state.sys.theta_v) + d_se)
-        .cast<std::complex<double>>();
+      photon_sector(omega, qx, qy).cast<std::complex<double>>();
     return ret;
   }
 
@@ -118,21 +126,30 @@ public:
    */
   std::array<double, 3> find_modes(double qx, double qy) const
   {
-    auto f = [this, qx, qy](double omega) {
-      return std::real(action(omega, qx, qy).determinant());
+    auto detphot = [this, qx, qy](double omega) {
+      return photon_sector(omega, qx, qy).determinant();
     };
-    auto g = [this, qx, qy](double omega) { return det_and_d(omega, qx, qy); };
 
+    auto phot_perp = [this, qx, qy](double omega) {
+      return std::real(action(omega, qx, qy)(2, 2));
+    };
+
+    auto other = [this, qx, qy](double omega) {
+      auto act = action(omega, qx, qy);
+      return std::real(act(0, 0) -
+                       act(0, 1) * act(1, 0) * act(2, 2) /
+                         act.bottomRightCorner<2, 2>().determinant());
+    };
     std::array<double, 3> roots;
     double xl = 0.5 * bs.root();
     double xu = 2 * bs.root();
-    const double DX = 1e-3 * bs.root();
 
-    auto solver = FDFSolver(gsl_root_fdfsolver_steffenson);
+    auto solver = FSolver(gsl_root_fsolver_falsepos);
+    // auto solver = FDFSolver(gsl_root_fdfsolver_steffenson);
 
-    auto gsl_fdf = gsl_function_fdf_pp(f, g);
-    auto last = bs.root();
-    solver.set(gsl_fdf, last);
+    auto gsl_f = gsl_function_pp(phot_perp);
+    solver.set(gsl_f, xl, xu);
+    auto last = solver.root();
 
     const int NITER = 100;
 
@@ -140,33 +157,9 @@ public:
       solver.step();
       if (gsl_root_test_delta(solver.root(), last, 1e-3 * bs.root(), 1e-3) ==
           GSL_SUCCESS) {
-        roots[0] = solver.root();
-        break;
-      }
-
-      last = solver.step();
-    }
-
-    // last = 0.5 * bs.root();
-    // solver.set(gsl_fdf, last);
-    // for (int i = 0; i < NITER; i++) {
-    //   solver.step();
-    //   if (gsl_root_test_delta(solver.root(), last, 1e-3 * bs.root(), 1e-3) ==
-    //       GSL_SUCCESS) {
-    //     roots[1] = solver.root();
-    //     break;
-    //   }
-
-    //   last = solver.step();
-    // }
-
-    last = 1.5 * bs.root();
-    solver.set(gsl_fdf, last);
-    for (int i = 0; i < NITER; i++) {
-      solver.step();
-      if (gsl_root_test_delta(solver.root(), last, 1e-3 * bs.root(), 1e-3) ==
-          GSL_SUCCESS) {
-        roots[2] = solver.root();
+        if (gsl_root_test_residual(detphot(solver.root()), 1e-15)) {
+          roots[0] = solver.root();
+        }
         break;
       }
 

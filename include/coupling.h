@@ -6,7 +6,7 @@
 #include "cavity.h"
 #include "state.h"
 
-using Eigen::Matrix2cd;
+using Eigen::Matrix2d;
 
 //! The coupling between the Superconductor and Cavity
 
@@ -340,18 +340,18 @@ public:
     return 0.5 * GPAR * GPAR * ret;
   }
 
-  Matrix2cd photon_se(double omega, double qx, double qy) const
+  Matrix2d photon_se(double omega, double qx, double qy) const
   {
-    return (Matrix2cd() << photon_se(omega, qx, qy, 0, 0),
+    return (Matrix2d() << photon_se(omega, qx, qy, 0, 0),
             photon_se(omega, qx, qy, 0, 1),
             photon_se(omega, qx, qy, 1, 0),
             photon_se(omega, qx, qy, 1, 1))
       .finished();
   }
 
-  Matrix2cd d_photon_se(double omega, double qx, double qy) const
+  Matrix2d d_photon_se(double omega, double qx, double qy) const
   {
-    return (Matrix2cd() << _photon_se(omega, qx, qy, 0, 0, true),
+    return (Matrix2d() << _photon_se(omega, qx, qy, 0, 0, true),
             _photon_se(omega, qx, qy, 0, 1, true),
             _photon_se(omega, qx, qy, 1, 0, true),
             _photon_se(omega, qx, qy, 1, 1, true))
