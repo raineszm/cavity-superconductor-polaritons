@@ -140,32 +140,23 @@ public:
                        act(0, 1) * act(1, 0) * act(2, 2) /
                          act.bottomRightCorner<2, 2>().determinant());
     };
-    std::array<double, 3> roots;
+    std::array<double, 3> roots{ { NAN, NAN, NAN } };
     double xl = 0.5 * bs.root();
     double xu = 2 * bs.root();
 
-    auto solver = FSolver(gsl_root_fsolver_falsepos);
-    // auto solver = FDFSolver(gsl_root_fdfsolver_steffenson);
-
     auto gsl_f = gsl_function_pp(phot_perp);
-    solver.set(gsl_f, xl, xu);
-    auto last = solver.root();
+    auto solver = FSolver::create(gsl_root_fsolver_brent, gsl_f, xl, xu);
 
-    const int NITER = 100;
+    auto perp_0 = solver.solve(1e-8 * bs.root(), 1e-6);
 
-    for (int i = 0; i < NITER; i++) {
-      solver.step();
-      if (gsl_root_test_delta(solver.root(), last, 1e-3 * bs.root(), 1e-3) ==
-          GSL_SUCCESS) {
-        if (gsl_root_test_residual(detphot(solver.root()), 1e-15)) {
-          roots[0] = solver.root();
-        }
-        break;
-      }
-
-      last = solver.step();
+    if (gsl_root_test_residual(detphot(perp_0),
+                               1e-8 * cav.omega0 * cav.omega0) == GSL_SUCCESS) {
+      roots[0] = perp_0;
     }
 
+    auto gsl_other = gsl_function_pp(other);
+    solver.set(gsl_other, xl, xu);
+    roots[1] = solver.solve(1e-8 * bs.root(), 1e-6);
     return roots;
   }
 };

@@ -38,9 +38,9 @@ public:
     }
     auto f = [sys, T](double x) { return sys.gap_eq(T, x); };
 
-    auto gsl_f = gsl_function_pp(f);
-    auto solver =
-      FSolver::create(gsl_root_fsolver_brent, gsl_f, 0., 5 * sys.Tc);
+    auto gsl_f = gsl_function_pp<decltype(f)>(f);
+    auto solver = FSolver::create<decltype(f)>(
+      gsl_root_fsolver_brent, gsl_f, 0., 5 * sys.Tc);
 
     return State(sys, T, solver.solve(1e-4 * sys.Tc, 0));
   }
