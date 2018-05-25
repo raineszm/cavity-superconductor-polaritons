@@ -10,8 +10,6 @@ cc = meson.get_compiler('cpp')
 m_dep = cc.find_library('m', required : false)
 #fmt = cc.find_library('fmt')
 eigen = dependency('eigen3')
-nlopt = dependency('nlopt')
-boost = dependency('boost', modules : ['math'])
 gsl = dependency('gsl')
 
 #pybind11 stuff
@@ -31,8 +29,6 @@ subdir('src')
 
 deps = [
     m_dep,
-    nlopt,
-    boost,
     eigen,
     gsl
     ]

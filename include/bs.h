@@ -1,12 +1,11 @@
 #pragma once
 #include "integrate.h"
+#include "roots.h"
 #include "state.h"
 #include "system.h"
-#include <boost/math/tools/roots.hpp>
 #include <cmath>
 #include <functional>
-
-using boost::math::tools::bracket_and_solve_root;
+#include <gsl/gsl_errno.h>
 
 //! Describes the Bardasis-Schrieffer mode of the system
 class BS
@@ -126,16 +125,25 @@ public:
 
     _mass = mass;
     _state_hash = std::hash<State>{}(state);
-    boost::uintmax_t max = 1e7;
-    auto [a, b] = bracket_and_solve_root([this](double x) { return action(x); },
-                                         mass,
-                                         2.,
-                                         false,
-                                         [this](double a, double b) {
-                                           double x = (a + b) / 2;
-                                           return std::fabs(action(x)) < 1e-8;
-                                         },
-                                         max);
-    return (_root = (a + b) / 2);
+
+    auto f = [this](double x) { return action(x); };
+
+    auto gsl_f = gsl_function_pp(f);
+    auto solver = FSolver(gsl_root_fsolver_brent);
+    solver.set(gsl_f, 1e-3 * state.delta, 1.99 * state.delta);
+    auto last = solver.root();
+
+    for (auto i = 0; i < 100; i++) {
+      solver.step();
+
+      if (gsl_root_test_delta(solver.root(), last, 1e-3 * state.delta, 0) ==
+          GSL_SUCCESS) {
+        return (_root = solver.root());
+      }
+
+      last = solver.root();
+    }
+
+    return (_root = NAN);
   }
 };

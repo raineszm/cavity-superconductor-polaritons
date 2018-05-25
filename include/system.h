@@ -53,7 +53,7 @@ public:
   //! The Fermi velocity
   double vf() const { return kf() / m; }
   //! The density of states per spin in 2D \f[\nu=\frac{m}{2\pi}\f]
-  double dos() const { return m / (2 * M_PI); }
+  constexpr double dos() const { return m / (2 * M_PI); }
   /** The density of electrons.
    *
    * For low temperatures we can neglect the distinction between \f$E_f\f$ and

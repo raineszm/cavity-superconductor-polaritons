@@ -1,10 +1,9 @@
 #pragma once
 
+#include "roots.h"
 #include "system.h"
-#include <boost/math/tools/roots.hpp>
 #include <cmath>
-
-using boost::math::tools::bracket_and_solve_root;
+#include <gsl/gsl_errno.h>
 
 //! Mean Field solution
 class State
@@ -38,16 +37,25 @@ public:
     if (T >= sys.Tc) {
       return State(sys, T, 0.);
     }
-    boost::uintmax_t max = 1e5;
-    auto [a, b] = bracket_and_solve_root(
-      [sys, T](double x) { return sys.gap_eq(T, x); },
-      sys.Tc,
-      2.,
-      false,
-      [sys](double a, double b) { return b - a < 1e-4 * sys.Tc; },
-      max);
+    auto f = [sys, T](double x) { return sys.gap_eq(T, x); };
 
-    return State(sys, T, (a + b) / 2);
+    auto gsl_f = gsl_function_pp(f);
+    auto solver = FSolver(gsl_root_fsolver_brent);
+    solver.set(gsl_f, 0., 5 * sys.Tc);
+    auto last = solver.root();
+
+    for (auto i = 0; i < 100; i++) {
+      solver.step();
+
+      if (gsl_root_test_delta(solver.root(), last, 1e-4 * sys.Tc, 0) ==
+          GSL_SUCCESS) {
+        return State(sys, T, solver.root());
+      }
+
+      last = solver.root();
+    }
+
+    return State(sys, T, 0);
   }
 
   /**
