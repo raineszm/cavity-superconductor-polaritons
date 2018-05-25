@@ -5,7 +5,6 @@
 #include "system.h"
 #include <cmath>
 #include <functional>
-#include <gsl/gsl_errno.h>
 
 //! Describes the Bardasis-Schrieffer mode of the system
 class BS
@@ -129,21 +128,9 @@ public:
     auto f = [this](double x) { return action(x); };
 
     auto gsl_f = gsl_function_pp(f);
-    auto solver = FSolver(gsl_root_fsolver_brent);
-    solver.set(gsl_f, 1e-3 * state.delta, 1.99 * state.delta);
-    auto last = solver.root();
+    auto solver = FSolver::create(
+      gsl_root_fsolver_brent, gsl_f, 1e-3 * state.delta, 1.99 * state.delta);
 
-    for (auto i = 0; i < 100; i++) {
-      solver.step();
-
-      if (gsl_root_test_delta(solver.root(), last, 1e-3 * state.delta, 0) ==
-          GSL_SUCCESS) {
-        return (_root = solver.root());
-      }
-
-      last = solver.root();
-    }
-
-    return (_root = NAN);
+    return (_root = solver.solve(1e-4 * state.delta, 0));
   }
 };

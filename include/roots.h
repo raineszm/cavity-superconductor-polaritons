@@ -1,6 +1,7 @@
 #pragma once
 #include "function.h"
 #include <cmath>
+#include <gsl/gsl_errno.h>
 #include <gsl/gsl_roots.h>
 #include <memory>
 #include <tuple>
@@ -15,6 +16,17 @@ public:
   {}
 
   template<typename F>
+  static FSolver create(const gsl_root_fsolver_type* t,
+                        gsl_function_pp<F>& f,
+                        double a,
+                        double b)
+  {
+    auto solver = FSolver(t);
+    solver.set(f, a, b);
+    return solver;
+  }
+
+  template<typename F>
   int set(gsl_function_pp<F>& f, double a, double b)
   {
     return gsl_root_fsolver_set(_solver.get(), &f, a, b);
@@ -23,6 +35,26 @@ public:
   int step() { return gsl_root_fsolver_iterate(_solver.get()); }
 
   double root() const { return gsl_root_fsolver_root(_solver.get()); }
+
+  double xl() const { return gsl_root_fsolver_x_lower(_solver.get()); }
+  double xu() const { return gsl_root_fsolver_x_upper(_solver.get()); }
+
+  bool found(double epsabs, double epsrel) const
+  {
+    return gsl_root_test_interval(xl(), xu(), epsabs, epsrel) == GSL_SUCCESS;
+  }
+
+  double solve(double epsabs, double epsrel, size_t niter = 100)
+  {
+    for (auto i = 0; i < niter; i++) {
+      step();
+
+      if (found(epsabs, epsrel)) {
+        return root();
+      }
+    }
+    return NAN;
+  }
 };
 
 class FDFSolver

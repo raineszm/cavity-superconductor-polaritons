@@ -3,7 +3,6 @@
 #include "roots.h"
 #include "system.h"
 #include <cmath>
-#include <gsl/gsl_errno.h>
 
 //! Mean Field solution
 class State
@@ -40,22 +39,10 @@ public:
     auto f = [sys, T](double x) { return sys.gap_eq(T, x); };
 
     auto gsl_f = gsl_function_pp(f);
-    auto solver = FSolver(gsl_root_fsolver_brent);
-    solver.set(gsl_f, 0., 5 * sys.Tc);
-    auto last = solver.root();
+    auto solver =
+      FSolver::create(gsl_root_fsolver_brent, gsl_f, 0., 5 * sys.Tc);
 
-    for (auto i = 0; i < 100; i++) {
-      solver.step();
-
-      if (gsl_root_test_delta(solver.root(), last, 1e-4 * sys.Tc, 0) ==
-          GSL_SUCCESS) {
-        return State(sys, T, solver.root());
-      }
-
-      last = solver.root();
-    }
-
-    return State(sys, T, 0);
+    return State(sys, T, solver.solve(1e-4 * sys.Tc, 0));
   }
 
   /**
