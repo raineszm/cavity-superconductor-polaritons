@@ -11,6 +11,11 @@ using boost::math::tools::bracket_and_solve_root;
 //! Describes the Bardasis-Schrieffer mode of the system
 class BS
 {
+private:
+  mutable double _mass = NAN;
+  mutable size_t _state_hash;
+  mutable double _root;
+
 public:
   /** The bare Bardasis-Schriefer 'mass'
    *
@@ -115,6 +120,12 @@ public:
   //! Obtained by solving for where action() is zero
   double root() const
   {
+    if (mass == _mass && std::hash<State>{}(state) == _state_hash) {
+      return _root;
+    }
+
+    _mass = mass;
+    _state_hash = std::hash<State>{}(state);
     boost::uintmax_t max = 1e7;
     auto [a, b] = bracket_and_solve_root([this](double x) { return action(x); },
                                          mass,
@@ -125,6 +136,6 @@ public:
                                            return std::fabs(action(x)) < 1e-8;
                                          },
                                          max);
-    return (a + b) / 2;
+    return (_root = (a + b) / 2);
   }
 };

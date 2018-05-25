@@ -3,6 +3,7 @@
 #include "integrate.h"
 #include "utils.h"
 #include <cmath>
+#include <functional>
 
 //! The material properties of the system
 
@@ -98,3 +99,21 @@ public:
     return c(l, d, T) - tanh_over(x, Tc) / 2;
   }
 };
+
+namespace std {
+template<>
+struct hash<System>
+{
+  typedef System argument_type;
+  typedef std::size_t result_type;
+  result_type operator()(argument_type const& s) const noexcept
+  {
+    result_type const hm = std::hash<double>{}(s.m);
+    result_type const hmu = std::hash<double>{}(s.mu);
+    result_type const hTc = std::hash<double>{}(s.Tc);
+    result_type const hvs = std::hash<double>{}(s.vs);
+    result_type const htheta_v = std::hash<double>{}(s.theta_v);
+    return hm ^ (hmu << 1) ^ (hTc << 2) ^ (hvs << 3) ^ (htheta_v << 4);
+  }
+};
+}

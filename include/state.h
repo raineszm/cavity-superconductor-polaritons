@@ -113,3 +113,19 @@ public:
 
   //! @}
 };
+
+namespace std {
+template<>
+struct hash<State>
+{
+  typedef State argument_type;
+  typedef std::size_t result_type;
+  result_type operator()(argument_type const& s) const noexcept
+  {
+    result_type const hT = std::hash<double>{}(s.T);
+    result_type const hsys = std::hash<System>{}(s.sys);
+    result_type const hdelta = std::hash<double>{}(s.delta);
+    return hT ^ (hsys << 1) ^ (hdelta << 2);
+  }
+};
+}
