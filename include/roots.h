@@ -1,4 +1,5 @@
 #pragma once
+#include "exceptions.h"
 #include "function.h"
 #include <cmath>
 #include <gsl/gsl_errno.h>
@@ -46,14 +47,18 @@ public:
 
   double solve(double epsabs, double epsrel, size_t niter = 100)
   {
-    for (auto i = 0; i < niter; i++) {
-      step();
+    try {
+      for (size_t i = 0; i < niter; i++) {
+        step();
 
-      if (found(epsabs, epsrel)) {
-        return root();
+        if (found(epsabs, epsrel)) {
+          return root();
+        }
       }
+      return NAN;
+    } catch (const gsl::RootException&) {
+      return NAN;
     }
-    return NAN;
   }
 };
 

@@ -11,7 +11,8 @@ class GSLException : public std::runtime_error
 
 public:
   GSLException(const char* reason, const char* file, int line, int gsl_errno)
-    : std::runtime_error(gsl_strerror(gsl_errno) + std::string(reason))
+    : std::runtime_error(gsl_strerror(gsl_errno) + std::string(": ") +
+                         std::string(reason))
   {}
 };
 
