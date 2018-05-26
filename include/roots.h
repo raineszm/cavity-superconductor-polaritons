@@ -55,9 +55,9 @@ public:
           return root();
         }
       }
-      return NAN;
+      return std::numeric_limits<double>::quiet_NaN();
     } catch (const gsl::RootException&) {
-      return NAN;
+      return std::numeric_limits<double>::quiet_NaN();
     }
   }
 };

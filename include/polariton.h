@@ -50,9 +50,10 @@ public:
   {
 
     auto L = M_PI * C / cav.omega0;
-    auto se = 2 / L * big * big * coupling.photon_se(omega, qx, qy);
-
-    return cav.action(omega, qx, qy, coupling.state.sys.theta_v) + se;
+    Matrix2d se = 2 / L * big * big * coupling.photon_se(omega, qx, qy);
+    Matrix2d cavaction = cav.action(omega, qx, qy, coupling.state.sys.theta_v);
+    cavaction += se;
+    return cavaction;
   }
 
   /** The inverse GF of the polariton
@@ -79,15 +80,13 @@ public:
   {
     auto L = M_PI * C / cav.omega0;
     std::complex<double> c(0., big * std::sqrt(2 / L) * coupling.ImDA(omega));
-    auto se = 2 / L * big * big * coupling.photon_se(omega, qx, qy);
 
     Matrix3cd act = Matrix3cd::Zero();
     act(0, 0) = bs.action(omega);
     act(0, 1) = c;
     act(1, 0) = -c;
     act.bottomRightCorner<2, 2>() =
-      (cav.action(omega, qx, qy, coupling.state.sys.theta_v) + se)
-        .cast<std::complex<double>>();
+      photon_sector(omega, qx, qy).cast<std::complex<double>>();
     return act;
   }
 
@@ -98,12 +97,15 @@ public:
     auto L = M_PI * C / cav.omega0;
     std::complex<double> c(0., big * std::sqrt(2 / L) * coupling.d_ImDA(omega));
 
+    auto d_se = 2 / L * big * big * coupling.d_photon_se(omega, qx, qy);
+    auto d_cavaction = cav.d_action(omega, qx, qy, coupling.state.sys.theta_v);
+    d_cavaction += d_se;
+
     Matrix3cd ret = Matrix3cd::Zero();
     ret(0, 0) = bs.d_action(omega);
     ret(0, 1) = c;
     ret(1, 0) = -c;
-    ret.bottomRightCorner<2, 2>() =
-      photon_sector(omega, qx, qy).cast<std::complex<double>>();
+    ret.bottomRightCorner<2, 2>() = d_cavaction.cast<std::complex<double>>();
     return ret;
   }
 
@@ -130,6 +132,10 @@ public:
       return photon_sector(omega, qx, qy).determinant();
     };
 
+    auto phot_par = [this, qx, qy](double omega) {
+      return photon_sector(omega, qx, qy)(0, 0);
+    };
+
     auto phot_perp = [this, qx, qy](double omega) {
       return photon_sector(omega, qx, qy)(1, 1);
     };
@@ -140,30 +146,46 @@ public:
                        act(0, 1) * act(1, 0) * act(2, 2) /
                          act.bottomRightCorner<2, 2>().determinant());
     };
-    std::array<double, 3> roots{ { NAN, NAN, NAN } };
+
+    auto other2 = [this, qx, qy](double omega) {
+      auto act = action(omega, qx, qy);
+      return std::real(act.bottomRightCorner<2, 2>().determinant() -
+                       act(0, 1) * act(1, 0) * act(2, 2) / act(0, 0));
+    };
+    std::array<double, 3> roots;
+    roots.fill(std::numeric_limits<double>::quiet_NaN());
     double xl = 0.5 * bs.root();
     double xu = 2 * bs.root();
+    auto solver = FSolver(gsl_root_fsolver_brent);
 
-    auto gsl_f = gsl_function_pp<decltype(phot_perp)>(phot_perp);
-    auto solver = FSolver::create<decltype(phot_perp)>(
-      gsl_root_fsolver_brent, gsl_f, xl, xu);
+    try {
+      auto gsl_f = gsl_function_pp<decltype(phot_perp)>(phot_perp);
+      solver.set(gsl_f, xl, xu);
 
-    auto perp_0 = solver.solve(1e-8 * bs.root(), 0);
+      auto perp_0 = solver.solve(1e-3 * bs.root(), 0);
 
-    if (gsl_root_test_residual(detphot(perp_0),
-                               1e-8 * cav.omega0 * cav.omega0) == GSL_SUCCESS) {
-      roots[0] = perp_0;
+      if (gsl_root_test_residual(
+            detphot(perp_0), 1e-8 * cav.omega0 * cav.omega0) == GSL_SUCCESS) {
+        roots[0] = perp_0;
+      }
+    } catch (const gsl::RootException&) {
     }
 
-    auto gsl_other = gsl_function_pp<decltype(other)>(other);
-    solver.set(gsl_other, xl, xu);
-    roots[1] = solver.solve(1e-8 * bs.root(), 0);
-    if (gsl_root_test_residual(std::get<1>(det_and_d(roots[1], qx, qy)),
-                               1e-16) == GSL_SUCCESS) {
-      roots[2] = roots[1];
-    } else if (gsl_root_test_residual(std::get<1>(det_and_d(roots[0], qx, qy)),
-                                      1e-16) == GSL_SUCCESS) {
-      roots[2] = roots[1];
+    try {
+      auto gsl_other = gsl_function_pp<decltype(other)>(other);
+      solver.set(gsl_other, xl, xu);
+      roots[1] = solver.solve(1e-8 * bs.root(), 0);
+    } catch (const gsl::RootException&) {
+    }
+    try {
+      auto gsl_par = gsl_function_pp<decltype(phot_par)>(phot_par);
+      solver.set(gsl_par, std::max(roots[0], roots[1]) * 1.01, xu);
+      auto seed = solver.solve(1e-3 * bs.root(), 0);
+
+      auto gsl_other = gsl_function_pp<decltype(other2)>(other2);
+      solver.set(gsl_other, (std::max(roots[0], roots[1]) + seed) / 2, xu);
+      roots[2] = solver.solve(1e-8 * bs.root(), 0);
+    } catch (const gsl::RootException&) {
     }
     return roots;
   }

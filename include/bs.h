@@ -127,10 +127,10 @@ public:
 
     auto f = [this](double x) { return action(x); };
 
-    auto gsl_f = gsl_function_pp(f);
-    auto solver = FSolver::create(
+    auto gsl_f = gsl_function_pp<decltype(f)>(f);
+    auto solver = FSolver::create<decltype(f)>(
       gsl_root_fsolver_brent, gsl_f, 1e-3 * state.delta, 1.99 * state.delta);
 
-    return (_root = solver.solve(1e-4 * state.delta, 0));
+    return (_root = solver.solve(1e-8 * state.delta, 0));
   }
 };
