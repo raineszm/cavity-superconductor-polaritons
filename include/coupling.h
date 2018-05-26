@@ -165,7 +165,7 @@ public:
     return { { p00 + p11, p01 + p10, p01 - p10, p00 - p11 } };
   }
 
-  double vs_comp(double i) const
+  double vs_comp(int i) const
   {
     assert(i < 2 and i >= 0);
     if (i == 0) {
@@ -174,7 +174,7 @@ public:
       return 0.;
     }
   }
-  double v_comp(double kx, double ky, double i) const
+  double v_comp(double kx, double ky, int i) const
   {
     assert(i < 2 and i >= 0);
     auto v = std::hypot(kx, ky) / state.sys.m;
