@@ -1,19 +1,20 @@
 project('bardasis_schrieffer', 'cpp',
         default_options : ['cpp_std=c++17',
         'buildtype=release',
-        'default_library=static',
-        'b_lto=true'])
+        'default_library=shared',
+        'b_lto=true',
+        'b_asneeded=false'])
 
 cc = meson.get_compiler('cpp')
 
 # Library Dependencies
 m_dep = cc.find_library('m', required : false)
-#fmt = cc.find_library('fmt')
 eigen = dependency('eigen3')
 gsl = dependency('gsl')
 
 #pybind11 stuff
-py3 = import('python3')
+pymod = import('python')
+py = pymod.find_installation()
 pybind_dirs = run_command('python', '-c',
       'import pybind11; print(pybind11.get_include())').stdout().strip()
 
@@ -23,7 +24,10 @@ endif
 
 include_dirs = include_directories('include', pybind_dirs)
 
-add_project_arguments('-ffast-math', language : 'cpp')
+if meson.get_compiler('cpp').get_id() == 'gcc'
+    add_project_arguments('-Wno-int-in-bool-context', language : 'cpp')
+    add_project_link_arguments('-undefined', 'dynamic_lookup', language : 'cpp')
+endif
 
 subdir('src')
 
@@ -33,10 +37,9 @@ deps = [
     gsl
     ]
 
-py3.extension_module('bardasis_schrieffer',
+py.extension_module('bardasis_schrieffer',
     ext_files,
     include_directories: include_dirs,
     dependencies : deps,
     install : true,
-    install_dir : join_paths(meson.build_root(), '..', 'python', 'lib'),
-    cpp_args : '-DDOCTEST_CONFIG_DISABLE')
+    install_dir : join_paths(meson.build_root(), '..', 'python', 'lib'))
