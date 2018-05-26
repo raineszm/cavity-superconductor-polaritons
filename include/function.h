@@ -1,6 +1,7 @@
 #pragma once
 
 #include <gsl/gsl_math.h>
+#include <tuple>
 
 // Build gsl_function from lambda
 template<typename F>
