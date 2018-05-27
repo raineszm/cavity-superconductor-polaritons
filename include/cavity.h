@@ -59,7 +59,8 @@ public:
   \right]
   \mathbf{A}(q)
   \f]
-  **/
+  * \sa matrix_structure()
+  */
   Matrix2d action(double omega, double qx, double qy, double theta_s) const
   {
     auto omega_q = this->omega(qx, qy);

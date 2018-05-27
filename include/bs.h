@@ -103,6 +103,7 @@ public:
                       state.delta);
   }
 
+  //! Derivative of the BS mode inverse GF wrt \f$\Omega\f$
   double d_action(double omega) const
   {
     return 2 * state.sys.dos() *
@@ -118,10 +119,12 @@ public:
   //! Obtained by solving for where action() is zero
   double root() const
   {
+    // If the cached value is still good return it
     if (mass == _mass && std::hash<State>{}(state) == _state_hash) {
       return _root;
     }
 
+    // Keep track of parameters for when we cache new value
     _mass = mass;
     _state_hash = std::hash<State>{}(state);
 

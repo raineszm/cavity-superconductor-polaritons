@@ -100,6 +100,7 @@ public:
   }
 };
 
+//! \cond
 namespace std {
 template<>
 struct hash<System>
@@ -117,3 +118,4 @@ struct hash<System>
   }
 };
 }
+//! \endcond
