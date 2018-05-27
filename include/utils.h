@@ -3,6 +3,7 @@
 #include <Eigen/Core>
 #include <cmath>
 
+using Eigen::Matrix2cd;
 using Eigen::Matrix3cd;
 
 inline double
@@ -27,6 +28,12 @@ c(double x1, double x2, double T)
               (24 * std::pow(T, 3) * std::pow(std::cosh(x2 / (2 * T)), 4))) /
            4;
   }
+}
+
+inline Matrix2cd
+adjugate(const Matrix2cd& m)
+{
+  return m.trace() * Matrix2cd::Identity() - m;
 }
 
 inline Matrix3cd
