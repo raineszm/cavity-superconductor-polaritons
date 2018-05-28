@@ -66,6 +66,7 @@ class FDFSolver
 {
   std::unique_ptr<gsl_root_fdfsolver, decltype(&gsl_root_fdfsolver_free)>
     _solver;
+  const gsl_function_fdf* _fdf = nullptr;
 
 public:
   FDFSolver(const gsl_root_fdfsolver_type* t)
@@ -75,10 +76,33 @@ public:
   template<typename F, typename U>
   int set(gsl_function_fdf_pp<F, U>& fdf, double guess)
   {
+    _fdf = &fdf;
     return gsl_root_fdfsolver_set(_solver.get(), &fdf, guess);
   }
 
   int step() { return gsl_root_fdfsolver_iterate(_solver.get()); }
 
   double root() const { return gsl_root_fdfsolver_root(_solver.get()); }
+
+  bool found(double epsabs) const
+  {
+    return gsl_root_test_residual(GSL_FN_FDF_EVAL_F(_fdf, root()), epsabs) ==
+           GSL_SUCCESS;
+  }
+
+  double solve(double epsabs, size_t niter = 100)
+  {
+    try {
+      for (size_t i = 0; i < niter; i++) {
+        step();
+
+        if (found(epsabs)) {
+          return root();
+        }
+      }
+      return std::numeric_limits<double>::quiet_NaN();
+    } catch (const gsl::RootException&) {
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+  }
 };
