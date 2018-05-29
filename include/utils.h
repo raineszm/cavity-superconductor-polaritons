@@ -2,6 +2,7 @@
 
 #include <Eigen/Core>
 #include <cmath>
+#include <gsl/gsl_deriv.h>
 
 using Eigen::Matrix2cd;
 using Eigen::Matrix3cd;
@@ -42,4 +43,20 @@ adjugate(const Matrix3cd& m)
   auto m2 = m * m;
   auto trm = m.trace();
   return (trm * trm - m2.trace()) * Matrix3cd::Identity() / 2 - m * trm + m2;
+}
+
+template<typename F>
+inline double
+deriv(const F& f, double x, double h)
+{
+  auto gsl_f = make_gsl_function(f);
+  return deriv_gsl(gsl_f, x, h);
+}
+
+inline double
+deriv_gsl(const gsl_function& f, double x, double h)
+{
+  double deriv, err;
+  gsl_deriv_central(&f, x, h, &deriv, &err);
+  return deriv;
 }

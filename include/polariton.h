@@ -19,6 +19,7 @@ using Eigen::Vector3d;
 #include "cavity.h"
 #include "coupling.h"
 #include "roots.h"
+#include "utils.h"
 
 /** The hybridized photon-Bardasis-Schrieffer object
  */
@@ -92,6 +93,11 @@ public:
     return act;
   }
 
+  double det_action(double omega, double qx, double qy) const
+  {
+    return std::real(action(omega, qx, qy).determinant());
+  }
+
   /** The derivative of the inverse GF
    */
   Matrix3cd d_action(double omega, double qx, double qy) const
@@ -119,6 +125,11 @@ public:
     return std::tuple<double, double>(std::real(A.determinant()), d_det);
   }
 
+  double d_det_action(double omega, double qx, double qy) const
+  {
+    return std::get<1>(det_and_d(omega, qx, qy));
+  }
+
   /** The eigenvalues of action()
    */
   Vector3d eigval(double omega, double qx, double qy) const
@@ -130,102 +141,96 @@ public:
    */
   std::array<double, 3> find_modes(double qx, double qy) const
   {
-    const double EPS = 1e-6 * bs.root();
 
     // Define functions to be used in root finding
     auto det = [this, qx, qy](double omega) {
-      return std::real(action(omega, qx, qy).determinant());
+      return det_action(omega, qx, qy);
     };
-
-    auto d_det = [this, qx, qy](double omega) {
-      return std::get<1>(det_and_d(omega, qx, qy));
-    };
-
-    gsl_function_pp<decltype(d_det)> gsl_d_det(d_det);
-
-    auto d_det_fdf = [this, gsl_d_det](double omega) {
-      auto d_det_val = GSL_FN_EVAL(&gsl_d_det, omega);
-      double d_d_det, err;
-      gsl_deriv_central(&gsl_d_det, omega, 1e-3 * bs.root(), &d_d_det, &err);
-      return std::tuple<double, double>(d_det_val, d_d_det);
-    };
-
-    std::array<double, 3> roots; // The return array
-    roots.fill(std::numeric_limits<double>::quiet_NaN());
-
-    FDFSolver fdf_solver(gsl_root_fdfsolver_steffenson);
-
-    gsl_function_fdf_pp<decltype(d_det), decltype(d_det_fdf)> gsl_d_det_fdf(
-      d_det, d_det_fdf);
-
-    fdf_solver.set(gsl_d_det_fdf, bs.root());
 
     // Here we use the fact that our functions has two local extrema (since it
     // has 3 roots) We find the two extrem then look for the roots between each
     // and the outer boundary and the roots between them
 
-    // Find the first extremum
-    double extremum = fdf_solver.solve(1e-18);
+    // Find the extrema
+    size_t count = 0;
+    auto gsl_det = make_gsl_function(det);
 
-    double deriv2, err;
+    std::array<double, 3> roots; // The return array
+    roots.fill(std::numeric_limits<double>::quiet_NaN());
+
     const double xl = 0.5 * bs.root();
     const double xu = 1.99 * bs.root();
+    auto extrema = _extrema(qx, qy, xl, xu);
+
     FSolver fsolver(gsl_root_fsolver_brent);
-    gsl_deriv_central(&gsl_d_det, extremum, EPS, &deriv2, &err);
-
-    if (deriv2 * d_det(xu) > 0) {
-      fsolver.set(gsl_d_det, xl, extremum - EPS);
-    } else {
-      fsolver.set(gsl_d_det, extremum + EPS, xu);
-    }
-
-    // Find other extremum
-    auto extremum2 = fsolver.solve(1e-8 * bs.root(), 1e-8);
-
-    size_t count = 0;
-    gsl_function_pp<decltype(det)> gsl_det(det);
-
-    // Check for double root
-    // We expect only one such double root
-    if (gsl_root_test_residual(det(extremum), 1e-20) == GSL_SUCCESS) {
-      roots[count++] = extremum;
-      roots[count++] = extremum;
-    } else {
-      // Find root beyond first extremum
-      if (det(xl) * det(extremum) > 0) {
-        fsolver.set(gsl_det, extremum, xu);
+    for (auto ext : extrema) {
+      // Check for double root
+      // We expect only one such double root
+      if (gsl_root_test_residual(det(ext), 1e-20) == GSL_SUCCESS) {
+        roots[count++] = ext;
+        roots[count++] = ext;
       } else {
-        fsolver.set(gsl_det, xl, extremum);
-      }
+        // Find root beyond first ext
+        if (det(xl) * det(ext) > 0) {
+          fsolver.set(gsl_det, ext, xu);
+        } else {
+          fsolver.set(gsl_det, xl, ext);
+        }
 
-      roots[count++] = fsolver.solve(1e-8 * bs.root(), 1e-8);
-    }
-
-    // check again for double root
-    if (gsl_root_test_residual(det(extremum2), 1e-20) == GSL_SUCCESS) {
-      roots[count++] = extremum2;
-      roots[count++] = extremum2;
-    } else {
-      // If not find root beyond second extremum
-      if (det(xl) * det(extremum2) > 0) {
-        fsolver.set(gsl_det, extremum2, xu);
-      } else {
-        fsolver.set(gsl_det, xl, extremum2);
+        roots[count++] = fsolver.solve(1e-8 * bs.root(), 1e-8);
       }
-      roots[count++] = fsolver.solve(1e-8 * bs.root(), 1e-8);
     }
 
     // Find root between extrema
-    if (extremum > extremum2) {
-      fsolver.set(gsl_det, extremum2, extremum);
-    } else {
-      fsolver.set(gsl_det, extremum, extremum2);
-    }
+    fsolver.set(gsl_det, extrema[0], extrema[1]);
     roots[count++] = fsolver.solve(1e-8 * bs.root(), 1e-8);
 
     // Check if we've had any double roots
     std::sort(roots.begin(), roots.end());
 
     return roots;
+  }
+
+private:
+  std::array<double, 2> _extrema(double qx,
+                                 double qy,
+                                 double xl,
+                                 double xu) const
+  {
+
+    auto d_det = [this, qx, qy](double omega) {
+      return d_det_action(omega, qx, qy);
+    };
+
+    auto gsl_d_det = make_gsl_function(d_det);
+
+    auto d_det_fdf = [this, gsl_d_det](double omega) {
+      auto d_det_val = GSL_FN_EVAL(&gsl_d_det, omega);
+      auto d_d_det = deriv_gsl(gsl_d_det, omega, 1e-3 * bs.root());
+      return std::tuple<double, double>(d_det_val, d_d_det);
+    };
+
+    std::array<double, 2> extrema;
+
+    FDFSolver fdf_solver(gsl_root_fdfsolver_steffenson);
+    auto gsl_d_det_fdf = make_gsl_function_fdf(d_det, d_det_fdf);
+    fdf_solver.set(gsl_d_det_fdf, bs.root());
+    extrema[0] = fdf_solver.solve(1e-18);
+
+    const double EPS = 1e-6 * bs.root();
+
+    FSolver fsolver(gsl_root_fsolver_brent);
+
+    if (deriv_gsl(gsl_d_det, extrema[0], EPS) * d_det(xu) > 0) {
+      fsolver.set(gsl_d_det, xl, extrema[0] - EPS);
+    } else {
+      fsolver.set(gsl_d_det, extrema[0] + EPS, xu);
+    }
+
+    // Find other extremum
+    extrema[1] = fsolver.solve(1e-8 * bs.root(), 1e-8);
+
+    std::sort(extrema.begin(), extrema.end());
+    return extrema;
   }
 };

@@ -64,3 +64,10 @@ public:
     std::tie(*f, *df) = static_cast<gsl_function_fdf_pp*>(params)->_g(x);
   }
 };
+
+template<typename F, typename G>
+gsl_function_fdf_pp<F, G>
+make_gsl_function_fdf(const F& func, const G& deriv)
+{
+  return gsl_function_fdf_pp<F, G>(func, deriv);
+}
