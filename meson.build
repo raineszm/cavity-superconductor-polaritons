@@ -43,3 +43,7 @@ py.extension_module('bardasis_schrieffer',
     dependencies : deps,
     install : true,
     install_dir : join_paths(meson.build_root(), '..', 'python', 'lib'))
+
+executable('debug', debug_files, 
+    include_directories: include_dirs,
+    dependencies : deps)

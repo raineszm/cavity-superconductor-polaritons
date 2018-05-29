@@ -16,6 +16,24 @@
             }
         },
         {
+            "label": "build_debug",
+            "type": "process",
+            "command": "ninja",
+            "args": [
+                "debug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build_debug"
+            },
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
             "label": "install",
             "type": "process",
             "command": "ninja",

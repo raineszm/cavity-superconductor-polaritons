@@ -12,3 +12,5 @@ bind_files = files([
      ])
 
 ext_files = src_files + bind_files
+
+debug_files = files(['debug.cpp'])
