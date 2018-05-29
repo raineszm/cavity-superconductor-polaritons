@@ -22,3 +22,4 @@ python/figures/
 .mypy_cache/*
 python/doc/xml
 python/doc/build
+lastfailed

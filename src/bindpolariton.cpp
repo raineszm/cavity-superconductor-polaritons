@@ -27,5 +27,6 @@ bind_polariton(py::module& m)
     .def("d_action", &Polariton::d_action)
     .def("det_and_d", &Polariton::det_and_d)
     .def("eigval", &Polariton::eigval)
+    .def("_extrema", &Polariton::_extrema)
     .def("find_modes", &Polariton::find_modes);
 }

@@ -2,17 +2,29 @@
 
 #include <gsl/gsl_errno.h>
 
+#include <sstream>
 #include <stdexcept>
 #include <string>
 
 namespace gsl {
 class GSLException : public std::runtime_error
 {
+  static std::string format_exception(const char* reason,
+                                      const char* file,
+                                      int line,
+                                      int gsl_errno)
+  {
+    std::stringstream str;
+    str << gsl_strerror(gsl_errno) << std::endl;
+    str << file << ":" << line << std::endl;
+    str << std::string(reason);
+    return str.str();
+  }
 
 public:
   GSLException(const char* reason, const char* file, int line, int gsl_errno)
-    : std::runtime_error(gsl_strerror(gsl_errno) + std::string(": ") +
-                         std::string(reason))
+    : std::runtime_error(
+        GSLException::format_exception(reason, file, line, gsl_errno))
   {}
 };
 

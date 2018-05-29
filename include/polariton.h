@@ -164,26 +164,43 @@ public:
 
     FSolver fsolver(gsl_root_fsolver_brent);
     for (auto ext : extrema) {
+      // Make sure we have an extremum
+      if (std::isnan(ext)) {
+        continue;
+      }
       // Check for double root
       // We expect only one such double root
       if (gsl_root_test_residual(det(ext), 1e-20) == GSL_SUCCESS) {
         roots[count++] = ext;
         roots[count++] = ext;
       } else {
-        // Find root beyond first ext
-        if (det(xl) * det(ext) > 0) {
-          fsolver.set(gsl_det, ext, xu);
-        } else {
-          fsolver.set(gsl_det, xl, ext);
-        }
+        try {
+          // Find root beyond first ext
+          if (det(xl) * det(ext) > 0) {
+            fsolver.set(gsl_det, ext, xu);
+          } else {
+            fsolver.set(gsl_det, xl, ext);
+          }
 
-        roots[count++] = fsolver.solve(1e-8 * bs.root(), 1e-8);
+          roots[count++] = fsolver.solve(1e-8 * bs.root(), 1e-8);
+        } catch (const gsl::GSLException&) {
+        }
       }
     }
 
-    // Find root between extrema
-    fsolver.set(gsl_det, extrema[0], extrema[1]);
-    roots[count++] = fsolver.solve(1e-8 * bs.root(), 1e-8);
+    if (std::isnan(extrema[0])) {
+      extrema[0] = xl;
+    }
+    if (std::isnan(extrema[1])) {
+      extrema[1] = xu;
+    }
+
+    try {
+      // Find root between extrema
+      fsolver.set(gsl_det, extrema[0], extrema[1]);
+      roots[count++] = fsolver.solve(1e-8 * bs.root(), 1e-8);
+    } catch (const gsl::GSLException&) {
+    }
 
     // Check if we've had any double roots
     std::sort(roots.begin(), roots.end());
@@ -191,7 +208,6 @@ public:
     return roots;
   }
 
-private:
   std::array<double, 2> _extrema(double qx,
                                  double qy,
                                  double xl,
@@ -221,14 +237,18 @@ private:
 
     FSolver fsolver(gsl_root_fsolver_brent);
 
-    if (deriv_gsl(gsl_d_det, extrema[0], EPS) * d_det(xu) > 0) {
-      fsolver.set(gsl_d_det, xl, extrema[0] - EPS);
-    } else {
-      fsolver.set(gsl_d_det, extrema[0] + EPS, xu);
-    }
+    try {
+      if (deriv_gsl(gsl_d_det, extrema[0], EPS) * d_det(xu) > 0) {
+        fsolver.set(gsl_d_det, xl, extrema[0] - EPS);
+      } else {
+        fsolver.set(gsl_d_det, extrema[0] + EPS, xu);
+      }
 
-    // Find other extremum
-    extrema[1] = fsolver.solve(1e-8 * bs.root(), 1e-8);
+      // Find other extremum
+      extrema[1] = fsolver.solve(1e-8 * bs.root(), 1e-8);
+    } catch (const gsl::GSLException&) {
+      extrema[1] = std::numeric_limits<double>::quiet_NaN();
+    }
 
     std::sort(extrema.begin(), extrema.end());
     return extrema;
