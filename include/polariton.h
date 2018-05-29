@@ -59,6 +59,17 @@ public:
     return cavaction;
   }
 
+  Matrix2d d_photon_sector(double omega, double qx, double qy) const
+  {
+
+    auto L = M_PI * C / cav.omega0;
+    Matrix2d d_se = 2 / L * big * big * coupling.d_photon_se(omega, qx, qy);
+    Matrix2d d_cavaction =
+      cav.d_action(omega, qx, qy, coupling.state.sys.theta_v);
+    d_cavaction += d_se;
+    return d_cavaction;
+  }
+
   /** The inverse GF of the polariton
    * \f[
    * S_\text{pol} = \sum_q
@@ -105,16 +116,13 @@ public:
     auto L = M_PI * C / cav.omega0;
     std::complex<double> c(0., big * std::sqrt(2 / L) * coupling.d_ImDA(omega));
 
-    auto d_se = 2 / L * big * big * coupling.d_photon_se(omega, qx, qy);
-    auto d_cavaction = cav.d_action(omega, qx, qy, coupling.state.sys.theta_v);
-    d_cavaction += d_se;
-
-    Matrix3cd ret = Matrix3cd::Zero();
-    ret(0, 0) = bs.d_action(omega);
-    ret(0, 1) = c;
-    ret(1, 0) = -c;
-    ret.bottomRightCorner<2, 2>() = d_cavaction.cast<std::complex<double>>();
-    return ret;
+    Matrix3cd act = Matrix3cd::Zero();
+    act(0, 0) = bs.d_action(omega);
+    act(0, 1) = c;
+    act(1, 0) = -c;
+    act.bottomRightCorner<2, 2>() =
+      d_photon_sector(omega, qx, qy).cast<std::complex<double>>();
+    return act;
   }
 
   std::tuple<double, double> det_and_d(double omega, double qx, double qy) const
@@ -152,17 +160,18 @@ public:
     // and the outer boundary and the roots between them
 
     // Find the extrema
-    size_t count = 0;
     auto gsl_det = make_gsl_function(det);
 
     std::array<double, 3> roots; // The return array
     roots.fill(std::numeric_limits<double>::quiet_NaN());
 
     const double xl = 0.5 * bs.root();
-    const double xu = 1.99 * bs.root();
+    const double xu = 1.99 * coupling.state.delta;
     auto extrema = _extrema(qx, qy, xl, xu);
 
     FSolver fsolver(gsl_root_fsolver_brent);
+    size_t count = 0;
+
     for (auto ext : extrema) {
       // Make sure we have an extremum
       if (std::isnan(ext)) {
@@ -176,10 +185,10 @@ public:
       } else {
         try {
           // Find root beyond first ext
-          if (det(xl) * det(ext) > 0) {
-            fsolver.set(gsl_det, ext, xu);
-          } else {
+          if (det(xu) * det(ext) > 0) {
             fsolver.set(gsl_det, xl, ext);
+          } else {
+            fsolver.set(gsl_det, ext, xu);
           }
 
           roots[count++] = fsolver.solve(1e-8 * bs.root(), 1e-8);
@@ -220,37 +229,38 @@ public:
 
     auto gsl_d_det = make_gsl_function(d_det);
 
-    auto d_det_fdf = [this, gsl_d_det](double omega) {
+    const double EPS = 1e-6 * bs.root();
+
+    auto d_det_fdf = [EPS, gsl_d_det](double omega) {
       auto d_det_val = GSL_FN_EVAL(&gsl_d_det, omega);
-      auto d_d_det = deriv_gsl(gsl_d_det, omega, 1e-3 * bs.root());
+      auto d_d_det = deriv_gsl(gsl_d_det, omega, EPS);
       return std::tuple<double, double>(d_det_val, d_d_det);
     };
 
     std::array<double, 2> extrema;
+    extrema.fill(std::numeric_limits<double>::quiet_NaN());
 
-    FDFSolver fdf_solver(gsl_root_fdfsolver_steffenson);
+    FDFSolver fdf_solver(gsl_root_fdfsolver_newton);
     auto gsl_d_det_fdf = make_gsl_function_fdf(d_det, d_det_fdf);
     fdf_solver.set(gsl_d_det_fdf, bs.root());
     extrema[0] = fdf_solver.solve(1e-18);
 
-    const double EPS = 1e-6 * bs.root();
+    // FSolver fsolver(gsl_root_fsolver_brent);
 
-    FSolver fsolver(gsl_root_fsolver_brent);
+    // try {
+    //   if (deriv_gsl(gsl_d_det, extrema[0], EPS) * d_det(xu) > 0) {
+    //     fsolver.set(gsl_d_det, xl, extrema[0] - EPS);
+    //   } else {
+    //     fsolver.set(gsl_d_det, extrema[0] + EPS, xu);
+    //   }
 
-    try {
-      if (deriv_gsl(gsl_d_det, extrema[0], EPS) * d_det(xu) > 0) {
-        fsolver.set(gsl_d_det, xl, extrema[0] - EPS);
-      } else {
-        fsolver.set(gsl_d_det, extrema[0] + EPS, xu);
-      }
+    //   // Find other extremum
+    //   extrema[1] = fsolver.solve(1e-8 * bs.root(), 1e-8);
+    // } catch (const gsl::GSLException&) {
+    //   extrema[1] = std::numeric_limits<double>::quiet_NaN();
+    // }
 
-      // Find other extremum
-      extrema[1] = fsolver.solve(1e-8 * bs.root(), 1e-8);
-    } catch (const gsl::GSLException&) {
-      extrema[1] = std::numeric_limits<double>::quiet_NaN();
-    }
-
-    std::sort(extrema.begin(), extrema.end());
+    // std::sort(extrema.begin(), extrema.end());
     return extrema;
   }
 };
