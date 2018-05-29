@@ -7,7 +7,6 @@
 #include <cmath>
 #include <complex>
 #include <gsl/gsl_deriv.h>
-#include <gsl/gsl_errno.h>
 #include <tuple>
 #include <vector>
 
@@ -179,16 +178,16 @@ public:
       }
       // Check for double root
       // We expect only one such double root
-      if (gsl_root_test_residual(det(ext), 1e-20) == GSL_SUCCESS) {
+      if (std::fabs(det(ext)) < 1e-17) {
         roots[count++] = ext;
         roots[count++] = ext;
       } else {
         try {
           // Find root beyond first ext
-          if (det(xu) * det(ext) > 0) {
-            fsolver.set(gsl_det, xl, ext);
-          } else {
+          if (det(xl) * det(ext) > 0) {
             fsolver.set(gsl_det, ext, xu);
+          } else {
+            fsolver.set(gsl_det, xl, ext);
           }
 
           roots[count++] = fsolver.solve(1e-8 * bs.root(), 1e-8);
@@ -245,22 +244,22 @@ public:
     fdf_solver.set(gsl_d_det_fdf, bs.root());
     extrema[0] = fdf_solver.solve(1e-18);
 
-    // FSolver fsolver(gsl_root_fsolver_brent);
+    FSolver fsolver(gsl_root_fsolver_brent);
 
-    // try {
-    //   if (deriv_gsl(gsl_d_det, extrema[0], EPS) * d_det(xu) > 0) {
-    //     fsolver.set(gsl_d_det, xl, extrema[0] - EPS);
-    //   } else {
-    //     fsolver.set(gsl_d_det, extrema[0] + EPS, xu);
-    //   }
+    try {
+      if (deriv_gsl(gsl_d_det, extrema[0], EPS) * d_det(xu) > 0) {
+        fsolver.set(gsl_d_det, xl, extrema[0] - EPS);
+      } else {
+        fsolver.set(gsl_d_det, extrema[0] + EPS, xu);
+      }
 
-    //   // Find other extremum
-    //   extrema[1] = fsolver.solve(1e-8 * bs.root(), 1e-8);
-    // } catch (const gsl::GSLException&) {
-    //   extrema[1] = std::numeric_limits<double>::quiet_NaN();
-    // }
+      // Find other extremum
+      extrema[1] = fsolver.solve(1e-8 * bs.root(), 1e-8);
+    } catch (const gsl::GSLException&) {
+      extrema[1] = std::numeric_limits<double>::quiet_NaN();
+    }
 
-    // std::sort(extrema.begin(), extrema.end());
+    std::sort(extrema.begin(), extrema.end());
     return extrema;
   }
 };
