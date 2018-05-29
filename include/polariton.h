@@ -160,20 +160,12 @@ public:
 
     fdf_solver.set(gsl_d_det_fdf, bs.root());
 
-    int count = 0; // Keep track of how many roots we've found
-
     // Here we use the fact that our functions has two local extrema (since it
     // has 3 roots) We find the two extrem then look for the roots between each
     // and the outer boundary and the roots between them
 
     // Find the first extremum
     double extremum = fdf_solver.solve(1e-18);
-
-    // Check for double root
-    // We expect only one such double root
-    if (gsl_root_test_residual(det(extremum), 1e-20) == GSL_SUCCESS) {
-      roots[count++] = extremum;
-    }
 
     double deriv2, err;
     const double xl = 0.5 * bs.root();
@@ -190,21 +182,38 @@ public:
     // Find other extremum
     auto extremum2 = fsolver.solve(1e-8 * bs.root(), 1e-8);
 
+    size_t count = 0;
+    gsl_function_pp<decltype(det)> gsl_det(det);
+
+    // Check for double root
+    // We expect only one such double root
+    if (gsl_root_test_residual(det(extremum), 1e-20) == GSL_SUCCESS) {
+      roots[count++] = extremum;
+      roots[count++] = extremum;
+    } else {
+      // Find root beyond first extremum
+      if (det(xl) * det(extremum) > 0) {
+        fsolver.set(gsl_det, extremum, xu);
+      } else {
+        fsolver.set(gsl_det, xl, extremum);
+      }
+
+      roots[count++] = fsolver.solve(1e-8 * bs.root(), 1e-8);
+    }
+
     // check again for double root
     if (gsl_root_test_residual(det(extremum2), 1e-20) == GSL_SUCCESS) {
       roots[count++] = extremum2;
-    }
-
-    gsl_function_pp<decltype(det)> gsl_det(det);
-
-    // Find root beyond first extremum
-    if (det(xl) * det(extremum) > 0) {
-      fsolver.set(gsl_det, extremum, xu);
+      roots[count++] = extremum2;
     } else {
-      fsolver.set(gsl_det, xl, extremum);
+      // If not find root beyond second extremum
+      if (det(xl) * det(extremum2) > 0) {
+        fsolver.set(gsl_det, extremum2, xu);
+      } else {
+        fsolver.set(gsl_det, xl, extremum2);
+      }
+      roots[count++] = fsolver.solve(1e-8 * bs.root(), 1e-8);
     }
-
-    roots[count++] = fsolver.solve(1e-8 * bs.root(), 1e-8);
 
     // Find root between extrema
     if (extremum > extremum2) {
@@ -215,17 +224,6 @@ public:
     roots[count++] = fsolver.solve(1e-8 * bs.root(), 1e-8);
 
     // Check if we've had any double roots
-    if (count < 3) {
-      // If not find root beyond second extremum
-      if (det(xl) * det(extremum2) > 0) {
-        fsolver.set(gsl_det, extremum2, xu);
-      } else {
-        fsolver.set(gsl_det, xl, extremum2);
-      }
-
-      roots[count++] = fsolver.solve(1e-8 * bs.root(), 1e-8);
-    }
-
     std::sort(roots.begin(), roots.end());
 
     return roots;
