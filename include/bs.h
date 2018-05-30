@@ -19,9 +19,11 @@ public:
    *
    * The mass of the BS mode is given by solving
    * \f[
-   * \underbrace{\frac{1}{g_d} - \frac{1}{g_s}}_{m_0} - I(\omega)\f]
+   * \underbrace{\frac{1}{g_d} - \frac{1}{g_s}}_{m_0} + I(\omega^2)\f]
    * where \f$I(\omega^2)\f$ is the integrand described by
    * action_int()
+   *
+   * In particular however, we divide the gap equation by \f$\nu\f$.
    */
   double mass;
   //! The associated mean field state
@@ -66,7 +68,7 @@ public:
       (std::tanh(Ep / (2 * state.T)) - std::tanh(Em / (2 * state.T))) /
       (omega * omega - 4 * l * l);
     return F1 * (omega * omega / 2 + 2 * l * l * std::cos(4 * theta)) /
-           std::sqrt(l * l - state.delta * state.delta);
+           (2 * std::sqrt(l * l - state.delta * state.delta));
   }
 
   double d_action_int(double l, double theta, double omega) const
@@ -89,29 +91,28 @@ public:
 
     double dF2 = omega;
 
-    return (F1 * dF2 + dF1 * F2) / std::sqrt(l * l - state.delta * state.delta);
+    return (F1 * dF2 + dF1 * F2) /
+           (2 * std::sqrt(l * l - state.delta * state.delta));
   }
 
   //! The value of the BS Mode inverse GF at frequency \f$\Omega\f$
   double action(double omega) const
   {
-    return mass + 2 * state.sys.dos() *
-                    gsl_xi_integrate(
-                      [this, omega](double l, double theta) {
-                        return action_int(l, theta, omega);
-                      },
-                      state.delta);
+    return mass + 2 * gsl_xi_integrate(
+                        [this, omega](double l, double theta) {
+                          return action_int(l, theta, omega);
+                        },
+                        state.delta);
   }
 
   //! Derivative of the BS mode inverse GF wrt \f$\Omega\f$
   double d_action(double omega) const
   {
-    return 2 * state.sys.dos() *
-           gsl_xi_integrate(
-             [this, omega](double l, double theta) {
-               return d_action_int(l, theta, omega);
-             },
-             state.delta);
+    return 2 * gsl_xi_integrate(
+                 [this, omega](double l, double theta) {
+                   return d_action_int(l, theta, omega);
+                 },
+                 state.delta);
   }
 
   //! The pole of the Bardasis Schrieffer mode GF
