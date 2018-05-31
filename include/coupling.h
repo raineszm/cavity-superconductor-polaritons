@@ -46,7 +46,7 @@ public:
 
     return fd *
            (std::tanh(Ep / (2 * state.T)) - std::tanh(Em / (2 * state.T))) /
-           ((omega * omega - 4 * l * l) *
+           ((omega * omega - 4 * l * l) * 2 *
             std::sqrt(l * l - state.delta * state.delta));
   }
 
@@ -57,7 +57,7 @@ public:
     double Ep = drift + l;
     double Em = drift - l;
 
-    return -2 * omega * fd *
+    return -omega * fd *
            (std::tanh(Ep / (2 * state.T)) - std::tanh(Em / (2 * state.T))) /
            (std::pow(omega * omega - 4 * l * l, 2) *
             std::sqrt(l * l - state.delta * state.delta));
@@ -90,8 +90,7 @@ public:
    */
   double ImDA(double omega) const
   {
-    return -2 * omega * state.delta * state.sys.m * GPAR * state.sys.vs *
-           state.sys.dos() *
+    return -2 * omega * state.delta * GPAR * state.sys.vs * state.sys.dos() *
            gsl_xi_integrate(
              [this, omega](double l, double theta) {
                return ImDA_int(l, theta, omega);
@@ -101,8 +100,7 @@ public:
 
   double d_ImDA(double omega) const
   {
-    return -2 * state.delta * state.sys.m * GPAR * state.sys.vs *
-           state.sys.dos() *
+    return -2 * state.delta * GPAR * state.sys.vs * state.sys.dos() *
            (gsl_xi_integrate(
               [this, omega](double l, double theta) {
                 return ImDA_int(l, theta, omega);
@@ -250,6 +248,7 @@ public:
     auto xp = state.sys.xi(kx + qx / 2, ky + qy / 2);
     auto xm = state.sys.xi(kx - qx / 2, ky - qy / 2);
 
+    // We've rotated our axes so the 'x'-axis is along vs
     auto vi = v_comp(kx, ky, i);
     auto vj = v_comp(kx, ky, j);
     auto vsi = vs_comp(i);
@@ -267,6 +266,25 @@ public:
     auto dm = state.sys.drift(kx - qx / 2, ky - qy / 2);
 
     auto pl = pi0_elems(dp, dm, lp, lm, omega, deriv);
+
+    auto vsdotq = state.sys.drift(qx, qy);
+    auto omega_ = omega - vsdotq;
+
+    if (std::fabs(omega_ - (lp - lm)) < 1e-3 * omega ||
+        std::fabs(omega_ + (lp - lm)) < 1e-3 * omega) {
+      auto xi = state.sys.xi(kx, ky);
+      auto l = std::hypot(xi, state.delta);
+
+      auto vdotq = (kx * qx + ky * qy) / state.sys.m;
+      auto vsdotk = state.sys.drift(kx, ky);
+      auto t00 =
+        (vsdotq + vdotq * xi / l) / (1 + std::cosh((vsdotk + l) / state.T));
+      auto t11 =
+        (vsdotq - vdotq * xi / l) / (1 + std::cosh((vsdotk - l) / state.T));
+
+      pl[0] = (t00 + t11) / (omega_ * 2 * state.T);
+      pl[3] = (t00 - t11) / (omega_ * 2 * state.T);
+    }
 
     return T0 * pl[0] + T1 * pl[1] + iT2 * pl[2] + T3 * pl[3];
   }

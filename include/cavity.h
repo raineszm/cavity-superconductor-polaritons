@@ -13,7 +13,7 @@ const double ALPHA = 7.2973525664e-3;
 const double C = 1 / ALPHA;
 
 //! The paramagnetic coupling strength
-const double GPAR = std::sqrt(ALPHA / C);
+const double GPAR = 1 / C;
 
 //! The physics of the cavity modes
 class Cavity
@@ -33,6 +33,8 @@ public:
     return std::sqrt(omega0 * omega0 + C * C * (qx * qx + qy * qy));
   }
 
+  double L() const { return M_PI * C / omega0; }
+
   Matrix2d matrix_structure(double qx, double qy, double theta_s) const
   {
     auto wq = this->omega(qx, qy);
@@ -51,8 +53,8 @@ public:
   /** The inverse GF of the photon modes
 
   \f[
-    S_A = \frac{1}{16 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 -
-  \omega_\mathbf{q}^2\right] \left[ \left(1 +
+    S_A = \frac{L \alpha^3}{32 \pi (c\alpha)^3}\sum_q \mathbf{A}(-q) \left[ (i
+  \omega_m)^2 - \omega_\mathbf{q}^2\right] \left[ \left(1 +
   \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
   - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin
   2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
@@ -64,14 +66,17 @@ public:
   Matrix2d action(double omega, double qx, double qy, double theta_s) const
   {
     auto omega_q = this->omega(qx, qy);
-    auto prefactor = (omega * omega - omega_q * omega_q) / (16 * M_PI * C * C);
+    auto prefactor = L() * std::pow(ALPHA, 3) *
+                     (omega * omega - omega_q * omega_q) /
+                     (32 * M_PI * std::pow(ALPHA * C, 3));
 
     return prefactor * matrix_structure(qx, qy, theta_s);
   }
 
   Matrix2d d_action(double omega, double qx, double qy, double theta_s) const
   {
-    auto prefactor = omega / (8 * M_PI * C * C);
+    auto prefactor =
+      L() * std::pow(ALPHA, 3) * omega / (16 * M_PI * std::pow(C * ALPHA, 3));
 
     return prefactor * matrix_structure(qx, qy, theta_s);
   }

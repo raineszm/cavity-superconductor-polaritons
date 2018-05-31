@@ -18,7 +18,6 @@ main(int argc, char** argv)
 
   const double TREL = 0.4;
   const double VREL = 0.6;
-  const double BIG = 100;
 
   auto sys0 = System(m, mu, TC, 0, 0);
   auto state0 = State::solve(sys0, TREL * TC);
@@ -27,7 +26,7 @@ main(int argc, char** argv)
   auto sys = System(m, mu, TC, VREL * vc, 0);
   auto state = State::solve(sys, TREL * TC);
   auto bs = BS(state.delta / 10, state);
-  auto p = Polariton(bs, Cavity(1.04 * bs.root()), Coupling(state), BIG);
+  auto p = Polariton(bs, Cavity(1.04 * bs.root()), Coupling(state));
 
   auto modes = p.find_modes(0, 0);
   std::cout << modes[0] << ", " << modes[1] << modes[2] << std::endl;

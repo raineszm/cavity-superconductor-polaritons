@@ -46,4 +46,5 @@ py.extension_module('bardasis_schrieffer',
 
 executable('debug', debug_files, 
     include_directories: include_dirs,
-    dependencies : deps)
+    dependencies : deps,
+    build_by_default:false)

@@ -180,7 +180,7 @@ Suppose we wish to write the theory such that the paramagnetic coupling is
 
 .. math::
 
-    \sqrt{\frac{2}{L}}\mathbf{v} \cdot \begin{pmatrix}A_x(q)\\A_y(q)\end{pmatrix}
+    \frac{e}{c}\sqrt{\frac{2}{L}}\mathbf{v} \cdot \begin{pmatrix}A_x(q)\\A_y(q)\end{pmatrix}
 
 We can do this by defining the transformation
 
@@ -234,6 +234,65 @@ Upon this transformation the photon action becomes
 .. math::
 
     S_A = \frac{1}{16 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
+    \left[
+    \left(1 + \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0 
+    - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin 2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
+    \right]
+    \mathbf{A}(q)
+
+On the other hand.
+We generally want all terms in the inverse propagator to have the same units.
+Looking at the copupling term (c.f. :cpp:func:`Coupling::ImDA`)
+
+.. math::
+
+    g_q \approx -2 \sqrt{\frac{2}{L}}\frac{e}{c} \nu v_s \Omega\Delta \int_\Delta^\infty
+   \frac{d\lambda}{\sqrt{\lambda^2 - \Delta^2}}
+   \int_0^{2\pi}\frac{d\theta}{2\pi}
+   \frac{n_F(E^-(\lambda))-n_F(E^+(\lambda))}{(\Omega + i0^+)^2 -
+   (2\lambda)^2}f_d(\theta)
+
+By inspection the units of this term are
+
+.. math::
+    [g_q] = [e \nu \frac{v_s}{c}/\sqrt{L}]
+
+By inspecting the BS action (c.f. :cpp:func:`BS::action`) one can see that the Bardasis-Schrieffer inverse GF
+has the same units as :math:`\nu`.
+As such it makes sense to absorb the factor :math:`\sqrt{\tfrac{2}{L}}e` into the photon fields.
+This makes the paramagnetic coupling 
+
+.. math::
+
+    \frac{\mathbf{v}}{c} \cdot \mathbf{A}
+
+and the coupling between the excitations
+
+.. math::
+
+    g_q \approx -2 \frac{v_s}{c} \nu \Omega\Delta \int_\Delta^\infty
+   \frac{d\lambda}{\sqrt{\lambda^2 - \Delta^2}}
+   \int_0^{2\pi}\frac{d\theta}{2\pi}
+   \frac{n_F(E^-(\lambda))-n_F(E^+(\lambda))}{(\Omega + i0^+)^2 -
+   (2\lambda)^2}f_d(\theta)
+
+and the photon action
+
+
+.. math::
+
+    S_A = \frac{L}{32\pi e^ 2 c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
+    \left[
+    \left(1 + \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0 
+    - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin 2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
+    \right]
+    \mathbf{A}(q)
+
+or using :math:`\alpha=\frac{e^2}{c}`
+
+.. math::
+
+    S_A = \frac{\alpha^3 L}{32\pi (\alpha c)^3}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
     \left[
     \left(1 + \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0 
     - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin 2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
