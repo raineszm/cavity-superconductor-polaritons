@@ -41,6 +41,20 @@ For the case of a function which depends only on the quasparticle energy :math:`
 Code
 ====
 
+Python
+------
+
+.. autosummary::
+   :toctree: pymodules
+
+    materials
+    polariton
+    units
+
+
+C++
+----
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
