@@ -98,21 +98,23 @@ public:
   //! The value of the BS Mode inverse GF at frequency \f$\Omega\f$
   double action(double omega) const
   {
-    return mass + 2 * gsl_xi_integrate(
-                        [this, omega](double l, double theta) {
-                          return action_int(l, theta, omega);
-                        },
-                        state.delta);
+    return state.sys.dos() *
+           (mass + 2 * gsl_xi_integrate(
+                         [this, omega](double l, double theta) {
+                           return action_int(l, theta, omega);
+                         },
+                         state.delta));
   }
 
   //! Derivative of the BS mode inverse GF wrt \f$\Omega\f$
   double d_action(double omega) const
   {
-    return 2 * gsl_xi_integrate(
-                 [this, omega](double l, double theta) {
-                   return d_action_int(l, theta, omega);
-                 },
-                 state.delta);
+    return 2 * state.sys.dos() *
+           gsl_xi_integrate(
+             [this, omega](double l, double theta) {
+               return d_action_int(l, theta, omega);
+             },
+             state.delta);
   }
 
   //! The pole of the Bardasis Schrieffer mode GF

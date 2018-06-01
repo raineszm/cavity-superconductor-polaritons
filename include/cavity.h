@@ -76,7 +76,7 @@ public:
   Matrix2d d_action(double omega, double qx, double qy, double theta_s) const
   {
     auto prefactor =
-      L() * std::pow(ALPHA, 3) * omega / (16 * M_PI * std::pow(C * ALPHA, 3));
+      L() * std::pow(ALPHA, 2) * omega / (16 * M_PI * std::pow(C * ALPHA, 3));
 
     return prefactor * matrix_structure(qx, qy, theta_s);
   }
