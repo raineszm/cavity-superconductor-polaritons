@@ -233,7 +233,8 @@ public:
     FDFSolver fdf_solver(gsl_root_fdfsolver_newton);
     auto gsl_d_det_fdf = make_gsl_function_fdf(d_det, d_det_fdf);
     fdf_solver.set(gsl_d_det_fdf, bs.root());
-    extrema[0] = fdf_solver.solve(1e-18);
+
+    extrema[0] = fdf_solver.solve(1e-10, 100UL, EPS);
 
     FSolver fsolver(gsl_root_fsolver_brent);
 

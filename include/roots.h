@@ -67,6 +67,7 @@ class FDFSolver
   std::unique_ptr<gsl_root_fdfsolver, decltype(&gsl_root_fdfsolver_free)>
     _solver;
   const gsl_function_fdf* _fdf = nullptr;
+  double _last = std::numeric_limits<double>::quiet_NaN();
 
 public:
   FDFSolver(const gsl_root_fdfsolver_type* t)
@@ -84,25 +85,33 @@ public:
 
   double root() const { return gsl_root_fdfsolver_root(_solver.get()); }
 
-  bool found(double epsabs) const
+  bool found(double ftol,
+             double xtol_abs = std::numeric_limits<double>::infinity(),
+             double xtol_rel = 0.) const
   {
-    return gsl_root_test_residual(GSL_FN_FDF_EVAL_F(_fdf, root()), epsabs) ==
-           GSL_SUCCESS;
+    return (gsl_root_test_residual(GSL_FN_FDF_EVAL_F(_fdf, root()), ftol) ==
+            GSL_SUCCESS) &&
+           (gsl_root_test_delta(root(), _last, xtol_abs, xtol_rel) ==
+            GSL_SUCCESS);
   }
 
-  double solve(double epsabs, size_t niter = 100)
+  double solve(double ftol,
+               size_t niter = 100,
+               double xtol_abs = std::numeric_limits<double>::infinity(),
+               double xtol_rel = 0)
   {
     try {
       for (size_t i = 0; i < niter; i++) {
         step();
 
-        if (found(epsabs)) {
+        if (found(ftol, xtol_abs, xtol_rel)) {
           return root();
         }
+
+        _last = root();
       }
-      return std::numeric_limits<double>::quiet_NaN();
     } catch (const gsl::RootException&) {
-      return std::numeric_limits<double>::quiet_NaN();
     }
+    return std::numeric_limits<double>::quiet_NaN();
   }
 };
