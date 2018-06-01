@@ -53,7 +53,7 @@ public:
   /** The inverse GF of the photon modes
 
   \f[
-    S_A = \frac{L \alpha^3}{32 \pi (c\alpha)^3}\sum_q \mathbf{A}(-q) \left[ (i
+    S_A = \frac{L \alpha^2}{32 \pi (c\alpha)^3}\sum_q \mathbf{A}(-q) \left[ (i
   \omega_m)^2 - \omega_\mathbf{q}^2\right] \left[ \left(1 +
   \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
   - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin
@@ -66,7 +66,7 @@ public:
   Matrix2d action(double omega, double qx, double qy, double theta_s) const
   {
     auto omega_q = this->omega(qx, qy);
-    auto prefactor = L() * std::pow(ALPHA, 3) *
+    auto prefactor = L() * std::pow(ALPHA, 2) *
                      (omega * omega - omega_q * omega_q) /
                      (32 * M_PI * std::pow(ALPHA * C, 3));
 

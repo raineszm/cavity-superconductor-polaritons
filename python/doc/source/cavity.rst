@@ -281,7 +281,7 @@ and the photon action
 
 .. math::
 
-    S_A = \frac{L}{32\pi e^ 2 c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
+    S_A = \frac{L}{32\pi e^2 c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
     \left[
     \left(1 + \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0 
     - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin 2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
@@ -292,7 +292,7 @@ or using :math:`\alpha=\frac{e^2}{c}`
 
 .. math::
 
-    S_A = \frac{\alpha^3 L}{32\pi (\alpha c)^3}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
+    S_A = \frac{\alpha^2 L}{32\pi (\alpha c)^3}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
     \left[
     \left(1 + \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0 
     - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin 2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
