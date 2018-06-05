@@ -31,11 +31,18 @@ public:
   const Cavity cav;
   //! The fermionic contribution/coupling
   const Coupling coupling;
+  //! Enhancement of the effective coupling
+  double big;
+  const System& sys;
+  const State& state;
 
-  Polariton(const BS& bs_, const Cavity& cav_, const Coupling& c_)
+  Polariton(const BS& bs_, const Cavity& cav_, const Coupling& c_, double big_)
     : bs(bs_)
     , cav(cav_)
     , coupling(c_)
+    , big(big_)
+    , sys(coupling.state.sys)
+    , state(coupling.state)
   {
     if (bs.state != coupling.state) {
       throw std::invalid_argument(
@@ -46,7 +53,7 @@ public:
   Matrix2d photon_sector(double omega, double qx, double qy) const
   {
 
-    Matrix2d se = coupling.photon_se(omega, qx, qy);
+    Matrix2d se = big * big * coupling.photon_se(omega, qx, qy);
     Matrix2d cavaction = cav.action(omega, qx, qy, coupling.state.sys.theta_v);
     cavaction += se;
     return cavaction;
@@ -55,7 +62,7 @@ public:
   Matrix2d d_photon_sector(double omega, double qx, double qy) const
   {
 
-    Matrix2d d_se = coupling.d_photon_se(omega, qx, qy);
+    Matrix2d d_se = big * big * coupling.d_photon_se(omega, qx, qy);
     Matrix2d d_cavaction =
       cav.d_action(omega, qx, qy, coupling.state.sys.theta_v);
     d_cavaction += d_se;
@@ -84,7 +91,7 @@ public:
    */
   Matrix3cd action(double omega, double qx, double qy) const
   {
-    std::complex<double> c(0., coupling.ImDA(omega));
+    std::complex<double> c(0., big * coupling.ImDA(omega));
 
     Matrix3cd act = Matrix3cd::Zero();
     act(0, 0) = bs.action(omega);
@@ -104,7 +111,7 @@ public:
    */
   Matrix3cd d_action(double omega, double qx, double qy) const
   {
-    std::complex<double> c(0., coupling.d_ImDA(omega));
+    std::complex<double> c(0., big * coupling.d_ImDA(omega));
 
     Matrix3cd act = Matrix3cd::Zero();
     act(0, 0) = bs.d_action(omega);
@@ -155,8 +162,9 @@ public:
     std::array<double, 3> roots; // The return array
     roots.fill(std::numeric_limits<double>::quiet_NaN());
 
-    const double xl = 0.7 * bs.root();
-    const double xu = 1.99 * coupling.state.delta;
+    const double xl = 0.6 * bs.root();
+    const double xu = 1.5 * bs.root();
+    // 1.99 * coupling.state.delta;
     auto extrema = _extrema(qx, qy, xl, xu);
 
     FSolver fsolver(gsl_root_fsolver_brent);
