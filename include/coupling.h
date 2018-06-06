@@ -367,6 +367,11 @@ public:
         },
         0);
 
+    // Diamagnetic?
+    // if (i == j && !deriv) {
+    //   ret += state.sys.n() / state.sys.m;
+    // }
+
     return 0.5 * GPAR * GPAR * ret;
   }
 
