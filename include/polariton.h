@@ -31,16 +31,23 @@ public:
   const Cavity cav;
   //! The fermionic contribution/coupling
   const Coupling coupling;
-  //! Enhancement of the effective coupling
-  double big;
+  //! Enhancement of the paramagnetic coupling between electrons and the A field
+  double paraX;
+  //! Enhancment of the dipole coupling \f$g\f$ between the modes
+  double dipoleX;
   const System& sys;
   const State& state;
 
-  Polariton(const BS& bs_, const Cavity& cav_, const Coupling& c_, double big_)
+  Polariton(const BS& bs_,
+            const Cavity& cav_,
+            const Coupling& c_,
+            double paraX_ = 1,
+            double dipoleX_ = 1)
     : bs(bs_)
     , cav(cav_)
     , coupling(c_)
-    , big(big_)
+    , paraX(paraX_)
+    , dipoleX(dipoleX_)
     , sys(coupling.state.sys)
     , state(coupling.state)
   {
@@ -53,7 +60,7 @@ public:
   Matrix2d photon_sector(double omega, double qx, double qy) const
   {
 
-    Matrix2d se = big * big * coupling.photon_se(omega, qx, qy);
+    Matrix2d se = paraX * paraX * coupling.photon_se(omega, qx, qy);
     Matrix2d cavaction = cav.action(omega, qx, qy, coupling.state.sys.theta_v);
     cavaction += se;
     return cavaction;
@@ -62,7 +69,7 @@ public:
   Matrix2d d_photon_sector(double omega, double qx, double qy) const
   {
 
-    Matrix2d d_se = big * big * coupling.d_photon_se(omega, qx, qy);
+    Matrix2d d_se = paraX * paraX * coupling.d_photon_se(omega, qx, qy);
     Matrix2d d_cavaction =
       cav.d_action(omega, qx, qy, coupling.state.sys.theta_v);
     d_cavaction += d_se;
@@ -91,7 +98,7 @@ public:
    */
   Matrix3cd action(double omega, double qx, double qy) const
   {
-    std::complex<double> c(0., big * coupling.ImDA(omega));
+    std::complex<double> c(0., paraX * dipoleX * coupling.ImDA(omega));
 
     Matrix3cd act = Matrix3cd::Zero();
     act(0, 0) = bs.action(omega);
