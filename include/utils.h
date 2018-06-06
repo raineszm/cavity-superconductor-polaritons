@@ -1,5 +1,4 @@
 #pragma once
-
 #include <Eigen/Core>
 #include <cmath>
 #include <gsl/gsl_deriv.h>
