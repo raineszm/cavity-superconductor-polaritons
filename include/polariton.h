@@ -118,7 +118,7 @@ public:
    */
   Matrix3cd d_action(double omega, double qx, double qy) const
   {
-    std::complex<double> c(0., big * coupling.d_ImDA(omega));
+    std::complex<double> c(0., paraX * dipoleX * coupling.d_ImDA(omega));
 
     Matrix3cd act = Matrix3cd::Zero();
     act(0, 0) = bs.d_action(omega);
