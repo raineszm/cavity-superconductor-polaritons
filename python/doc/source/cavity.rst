@@ -330,9 +330,48 @@ We now substitute in mode operators
     \sum_q \sqrt{\frac{1}{\omega_q}}g(q) \\
     \times 
     \left[\left(b_{-q} + b^\dagger_{q}\right)\mathbf{v}_s \cdot \sum_\alpha \bm{\epsilon}_{q,\alpha}(L/2)\left(a_{\alpha,q} + a^\dagger_{\alpha, -q}\right)\right.\\
-    \left.-\sum_\alpha \bm{\epsilon}_{q,\alpha}(L/2)\left(a_{\alpha,-q} + a^\dagger_{\alpha,q}\right)\mathbf{v}_s \cdot \left(b_q + b^\dagger_{-q}\right)\right]
+    \left.-\mathbf{v}_s \cdot \sum_\alpha \bm{\epsilon}_{q,\alpha}(L/2)\left(a_{\alpha,-q} + a^\dagger_{\alpha,q}\right)\left(b_q + b^\dagger_{-q}\right)\right]
 
-Throwing out counter-rotating terms
+Throwing out counter-rotating terms we can write this
+
+
+ .. math::
+    
+    i\sqrt{\frac{\pi c^2}{M\Omega_\text{BS}}}
+    \sum_q \sqrt{\frac{1}{\omega_q}}g(q) 
+    \mathbf{v}_s \cdot \sum_\alpha \bm{\epsilon}_{q,\alpha}(L/2)
+    \left[a^\dagger_{\alpha, -q} b_{-q} + b^\dagger_{q}a_{\alpha,q}
+    -b^\dagger_{-q}a_{\alpha,-q} - a^\dagger_{\alpha,q}b_q\right]
+
+And using the symmetry properties of :math:`\epsilon`
+
+ .. math::
+    
+    S_g = 2i\sqrt{\frac{\pi c^2}{M\Omega_\text{BS}}}
+    \sum_q \frac{1}{\sqrt{\omega_q}}g(q) 
+    \mathbf{v}_s \cdot \sum_\alpha \bm{\epsilon}_{q,\alpha}(L/2)
+    \left[b^\dagger_{q}a_{\alpha,q} -a^\dagger_{\alpha,q}b_q\right]
+
+We may then extract the effective coupling
+
+.. math::
+
+    g_\text{eff}(q, \alpha) = 2 i \sqrt{\frac{\pi c^2}{M\Omega_\text{BS}\omega_q}}
+    \mathbf{v}_s\cdot \bm{\epsilon}_{\alpha,\mathbf{q}}\left(\frac{L}{2}\right)g(q)
+
+or explicitly
+
+.. math::
+
+    g_\text{eff}(q, \alpha) = 4 i e\nu\Omega\Delta  \sqrt{\frac{\pi}{M\Omega_\text{BS}\omega_q}}
+    \mathbf{v}_s\cdot \bm{\epsilon}_{\alpha,\mathbf{q}}\left(\frac{L}{2}\right)
+    \int_\Delta^\infty
+    \frac{d\lambda}{\sqrt{\lambda^2 - \Delta^2}}\\
+    \times
+    \int_0^{2\pi}\frac{d\theta}{2\pi}
+    \frac{n_F(E^-(\lambda))-n_F(E^+(\lambda))}{(\Omega + i0^+)^2 -
+    (2\lambda)^2}f_d(\theta)
+
 
 .. autodoxygenfile:: cavity.h
  
