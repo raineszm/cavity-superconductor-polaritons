@@ -50,6 +50,8 @@ public:
             std::sqrt(l * l - state.delta * state.delta));
   }
 
+  /** The integrand for the derivative of the imaginary part of the coupling
+   */
   double d_ImDA_int(double l, double theta, double omega) const
   {
     double fd = std::sqrt(2) * std::cos(2 * theta);
@@ -98,6 +100,8 @@ public:
              state.delta);
   }
 
+  /** The derivative of the imaginary part of the coupling \f$dg/d\omega\f$
+   */
   double d_ImDA(double omega) const
   {
     return -2 * state.delta * GPAR * state.sys.vs * state.sys.dos() *
@@ -325,15 +329,15 @@ public:
    */
   double photon_se(double omega, double qx, double qy, int i, int j) const
   {
-    return _photon_se(omega, qx, qy, i, j, false);
+    return _photon_se_or_deriv(omega, qx, qy, i, j, false);
   }
 
-  double _photon_se(double omega,
-                    double qx,
-                    double qy,
-                    int i,
-                    int j,
-                    bool deriv) const
+  double _photon_se_or_deriv(double omega,
+                             double qx,
+                             double qy,
+                             int i,
+                             int j,
+                             bool deriv) const
   {
     auto ret =
       state.sys.dos() *
@@ -384,12 +388,16 @@ public:
       .finished();
   }
 
+  /** The derivative of the photon self energy w.r.t frequency
+   *
+   * \f[\frac{d\Pi(\omega, \mathbf{q})}{d\omega}\f]
+   */
   Matrix2d d_photon_se(double omega, double qx, double qy) const
   {
-    return (Matrix2d() << _photon_se(omega, qx, qy, 0, 0, true),
-            _photon_se(omega, qx, qy, 0, 1, true),
-            _photon_se(omega, qx, qy, 1, 0, true),
-            _photon_se(omega, qx, qy, 1, 1, true))
+    return (Matrix2d() << _photon_se_or_deriv(omega, qx, qy, 0, 0, true),
+            _photon_se_or_deriv(omega, qx, qy, 0, 1, true),
+            _photon_se_or_deriv(omega, qx, qy, 1, 0, true),
+            _photon_se_or_deriv(omega, qx, qy, 1, 1, true))
       .finished();
   }
   //@}

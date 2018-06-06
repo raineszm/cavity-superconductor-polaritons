@@ -32,7 +32,7 @@ bind_coupling(py::module& m)
          py::overload_cast<double, double, double, int, int>(
            &Coupling::photon_se, py::const_),
          "Photon self energy matrix components")
-    .def("_photon_se", &Coupling::_photon_se)
+    .def("_photon_se_or_deriv", &Coupling::_photon_se_or_deriv)
     .def("d_photon_se", &Coupling::d_photon_se)
     .def("photon_se_int", &Coupling::photon_se_int);
 }
