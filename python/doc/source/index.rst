@@ -37,19 +37,18 @@ For the case of a function which depends only on the quasparticle energy :math:`
 
     2 \nu \int_\Delta^\infty d\lambda \frac{\lambda}{\sqrt{\lambda^2 - \Delta^2}}\int_0^{2\pi}\frac{d\theta}{2\pi} f(\lambda, \mathbf{k}_f)]
 
+Physics
+=======
+
+.. toctree::
+    :caption: Physics concepts
+
+    modes
+
 
 Code
 ====
 
-Python
-------
-
-.. autosummary::
-   :toctree: pymodules
-
-    materials
-    polariton
-    units
 
 
 C++
@@ -57,7 +56,7 @@ C++
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: C++ modules:
 
    system
    state
@@ -66,6 +65,14 @@ C++
    coupling
    polariton
 
+Python
+------
+
+.. toctree::
+    :caption: Python modules
+    :glob:
+
+    pymodules/*
 
 
 

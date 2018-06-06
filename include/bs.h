@@ -139,4 +139,44 @@ public:
 
     return (_root = solver.solve(1e-8 * state.delta, 0));
   }
+
+  /** The Hamiltonian of the BS mode operators
+   *
+   * We can define mode operators \f$b,b^\dagger\f$ such the BS action can be
+   * rewritten \f[\frac{1}{\beta}\sum_q \bar{b}_q \left(-i \omega_m +
+   * \Omega_\text{BS}\right)b_q\f]
+   *
+   * This defines the Hamiltonian of the BS mode.
+   *
+   * To do so we make the following approximations.
+   *
+   * The BS action can be written
+   * \f[ \underbrace{\frac{1}{g_d} - \frac{1}{g_s}}_{m_0} -
+   * \Omega^2_\text{BS}I(\Omega_\text{BS}^2) = 0,\f]
+   * where c.f. \ref action_int() the integral \f$I = -\Omega^2 I_0\f$.
+   *
+   * Here we have already assumed that the BS mode dispersion is irrelevant for
+   * our purposes and noted that the supercurrent doesn't much affect the BS
+   * mode frequency.
+   * This allows us to write
+   * \f[m_0 = \Omega_\text{BS}^2 I_0(\text{BS}^2)\f]
+   *
+   * For frequencies near \f$\Omega_\text{BS}\f$ we can drop the frequency
+   * dependence in \f$I_0\f$ and define \f$I_0(\Omega^2) \approx
+   * I_0(\Omega_\text{BS}^2) = \frac{1}{2}M\f$.
+   * Then the action becomes \f[\sum_q
+   * d_{-q} \left[\frac{1}{2}M\Omega_\text{BS}^2 -
+   * \frac{1}{2}M\Omega^2\right]d_q
+   * \f]
+   * or in real space/time
+   * \f[
+   * \mathcal{L} = \frac{1}{2}Md^2 + \frac{1}{2}M\Omega^2\dot{d}^2
+   * \f]
+   *
+   * This is just the Lagrangian of a Harmonic oscillator.
+   * Immediately we can write the BS amplitude in terms of the mode operators
+   * \f[d_q = \sqrt{\frac{1}{2M\Omega_\text{BS}}} \left(b_q +
+   * b^\dagger_{-q}\right) \f]
+   */
+  double hamiltonian() const { return root(); }
 };

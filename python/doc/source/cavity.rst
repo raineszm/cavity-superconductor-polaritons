@@ -242,7 +242,7 @@ Upon this transformation the photon action becomes
 
 On the other hand.
 We generally want all terms in the inverse propagator to have the same units.
-Looking at the copupling term (c.f. :cpp:func:`Coupling::ImDA`)
+Looking at the coupling term (c.f. :cpp:func:`Coupling::ImDA`)
 
 .. math::
 
@@ -299,4 +299,40 @@ or using :math:`\alpha=\frac{e^2}{c}`
     \right]
     \mathbf{A}(q)
 
+Returning to the mode Basis
+============================
+
+As detailed above, in terms of the mode operators
+
+.. math::
+
+    \mathbf{A}(\mathbf{q}, z) = \sqrt{\frac{2\pi c^2}{\omega_\mathbf{q}}}\left(\bm{\epsilon}_\alpha(q, z) a_{\alpha,q} + \bm{\epsilon}_\alpha(-q, z)^* a^\dagger_{-q, \alpha}\right)
+
+and the mode action is
+
+.. math::
+
+    S_a = \sum_q \bar{a}_{\alpha, q}(-i \omega_m + \omega_\mathbf{q}) a_{\alpha, q}
+
+Consider then the coupling of the BS mode to the photons in terms of mode operators (c.f. :cpp:func:`BS::hamiltonian`, :cpp:func:`Coupling::ImDA`)
+
+ This coupling can be written
+
+ .. math::
+    
+    \sum_q i g(q) \left(d_{-q} \mathbf{v}_s \cdot \mathbf{A}_q(L/2) - \mathbf{A}_{-q}(L/2)\cdot \mathbf{v}_s d_q\right)
+
+We now substitute in mode operators
+
+ .. math::
+    
+    i\sqrt{\frac{2\pi c^2}{2M\Omega_\text{BS}}}
+    \sum_q \sqrt{\frac{1}{\omega_q}}g(q) \\
+    \times 
+    \left[\left(b_{-q} + b^\dagger_{q}\right)\mathbf{v}_s \cdot \sum_\alpha \bm{\epsilon}_{q,\alpha}(L/2)\left(a_{\alpha,q} + a^\dagger_{\alpha, -q}\right)\right.\\
+    \left.-\sum_\alpha \bm{\epsilon}_{q,\alpha}(L/2)\left(a_{\alpha,-q} + a^\dagger_{\alpha,q}\right)\mathbf{v}_s \cdot \left(b_q + b^\dagger_{-q}\right)\right]
+
+Throwing out counter-rotating terms
+
 .. autodoxygenfile:: cavity.h
+ 
