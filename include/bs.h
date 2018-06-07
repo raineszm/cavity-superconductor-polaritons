@@ -152,14 +152,15 @@ public:
    *
    * The BS action can be written
    * \f[ \underbrace{\frac{1}{g_d} - \frac{1}{g_s}}_{m_0} -
-   * \Omega^2_\text{BS}I(\Omega_\text{BS}^2) = 0,\f]
-   * where c.f. \ref action_int() the integral \f$I = -\Omega^2 I_0\f$.
+   * \Omega^2_\text{BS}I_0(\Omega_\text{BS}^2) = 0,\f]
+   * where (c.f. \ref action_int()) the integral \f$I(\Omega^2) = -\Omega^2
+   * I_0(\Omega^2)\f$.
    *
    * Here we have already assumed that the BS mode dispersion is irrelevant for
    * our purposes and noted that the supercurrent doesn't much affect the BS
    * mode frequency.
    * This allows us to write
-   * \f[m_0 = \Omega_\text{BS}^2 I_0(\text{BS}^2)\f]
+   * \f[m_0 = \Omega_\text{BS}^2 I_0(\Omega_\text{BS}^2)\f]
    *
    * For frequencies near \f$\Omega_\text{BS}\f$ we can drop the frequency
    * dependence in \f$I_0\f$ and define \f$I_0(\Omega^2) \approx
