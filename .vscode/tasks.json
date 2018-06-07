@@ -70,6 +70,16 @@
             },
             "group": "build",
             "problemMatcher": []
+        },
+        {
+            "label": "dropdocs",
+            "type": "process",
+            "command": "invoke",
+            "args": [
+                "dropdocs"
+            ],
+            "group": "build",
+            "problemMatcher": []
         }
     ]
 }
