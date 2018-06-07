@@ -20,9 +20,11 @@ public:
 
   //! This also holds the related System
   const State state;
+  const Cavity cav;
 
-  explicit Coupling(const State& state_)
+  explicit Coupling(const State& state_, const Cavity& cav_)
     : state(state_)
+    , cav(cav_)
   {}
 
   /** The integrand for the imaginary part of the coupling
@@ -399,6 +401,34 @@ public:
             _photon_se_or_deriv(omega, qx, qy, 1, 0, true),
             _photon_se_or_deriv(omega, qx, qy, 1, 1, true))
       .finished();
+  }
+
+  Matrix2d photon_se_mode(double omega, double qx, double qy) const
+  {
+    double e2_factor = cav.omega0 / cav.omega(qx, qy);
+    Matrix2d U;
+    U << -qy, qx, -qx * e2_factor, -qy * e2_factor;
+    return 4 / cav.L() * U *
+           (Matrix2d() << photon_se(omega, qx, qy, 0, 0),
+            photon_se(omega, qx, qy, 0, 1),
+            photon_se(omega, qx, qy, 1, 0),
+            photon_se(omega, qx, qy, 1, 1))
+             .finished() *
+           U.adjoint();
+  }
+
+  Matrix2d d_photon_se_mode(double omega, double qx, double qy) const
+  {
+    double e2_factor = cav.omega0 / cav.omega(qx, qy);
+    Matrix2d U;
+    U << -qy, qx, -qx * e2_factor, -qy * e2_factor;
+    return 4 / cav.L() * U *
+           (Matrix2d() << _photon_se_or_deriv(omega, qx, qy, 0, 0, true),
+            _photon_se_or_deriv(omega, qx, qy, 0, 1, true),
+            _photon_se_or_deriv(omega, qx, qy, 1, 0, true),
+            _photon_se_or_deriv(omega, qx, qy, 1, 1, true))
+             .finished() *
+           U.adjoint();
   }
   //@}
 };

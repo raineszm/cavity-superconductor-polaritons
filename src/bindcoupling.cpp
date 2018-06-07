@@ -5,6 +5,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include "cavity.h"
 #include "coupling.h"
 #include "state.h"
 #include "system.h"
@@ -16,7 +17,7 @@ void
 bind_coupling(py::module& m)
 {
   py::class_<Coupling>(m, "Coupling")
-    .def(py::init<const State&>(), "state"_a)
+    .def(py::init<const State&, const Cavity&>(), "state"_a, "cav"_a)
     // Attributes
     .def_readonly("state", &Coupling::state)
     // Functions
@@ -34,5 +35,7 @@ bind_coupling(py::module& m)
          "Photon self energy matrix components")
     .def("_photon_se_or_deriv", &Coupling::_photon_se_or_deriv)
     .def("d_photon_se", &Coupling::d_photon_se)
-    .def("photon_se_int", &Coupling::photon_se_int);
+    .def("photon_se_int", &Coupling::photon_se_int)
+    .def("photon_se_mode", &Coupling::photon_se_mode)
+    .def("d_photon_se_mode", &Coupling::d_photon_se_mode);
 }

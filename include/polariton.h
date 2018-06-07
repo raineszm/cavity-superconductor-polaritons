@@ -27,8 +27,6 @@ class Polariton
 public:
   //! The Bardasis Schrieffer mode
   const BS bs;
-  //! The photonic sector
-  const Cavity cav;
   //! The fermionic contribution/coupling
   const Coupling coupling;
   //! Enhancement of the paramagnetic coupling between electrons and the A field
@@ -37,19 +35,20 @@ public:
   double dipoleX;
   const System& sys;
   const State& state;
+  //! The photonic sector
+  const Cavity& cav;
 
   Polariton(const BS& bs_,
-            const Cavity& cav_,
             const Coupling& c_,
             double paraX_ = 1,
             double dipoleX_ = 1)
     : bs(bs_)
-    , cav(cav_)
     , coupling(c_)
     , paraX(paraX_)
     , dipoleX(dipoleX_)
     , sys(coupling.state.sys)
     , state(coupling.state)
+    , cav(coupling.cav)
   {
     if (bs.state != coupling.state) {
       throw std::invalid_argument(
