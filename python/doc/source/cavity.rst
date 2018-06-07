@@ -111,7 +111,7 @@ The n-th harmonic TE and TM polarizations are respectively
 .. math::
 
     \bm{\epsilon}_1 &= i\sqrt{\frac{2}{L}} \sin\left(\frac{n \pi z}{L}\right)\hat{\bm{z}} \times \hat{\bm{q}}\\
-    \bm{\epsilon}_2 &= \sqrt{\frac{2}{L}} \frac{1}{\omega_\mathbf{q}}\left(c q\cos\left(\frac{n \pi z}{L}\right)\hat{\bm{z}} 
+    \bm{\epsilon}_2 &= \sqrt{\frac{2}{L}} \frac{1}{\omega_\mathbf{q}}\left(c q\cos\left(\frac{n \pi z}{L}\right)\hat{\bm{z}}
     -i \omega_0 \sin\left(\frac{n \pi z}{L}\right) \hat{\bm{q}}\right)
 
 Note that both of these have the property :math:`\bm{\epsilon(-q, z)} = \bm{\epsilon}^\ast(q, z)`.
@@ -126,7 +126,7 @@ This allows us to write
 .. math::
 
 
-    D_{\alpha\alpha'}(q) 
+    D_{\alpha\alpha'}(q)
     = \frac{2\pi c^2}{\omega_{\mathbf q}}\int dz \epsilon^{i\ast}_\alpha(\mathbf{q}, z)\int dz' \epsilon^{j}_{\alpha}(\mathbf{q}, z')
     \sum_{\beta}
     \left(\epsilon^i_\beta(q, z) \epsilon^{\ast j}_{\beta}(q, z') \frac{1}{i\omega_m - \omega_\mathbf{q}}
@@ -155,7 +155,7 @@ We recall
     \mathbf{A}_\alpha(\mathbf{q}) = \sqrt{\frac{2\pi c^2}{\omega_\mathbf{q}}}
     \left(a_{\alpha,q} + a^\dagger_{-q, \alpha}\right)
 
-and 
+and
 
 .. math::
 
@@ -235,7 +235,7 @@ Upon this transformation the photon action becomes
 
     S_A = \frac{1}{16 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
     \left[
-    \left(1 + \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0 
+    \left(1 + \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
     - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin 2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
     \right]
     \mathbf{A}(q)
@@ -260,7 +260,7 @@ By inspection the units of this term are
 By inspecting the BS action (c.f. :cpp:func:`BS::action`) one can see that the Bardasis-Schrieffer inverse GF
 has the same units as :math:`\nu`.
 As such it makes sense to absorb the factor :math:`\sqrt{\tfrac{2}{L}}e` into the photon fields.
-This makes the paramagnetic coupling 
+This makes the paramagnetic coupling
 
 .. math::
 
@@ -283,7 +283,7 @@ and the photon action
 
     S_A = \frac{L}{32\pi e^2 c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
     \left[
-    \left(1 + \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0 
+    \left(1 + \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
     - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin 2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
     \right]
     \mathbf{A}(q)
@@ -294,7 +294,7 @@ or using :math:`\alpha=\frac{e^2}{c}`
 
     S_A = \frac{\alpha^2 L}{32\pi (\alpha c)^3}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
     \left[
-    \left(1 + \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0 
+    \left(1 + \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
     - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin 2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
     \right]
     \mathbf{A}(q)
@@ -319,16 +319,16 @@ Consider then the coupling of the BS mode to the photons in terms of mode operat
  This coupling can be written
 
  .. math::
-    
+
     \sum_q i g(q) \left(d_{-q} \mathbf{v}_s \cdot \mathbf{A}_q(L/2) - \mathbf{A}_{-q}(L/2)\cdot \mathbf{v}_s d_q\right)
 
 We now substitute in mode operators
 
  .. math::
-    
+
     i\sqrt{\frac{2\pi c^2}{2M\Omega_\text{BS}}}
     \sum_q \sqrt{\frac{1}{\omega_q}}g(q) \\
-    \times 
+    \times
     \left[\left(b_{-q} + b^\dagger_{q}\right)\mathbf{v}_s \cdot \sum_\alpha \bm{\epsilon}_{q,\alpha}(L/2)\left(a_{\alpha,q} + a^\dagger_{\alpha, -q}\right)\right.\\
     \left.-\mathbf{v}_s \cdot \sum_\alpha \bm{\epsilon}_{q,\alpha}(L/2)\left(a_{\alpha,-q} + a^\dagger_{\alpha,q}\right)\left(b_q + b^\dagger_{-q}\right)\right]
 
@@ -336,9 +336,9 @@ Throwing out counter-rotating terms we can write this
 
 
  .. math::
-    
+
     i\sqrt{\frac{\pi c^2}{M\Omega_\text{BS}}}
-    \sum_q \sqrt{\frac{1}{\omega_q}}g(q) 
+    \sum_q \sqrt{\frac{1}{\omega_q}}g(q)
     \mathbf{v}_s \cdot \sum_\alpha \bm{\epsilon}_{q,\alpha}(L/2)
     \left[a^\dagger_{\alpha, -q} b_{-q} + b^\dagger_{q}a_{\alpha,q}
     -b^\dagger_{-q}a_{\alpha,-q} - a^\dagger_{\alpha,q}b_q\right]
@@ -346,9 +346,9 @@ Throwing out counter-rotating terms we can write this
 And using the symmetry properties of :math:`\epsilon`
 
  .. math::
-    
+
     S_g = 2i\sqrt{\frac{\pi c^2}{M\Omega_\text{BS}}}
-    \sum_q \frac{1}{\sqrt{\omega_q}}g(q) 
+    \sum_q \frac{1}{\sqrt{\omega_q}}g(q)
     \mathbf{v}_s \cdot \sum_\alpha \bm{\epsilon}_{q,\alpha}(L/2)
     \left[b^\dagger_{q}a_{\alpha,q} -a^\dagger_{\alpha,q}b_q\right]
 
@@ -373,5 +373,123 @@ or explicitly
     (2\lambda)^2}f_d(\theta)
 
 
+Photon Self-Energy
+==================
+
+Consider the addition of the photonic self-energy to the photon action.
+
+The thermal photon action is (c.f. :cpp:func:`Coupling::photon_se`)
+
+.. math::
+
+    \mathcal{L}_\text{SE} = -\frac{1}{2\beta}\sum_q\mathbf{A}_{-q}(L/2)\hat{\Pi}(q)\mathcal{A}_q(L/2)
+
+Going to the mode basis
+
+.. math::
+
+    \frac{1}{2}\sum_{\alpha,\beta}
+    \frac{\pi c^2}{\omega_\mathbf{q}}
+    \left(\bm{\epsilon}_\alpha(-q, L/2) a_{\alpha,-q} + \bm{\epsilon}_\alpha(q, L/2)^* a^\dagger_{q, \alpha}\right)
+    \hat{\Pi}(q)
+    \left(\bm{\epsilon}_\beta(q, L/2) a_{\beta,q} + \bm{\epsilon}_\beta(-q, L/2)^* a^\dagger_{-q, \beta}\right)
+
+Ignoring the counter rotating terms
+
+.. math::
+
+    \frac{1}{2}\sum_{\alpha,\beta}
+    \frac{\pi c^2}{\omega_\mathbf{q}}\left(
+    a^\dagger_{q, \alpha}\bm{\epsilon}_\alpha(q, L/2)^*
+    \hat{\Pi}(q)
+    \bm{\epsilon}_\beta(q, L/2) a_{q,\beta}
+    +
+    a_{\alpha,-q}\bm{\epsilon}_\alpha(-q, L/2)
+    \hat{\Pi}(q)
+    \bm{\epsilon}_\beta(-q, L/2)^* a^\dagger_{-q, \beta }
+    \right)\\ =
+    \frac{1}{2}\sum_{\alpha,\beta}
+    \frac{\pi c^2}{\omega_\mathbf{q}}
+    a^\dagger_{q, \alpha}\bm{\epsilon}_\alpha(q, L/2)^*
+    \left(
+    \hat{\Pi}(q)
+    +
+    \hat{\Pi}^T(-q)\right)
+    \bm{\epsilon}_\beta(q, L/2)
+    a_{q,\beta}
+
+We thus define
+
+.. math::
+   \tilde{\Pi}_{\alpha\beta}(q) = \frac{1}{2}\bm{\epsilon}_\alpha(q, L/2)^*
+    \left(
+    \hat{\Pi}(q)
+    +
+    \hat{\Pi}^T(-q)\right)
+    \bm{\epsilon}_\beta(q, L/2)
+
+The thermal photon action is then
+
+.. math::
+
+    S = \frac{1}{\beta}\sum_q a^\dagger_{q, \alpha}\left(-i\omega_m + \omega_\mathbf{q} + \tilde{\Pi}_{\alpha\beta}(i \omega_m, \mathbf{q})\right)a_{q,\beta}
+
+Renormalization
+---------------
+
+In order to normalize we must first find the new mass.
+At :math:`q=0`
+
+.. math::
+
+   S = -i\omega_m + \omega_0 + \tilde{\Pi}_{\alpha\beta}(i \omega_m, 0)
+
+The renormalized mass :math:`\omega_r` is the frequency at which this action vanishes.
+This allows us to expand
+
+.. math::
+
+    \tilde{\Pi} \approx (\hat{Z}-1)\left(\omega_r - i \omega_m  - \omega_0\right) + \hat{\tilde{\Pi}}(\omega_r, \mathbf{q}) + \cdots
+
+where
+
+.. math::
+
+    1 - \hat{Z} = \left.\frac{\partial\Pi(i\omega, 0)}{\partial(i\omega)}\right|_{i\omega=\omega_r-\omega_0}
+
+
+Assuming :math:`\hat{Z}` is positive definite it admits a Cholesky decomposition :math:`\hat{Z} = \hat{L} \hat{L}^\dagger`.
+We then absorb the matrix :math:`\hat{L}` in the definition of our field operators
+
+.. math::
+
+    \tilde{a} = \hat{L}^\dagger a
+
+This makes the photonic Lagrangian
+
+.. math::
+
+    \mathcal{L} = -i\omega_m + \tilde{\omega_\mathbf{q}} + \hat{L}^{-1}\hat{\tilde{\Pi}}(\omega_r, \mathbf{q})(\hat{L}^{\dagger})^{-1}
+
+allowing us to define the effective Hamiltonian
+
+.. math::
+
+    \hat{H}_\text{phot} = \tilde{\omega}_{\mathbf{q}} + \hat{L}^{-1}\hat{\tilde{\Pi}}(\omega_r, \mathbf{q}){(\hat{L}^\dagger)}^{-1}
+
+Similarly, the coupling to the Bardasis-Schrieffer mode becomes
+
+.. math::
+
+    \tilde{g}_\text{eff}(q, \alpha) = 4 i e\nu\Omega\Delta  \sqrt{\frac{\pi}{M\Omega_\text{BS}\omega_q}}
+    \mathbf{v}_s\cdot \bm{\epsilon}_{\alpha',\mathbf{q}} \left[{(\hat{L}^\dagger)}^{-1}\right]_{\alpha'\alpha} \left(\frac{L}{2}\right)
+    \int_\Delta^\infty
+    \frac{d\lambda}{\sqrt{\lambda^2 - \Delta^2}}\\
+    \times
+    \int_0^{2\pi}\frac{d\theta}{2\pi}
+    \frac{n_F(E^-(\lambda))-n_F(E^+(\lambda))}{(\Omega + i0^+)^2 -
+    (2\lambda)^2}f_d(\theta)
+
+
 .. autodoxygenfile:: cavity.h
- 
+
