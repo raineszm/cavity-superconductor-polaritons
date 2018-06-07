@@ -171,13 +171,22 @@ public:
    * \f]
    * or in real space/time
    * \f[
-   * \mathcal{L} = \frac{1}{2}Md^2 + \frac{1}{2}M\Omega^2\dot{d}^2
+   * \mathcal{L} = \frac{1}{2}M\Omega_\text{BS}^2d^2 - \frac{1}{2}M\dot{d}^2
    * \f]
    *
-   * This is just the Lagrangian of a Harmonic oscillator.
-   * Immediately we can write the BS amplitude in terms of the mode operators
-   * \f[d_q = \sqrt{\frac{1}{2M\Omega_\text{BS}}} \left(b_q +
-   * b^\dagger_{-q}\right) \f]
+   * One difference from the usual derivation is the extra minus sign in our
+   * Lagrangian leading us to define
+   *
+   * \f[
+   * b_q = \frac{1}{\sqrt{2M\omega_q}}\left(i M\omega_qd_q -  \Pi_q\right)\\
+   * b^\dagger_q = -\frac{1}{\sqrt{2M\omega_q}}\left(iM\omega_qd_{-q} +
+   * \Pi_{-q}\right) \f]
+   *
+   * Thus the operator \f$d\f$ is given by
+   *
+   * \f[
+   * d_q = -i\frac{b^\dagger_{-q} - b_q}{\sqrt{2 M\omega_q}}
+   * \f]
    */
   double hamiltonian() const { return root(); }
 };

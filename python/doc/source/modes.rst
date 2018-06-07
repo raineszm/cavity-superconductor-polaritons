@@ -1,3 +1,5 @@
+.. _modes::
+
 Modes and Mode Operators
 =========================
 
