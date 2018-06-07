@@ -178,14 +178,15 @@ public:
    * Lagrangian leading us to define
    *
    * \f[
-   * b_q = \frac{1}{\sqrt{2M\omega_q}}\left(i M\omega_qd_q -  \Pi_q\right)\\
-   * b^\dagger_q = -\frac{1}{\sqrt{2M\omega_q}}\left(iM\omega_qd_{-q} +
+   * b_q = \frac{1}{\sqrt{2M\Omega_\text{BS}}}\left(i M\Omega_\text{BS}d_q -
+   * \Pi_q\right)\\ b^\dagger_q =
+   * -\frac{1}{\sqrt{2M\Omega_\text{BS}}}\left(iM\Omega_\text{BS}d_{-q} +
    * \Pi_{-q}\right) \f]
    *
    * Thus the operator \f$d\f$ is given by
    *
    * \f[
-   * d_q = -i\frac{b^\dagger_{-q} - b_q}{\sqrt{2 M\omega_q}}
+   * d_q = -i\frac{b^\dagger_{-q} - b_q}{\sqrt{2 M\Omega_\text{BS}}}
    * \f]
    */
   double hamiltonian() const { return root(); }
