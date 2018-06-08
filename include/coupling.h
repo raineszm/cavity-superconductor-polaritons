@@ -384,29 +384,60 @@ public:
       .finished();
   }
 
+  /**
+   * The self-energy as experienced by the photon mode operators i.e. the action
+   * is
+   *
+   * \f[
+   *  S = \frac{1}{\beta}\sum_q \bar{a}_q \left[-i\omega_m + \omega_q +
+   * \tilde{\Pi}(q)\right] a_q \f]
+   *
+   * In particular, (c.f. \ref photon_se(), \ref Polariton::action()), the
+   * self energy we have previously defined enters as
+   *
+   * \f[
+   *  \frac{-1}{\beta}\sum_q A_{-q} \Pi_q A_q
+   * \f]
+   *
+   * that being the case the mode self-energy \f$\tilde{\Pi}\f$
+   * is defined by
+   *
+   * \f[
+   * \frac{2\pi c^2}{\omega_q} \epsilon(L/2)^* \Pi(q) \epsilon(L/2)
+   * \f]
+   * Our code implements the polarization vectors as \f$i\sqrt{\tfrac{2}{L}}V\f$
+   * where $V$ is a real matrix describing the polarization vectors (c.f.
+   * \ref Cavity::polarizations()) so the final expresion is
+   *
+   * \f[
+   * \tilde{\Pi} = \frac{2\pi c^2}{\omega_q}\frac{2}{L} V^T \Pi(q) V
+   * \f]
+   */
   Matrix2d photon_se_mode(double omega, double qx, double qy) const
   {
     Matrix2d V = cav.polarizations(qx, qy, state.sys.theta_v);
 
-    return 4 / cav.L() * V *
+    return 2 * M_PI * C * C * 2 / (cav.L() * cav.omega(qx, qy)) *
+           V.transpose() *
            (Matrix2d() << photon_se(omega, qx, qy, 0, 0),
             photon_se(omega, qx, qy, 0, 1),
             photon_se(omega, qx, qy, 1, 0),
             photon_se(omega, qx, qy, 1, 1))
              .finished() *
-           V.adjoint();
+           V;
   }
 
   Matrix2d d_photon_se_mode(double omega, double qx, double qy) const
   {
     Matrix2d V = cav.polarizations(qx, qy, state.sys.theta_v);
-    return 4 / cav.L() * V *
+    return 2 * M_PI * C * C * 2 / (cav.L() * cav.omega(qx, qy)) *
+           V.transpose() *
            (Matrix2d() << _photon_se_or_deriv(omega, qx, qy, 0, 0, true),
             _photon_se_or_deriv(omega, qx, qy, 0, 1, true),
             _photon_se_or_deriv(omega, qx, qy, 1, 0, true),
             _photon_se_or_deriv(omega, qx, qy, 1, 1, true))
              .finished() *
-           V.adjoint();
+           V;
   }
   //@}
 };

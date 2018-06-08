@@ -84,9 +84,8 @@ public:
   /** The polarization vectors of the problem at \f$z=L/2\f$ in the basis where
    * \f$\theta_v\f$ defines the \f$x\f$-axis.
    *
-   * Polarization vectors are along the rows because I'm dumb.
-   * Also this does not include the factor \f$i\sqrt{\tfrac{2}{L}}\f$, also
-   * because I'm dumb.
+   * The vectors are along the columns
+   * The factor \f$i\sqrt{\tfrac{2}{L}}\f$ is not includes.
    *
    * \note this is not a unitary transformation.
    */
@@ -99,6 +98,6 @@ public:
     auto q1 = q * std::cos(theta_q - theta_s);
     auto q2 = q * std::sin(theta_q - theta_s);
 
-    return (Matrix2d() << -q2, q1, -q1 * e2_factor, -q2 * e2_factor).finished();
+    return (Matrix2d() << -q2, e2_factor * q1, -q1, -e2_factor * q2).finished();
   }
 };

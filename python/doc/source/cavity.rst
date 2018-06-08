@@ -425,7 +425,7 @@ Ignoring the counter rotating terms
 We thus define
 
 .. math::
-   \tilde{\Pi}_{\alpha\beta}(q) = \frac{1}{2}\bm{\epsilon}_\alpha(q, L/2)^*
+   \tilde{\Pi}_{\alpha\beta}(q) = \frac{1}{2}\frac{\pi c^2}{\omega_q}\bm{\epsilon}_\alpha(q, L/2)^*
     \left(
     \hat{\Pi}(q)
     +
