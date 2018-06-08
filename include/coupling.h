@@ -3,6 +3,7 @@
 #include <array>
 #include <cmath>
 
+#include "bs.h"
 #include "cavity.h"
 #include "state.h"
 
@@ -16,15 +17,17 @@ using Eigen::Matrix2d;
 class Coupling
 {
 public:
+  const BS bs;
+  const Cavity cav;
   //! The associated mean field state
 
   //! This also holds the related System
-  const State state;
-  const Cavity cav;
+  const State& state;
 
-  explicit Coupling(const State& state_, const Cavity& cav_)
-    : state(state_)
+  explicit Coupling(const BS& bs_, const Cavity& cav_)
+    : bs(bs_)
     , cav(cav_)
+    , state(bs.state)
   {}
 
   /** The integrand for the imaginary part of the coupling
@@ -117,6 +120,28 @@ public:
                         return d_ImDA_int(l, theta, omega);
                       },
                       state.delta));
+  }
+
+  double mode_coupling(double omega, double qx, double qy, int i) const
+  {
+    assert(i == 0 || i == 1);
+    auto M = bs.M();
+    auto V = cav.polarizations(qx, qy, state.sys.theta_v);
+    auto vsdoteps = V(0, i);
+    return 2 * std::sqrt(M_PI * C * C / (M * bs.root() * cav.omega(qx, qy))) *
+           vsdoteps * ImDA(omega);
+  }
+
+  /** The derivative of the mode coupling \f$dg/d\omega\f$
+   */
+  double d_mode_coupling(double omega, double qx, double qy, int i) const
+  {
+    assert(i == 0 || i == 1);
+    auto M = bs.M();
+    auto V = cav.polarizations(qx, qy, state.sys.theta_v);
+    auto vsdoteps = V(0, i);
+    return 2 * std::sqrt(M_PI * C * C / (M * bs.root() * cav.omega(qx, qy))) *
+           vsdoteps * d_ImDA(omega);
   }
 
   /** The polarization bubble entering into the photon self energy

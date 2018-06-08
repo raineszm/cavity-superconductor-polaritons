@@ -190,4 +190,8 @@ public:
    * \f]
    */
   double hamiltonian() const { return root(); }
+
+  /** The kinetic mass of the BS mode
+   */
+  double M() const { return 2 * state.sys.dos() * mass / (root() * root()); }
 };

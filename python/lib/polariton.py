@@ -8,8 +8,7 @@ def build_polariton(m, mu, Tc, vs, theta_v, T, root_rel, paraX, dipoleX):
     state = bsm.State.solve(sys, T)
     bs = bsm.BS(0.3, state)
     return bsm.Polariton(
-        bs=bs,
-        coupling=bsm.Coupling(state, bsm.Cavity(bs.root * root_rel)),
+        coupling=bsm.Coupling(state=state, cav=bsm.Cavity(bs.root * root_rel), bs=bs),
         paraX=paraX,
         dipoleX=dipoleX,
     )

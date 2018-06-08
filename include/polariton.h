@@ -25,8 +25,6 @@ using Eigen::Vector3d;
 class Polariton
 {
 public:
-  //! The Bardasis Schrieffer mode
-  const BS bs;
   //! The fermionic contribution/coupling
   const Coupling coupling;
   //! Enhancement of the paramagnetic coupling between electrons and the A field
@@ -35,26 +33,20 @@ public:
   double dipoleX;
   const System& sys;
   const State& state;
+  //! The Bardasis Schrieffer mode
+  const BS& bs;
   //! The photonic sector
   const Cavity& cav;
 
-  Polariton(const BS& bs_,
-            const Coupling& c_,
-            double paraX_ = 1,
-            double dipoleX_ = 1)
-    : bs(bs_)
-    , coupling(c_)
+  Polariton(const Coupling& c_, double paraX_ = 1, double dipoleX_ = 1)
+    : coupling(c_)
     , paraX(paraX_)
     , dipoleX(dipoleX_)
     , sys(coupling.state.sys)
     , state(coupling.state)
+    , bs(coupling.bs)
     , cav(coupling.cav)
-  {
-    if (bs.state != coupling.state) {
-      throw std::invalid_argument(
-        "bs and c must be constructed with the same state");
-    }
-  }
+  {}
 
   Matrix2d photon_sector(double omega, double qx, double qy) const
   {

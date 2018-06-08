@@ -17,9 +17,11 @@ void
 bind_coupling(py::module& m)
 {
   py::class_<Coupling>(m, "Coupling")
-    .def(py::init<const State&, const Cavity&>(), "state"_a, "cav"_a)
+    .def(py::init<const BS&, const Cavity&>(), "bs"_a, "cav"_a)
     // Attributes
-    .def_readonly("state", &Coupling::state)
+    .def_readonly("bs", &Coupling::bs)
+    .def_property_readonly("cav", [](const Coupling& c) { return c.cav; })
+    .def_property_readonly("state", [](const Coupling& c) { return c.state; })
     // Functions
     .def("ImDA", &Coupling::ImDA)
     .def("d_ImDA", &Coupling::d_ImDA)
