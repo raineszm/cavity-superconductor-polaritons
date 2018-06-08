@@ -98,7 +98,7 @@ public:
   //! The value of the BS Mode inverse GF at frequency \f$\Omega\f$
   double action(double omega) const
   {
-    return state.sys.dos() *
+    return -state.sys.dos() *
            (mass + 2 * gsl_xi_integrate(
                          [this, omega](double l, double theta) {
                            return action_int(l, theta, omega);
@@ -109,7 +109,7 @@ public:
   //! Derivative of the BS mode inverse GF wrt \f$\Omega\f$
   double d_action(double omega) const
   {
-    return 2 * state.sys.dos() *
+    return -2 * state.sys.dos() *
            gsl_xi_integrate(
              [this, omega](double l, double theta) {
                return d_action_int(l, theta, omega);
