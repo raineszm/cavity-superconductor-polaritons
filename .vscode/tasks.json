@@ -80,6 +80,16 @@
             ],
             "group": "build",
             "problemMatcher": []
+        },
+        {
+            "label": "oni",
+            "type": "process",
+            "command": "/usr/local/bin/oni",
+            "args": [
+                "${file}",
+            ],
+            "isBackground": true,
+            "problemMatcher": []
         }
     ]
 }
