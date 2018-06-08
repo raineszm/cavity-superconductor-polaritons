@@ -273,25 +273,6 @@ public:
 
     auto pl = pi0_elems(dp, dm, lp, lm, omega, deriv);
 
-    auto vsdotq = state.sys.drift(qx, qy);
-    auto omega_ = omega - vsdotq;
-
-    if (std::fabs(omega_ - (lp - lm)) < 1e-3 * omega ||
-        std::fabs(omega_ + (lp - lm)) < 1e-3 * omega) {
-      auto xi = state.sys.xi(kx, ky);
-      auto l = std::hypot(xi, state.delta);
-
-      auto vdotq = (kx * qx + ky * qy) / state.sys.m;
-      auto vsdotk = state.sys.drift(kx, ky);
-      auto t00 =
-        (vsdotq + vdotq * xi / l) / (1 + std::cosh((vsdotk + l) / state.T));
-      auto t11 =
-        (vsdotq - vdotq * xi / l) / (1 + std::cosh((vsdotk - l) / state.T));
-
-      pl[0] = (t00 + t11) / (omega_ * 2 * state.T);
-      pl[3] = (t00 - t11) / (omega_ * 2 * state.T);
-    }
-
     return T0 * pl[0] + T1 * pl[1] + iT2 * pl[2] + T3 * pl[3];
   }
 
@@ -405,30 +386,27 @@ public:
 
   Matrix2d photon_se_mode(double omega, double qx, double qy) const
   {
-    double e2_factor = cav.omega0 / cav.omega(qx, qy);
-    Matrix2d U;
-    U << -qy, qx, -qx * e2_factor, -qy * e2_factor;
-    return 4 / cav.L() * U *
+    Matrix2d V = cav.polarizations(qx, qy, state.sys.theta_v);
+
+    return 4 / cav.L() * V *
            (Matrix2d() << photon_se(omega, qx, qy, 0, 0),
             photon_se(omega, qx, qy, 0, 1),
             photon_se(omega, qx, qy, 1, 0),
             photon_se(omega, qx, qy, 1, 1))
              .finished() *
-           U.adjoint();
+           V.adjoint();
   }
 
   Matrix2d d_photon_se_mode(double omega, double qx, double qy) const
   {
-    double e2_factor = cav.omega0 / cav.omega(qx, qy);
-    Matrix2d U;
-    U << -qy, qx, -qx * e2_factor, -qy * e2_factor;
-    return 4 / cav.L() * U *
+    Matrix2d V = cav.polarizations(qx, qy, state.sys.theta_v);
+    return 4 / cav.L() * V *
            (Matrix2d() << _photon_se_or_deriv(omega, qx, qy, 0, 0, true),
             _photon_se_or_deriv(omega, qx, qy, 0, 1, true),
             _photon_se_or_deriv(omega, qx, qy, 1, 0, true),
             _photon_se_or_deriv(omega, qx, qy, 1, 1, true))
              .finished() *
-           U.adjoint();
+           V.adjoint();
   }
   //@}
 };
