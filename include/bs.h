@@ -15,7 +15,7 @@ private:
   mutable double _root;
 
 public:
-  /** The bare Bardasis-Schriefer 'mass'
+  /** The bare Bardasis-Schrieffer 'mass'
    *
    * The mass of the BS mode is given by solving
    * \f[
