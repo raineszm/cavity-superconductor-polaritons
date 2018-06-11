@@ -52,7 +52,7 @@ Throwing out counter-rotating terms
 
  .. math::
 
-   2i\sqrt{\frac{\Omega_\text{BS} \pi c^2}{2 m_0}} \sum_q i g(i \Omega, \mathbf{q})\frac{1}{\sqrt{\omega_\mathbf{q}}}
+   2i\sqrt{\frac{\Omega_\text{BS} \pi c^2}{2 m_0}} \sum_q i g(i \Omega_m, \mathbf{q})\frac{1}{\sqrt{\omega_\mathbf{q}}}
    \sum_\alpha
    \left[
      b^\dagger_{q}\mathbf{v}_s \cdot \bm{\epsilon}_\alpha(q, L/2) a_{\alpha,q}
@@ -63,7 +63,7 @@ Using the properties of :math:`\bm{\epsilon}` this can be written
 
 
 .. math::
-   \sqrt{\frac{2\pi c^2\Omega_\text{BS} }{m_0}} \sum_q  g(i \Omega, \mathbf{q})\frac{1}{\sqrt{\omega_\mathbf{q}}}
+   \sqrt{\frac{2\pi c^2\Omega_\text{BS} }{m_0}} \sum_q  g(i \Omega_m, \mathbf{q})\frac{1}{\sqrt{\omega_\mathbf{q}}}
    \sum_\alpha
    \left[
      b^\dagger_{q}\mathbf{v}_s \cdot i\bm{\epsilon}_\alpha(q, L/2) a_{\alpha,q}
@@ -74,20 +74,19 @@ We may then extract the effective coupling
 
 .. math::
 
-    g_\text{eff}(q, \alpha) = \sqrt{\frac{2\pi c^2\Omega_\text{BS} }{m_0\omega_{\mathbf{q}}}}
-    \mathbf{v}_s\cdot i\bm{\epsilon}_{\alpha,\mathbf{q}}\left(\frac{L}{2}\right)g(i\Omega, \mathbf{q})
+    g_\text{eff}(i\Omega_m, \mathbf{q}, \alpha) = \sqrt{\frac{2\pi c^2\Omega_\text{BS} }{m_0\omega_{\mathbf{q}}}}
+    \mathbf{v}_s\cdot i\bm{\epsilon}_{\alpha,\mathbf{q}}\left(\frac{L}{2}\right)g(i\Omega_m, \mathbf{q})
 
 or explicitly
 
 .. math::
-
 
    g_\text{eff}(i\Omega_m, q) \approx -2i \Omega_m e \mathbf{v}_s\cdot i\bm{\epsilon}_{\alpha,\mathbf{q}}
    \nu \Delta \sqrt{\frac{2\pi \Omega_\text{BS} }{m_0\omega_{\mathbf{q}}}}
     \int_\Delta^\infty
    \frac{d\lambda}{\sqrt{\lambda^2 - \Delta^2}}
    \int_0^{2\pi}\frac{d\theta}{2\pi}
-   \frac{n_F(E^-(\lambda))-n_F(E^+(\lambda))}{(\Omega + i0^+)^2 -
+   \frac{n_F(E^-(\lambda))-n_F(E^+(\lambda))}{(i\Omega_m)^2 -
    (2\lambda)^2}f_d(\theta)
 
 Photon Self-Energy
@@ -99,57 +98,80 @@ The thermal photon action is (c.f. :cpp:func:`Coupling::photon_se`)
 
 .. math::
 
-    \mathcal{L}_\text{SE} = -\frac{1}{2\beta}\sum_q\mathbf{A}_{-q}(L/2)\hat{\Pi}(q)\mathcal{A}_q(L/2)
+    S = \frac{1}{8\pi c^2 \beta}\sum_q\mathbf{A}_{-q}(L/2)\left(
+        \omega_\mathbf{q}^2 - (i\Omega_m)^2 + \hat{\Pi}(i\Omega_m, \mathbf q)\right)\mathbf{A}_q(L/2)
 
-Going to the mode basis
+Going to the :ref:`mode basis <photon-mode>`
 
 .. math::
 
-    \frac{1}{2}\sum_{\alpha,\beta}
-    \frac{\pi c^2}{\omega_\mathbf{q}}
+    \frac{1}{\beta}\sum_{q}
+    \frac{1}{4\omega_\mathbf{q}}
     \left(\bm{\epsilon}_\alpha(-q, L/2) a_{\alpha,-q} + \bm{\epsilon}_\alpha(q, L/2)^* a^\dagger_{q, \alpha}\right)
-    \hat{\Pi}(q)
+    \hat{\Pi}(i \Omega_m, \mathbf q)
     \left(\bm{\epsilon}_\beta(q, L/2) a_{\beta,q} + \bm{\epsilon}_\beta(-q, L/2)^* a^\dagger_{-q, \beta}\right)
 
 Ignoring the counter rotating terms
 
 .. math::
 
-    \frac{1}{2}\sum_{\alpha,\beta}
-    \frac{\pi c^2}{\omega_\mathbf{q}}\left(
-    a^\dagger_{q, \alpha}\bm{\epsilon}_\alpha(q, L/2)^*
-    \hat{\Pi}(q)
-    \bm{\epsilon}_\beta(q, L/2) a_{q,\beta}
+    \frac{1}{\beta}\sum_{q}
+    \frac{1}{4\omega_\mathbf{q}}
+     a_{\alpha,-q}\bm{\epsilon}_\alpha(-q, L/2)
+    \hat{\Pi}(i \Omega_m, \mathbf q)
+    \bm{\epsilon}_\beta(-q, L/2)^* a^\dagger_{-q, \beta}
     +
-    a_{\alpha,-q}\bm{\epsilon}_\alpha(-q, L/2)
-    \hat{\Pi}(q)
-    \bm{\epsilon}_\beta(-q, L/2)^* a^\dagger_{-q, \beta }
-    \right)\\ =
-    \frac{1}{2}\sum_{\alpha,\beta}
-    \frac{\pi c^2}{\omega_\mathbf{q}}
-    a^\dagger_{q, \alpha}\bm{\epsilon}_\alpha(q, L/2)^*
-    \left(
-    \hat{\Pi}(q)
+    a^\dagger_{q, \alpha}\bm{\epsilon}_\alpha(q, L/2)^* 
+    \hat{\Pi}(i \Omega_m, \mathbf q)
+    \bm{\epsilon}_\beta(q, L/2) a_{\beta,q}
+
+Flipping the momentum index 
+
+.. math::
+
+    \frac{1}{\beta}\sum_{q}
+    \frac{1}{4\omega_\mathbf{q}}
+     a^\dagger_{q, \alpha} 
+    \bm{\epsilon}_\alpha(q, L/2)^* 
+     \left[
+    \hat{\Pi}^T(-i \Omega_m, -\mathbf q)
     +
-    \hat{\Pi}^T(-q)\right)
+    \hat{\Pi}(i \Omega_m, \mathbf q)
+    \right]
     \bm{\epsilon}_\beta(q, L/2)
-    a_{q,\beta}
+    a_{\beta,q}
+
+:math:`\Pi` has the symmetry property :math:`\Pi^T(q) = \Pi(-q)`
 
 We thus define
 
 .. math::
-   \tilde{\Pi}_{\alpha\beta}(q) = \frac{1}{2}\frac{\pi c^2}{\omega_q}\bm{\epsilon}_\alpha(q, L/2)^*
-    \left(
-    \hat{\Pi}(q)
-    +
-    \hat{\Pi}^T(-q)\right)
+
+   \tilde{\Pi}_{\alpha\beta}(q) = \frac{1}{2\omega_q}\bm{\epsilon}^*_\alpha(q, L/2)
+    \hat{\Pi}(i\Omega_m, \mathbf q)
     \bm{\epsilon}_\beta(q, L/2)
 
 The thermal photon action is then
 
 .. math::
 
-    S = \frac{1}{\beta}\sum_q a^\dagger_{q, \alpha}\left(-i\omega_m + \omega_\mathbf{q} + \tilde{\Pi}_{\alpha\beta}(i \omega_m, \mathbf{q})\right)a_{q,\beta}
+    S = \frac{1}{\beta}\sum_q a^\dagger_{q, \alpha}\left(-i\Omega_m + \Omega_\mathbf{q} + \tilde{\Pi}_{\alpha\beta}(i \Omega_m, \mathbf{q})\right)a_{q,\beta}
+
+Finally to make contact with code, when integrating out the fermions one obtains a term of the form
+
+.. math::
+
+    \frac{1}{\beta} \sum_q \mathbf{A}_{-q} \hat{P}(i\Omega_m, \mathbf{q}) \mathbf{A}_q
+
+This :math:`P` is what is implemented in :cpp:func:`Coupling::photon_se()`.
+A quick comparison shows us that
+
+.. math::
+
+    \tilde{\Pi}_{\alpha\beta}(i\Omega_m, \mathbf q) 
+    = -\frac{4\pi c^2}{\omega_q}\bm{\epsilon}^*_\alpha(q, L/2)
+    \hat{P}(i\Omega_m, \mathbf q)
+    \bm{\epsilon}_\beta(q, L/2)
 
 Renormalization
 ---------------
@@ -159,20 +181,20 @@ At :math:`q=0`
 
 .. math::
 
-   S = -i\omega_m + \omega_0 + \tilde{\Pi}_{\alpha\beta}(i \omega_m, 0)
+   S = -i\Omega_m + \omega_0 + \tilde{\Pi}_{\alpha\beta}(i \omega_m, 0)
 
 The renormalized mass :math:`\omega_r` is the frequency at which this action vanishes.
 This allows us to expand
 
 .. math::
 
-    \tilde{\Pi} \approx (\hat{Z}-1)\left(\omega_r - i \omega_m  - \omega_0\right) + \hat{\tilde{\Pi}}(\omega_r, \mathbf{q}) + \cdots
+    \tilde{\Pi} \approx (\hat{Z}-1)\left(\omega_r - i \Omega_m  - \omega_0\right) + \hat{\tilde{\Pi}}(\omega_r, \mathbf{q}) + \cdots
 
 where
 
 .. math::
 
-    1 - \hat{Z} = \left.\frac{\partial\Pi(i\omega, 0)}{\partial(i\omega)}\right|_{i\omega=\omega_r-\omega_0}
+    1 - \hat{Z} = \left.\frac{\partial\Pi(i\Omega, 0)}{\partial(i\Omega)}\right|_{i\Omega=\omega_r-\omega_0}
 
 
 Assuming :math:`\hat{Z}` is positive definite it admits a Cholesky decomposition :math:`\hat{Z} = \hat{L} \hat{L}^\dagger`.
@@ -196,16 +218,16 @@ allowing us to define the effective Hamiltonian
 
 Similarly, the coupling to the Bardasis-Schrieffer mode becomes
 
+
 .. math::
 
-    \tilde{g}_\text{eff}(q, \alpha) = 4 i e\nu\Omega\Delta  \sqrt{\frac{\pi}{M\Omega_\text{BS}\omega_q}}
-    \mathbf{v}_s\cdot \bm{\epsilon}_{\alpha',\mathbf{q}} \left[{(\hat{L}^\dagger)}^{-1}\right]_{\alpha'\alpha} \left(\frac{L}{2}\right)
+   g_\text{eff}(i\Omega_m, q) \approx -2i \Omega_m e \mathbf{v}_s\cdot i\bm{\epsilon}_{\alpha',\mathbf{q}} 
+   \left[(L^\dagger)^{-1}\right]_{\alpha',\alpha}
+   \nu \Delta \sqrt{\frac{2\pi \Omega_\text{BS} }{m_0\omega_{\mathbf{q}}}}
     \int_\Delta^\infty
-    \frac{d\lambda}{\sqrt{\lambda^2 - \Delta^2}}\\
-    \times
-    \int_0^{2\pi}\frac{d\theta}{2\pi}
-    \frac{n_F(E^-(\lambda))-n_F(E^+(\lambda))}{(\Omega + i0^+)^2 -
-    (2\lambda)^2}f_d(\theta)
-
+   \frac{d\lambda}{\sqrt{\lambda^2 - \Delta^2}}
+   \int_0^{2\pi}\frac{d\theta}{2\pi}
+   \frac{n_F(E^-(\lambda))-n_F(E^+(\lambda))}{(i\Omega_m)^2 -
+   (2\lambda)^2}f_d(\theta)
 
 .. autodoxygenfile:: coupling.h

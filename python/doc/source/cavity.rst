@@ -63,6 +63,8 @@ For a free space solution, the magnetic and electric energies will be equal so
     \implies C_\mathbf{q}^2 = \frac{2\pi c^2}{\omega_\mathbf{q}}
 
 
+.. _photon-mode:
+
 So the relation between mode operators and the A field is
 
 .. math::
@@ -119,7 +121,7 @@ And from the mode action
 
 .. math::
 
-    \braket{a_{\beta, q}\bar{a}_{\beta', q}}) = \frac{1}{i \omega_m - \omega_\mathbf{q}} \delta_{\beta\beta'}
+    -\braket{a_{\beta, q}\bar{a}_{\beta', q}}) = \frac{1}{i \omega_m - \omega_\mathbf{q}} \delta_{\beta\beta'}
 
 This allows us to write
 
@@ -127,7 +129,7 @@ This allows us to write
 
 
     D_{\alpha\alpha'}(q)
-    = \frac{2\pi c^2}{\omega_{\mathbf q}}\int dz \epsilon^{i\ast}_\alpha(\mathbf{q}, z)\int dz' \epsilon^{j}_{\alpha}(\mathbf{q}, z')
+    = -\frac{2\pi c^2}{\omega_{\mathbf q}}\int dz \epsilon^{i\ast}_\alpha(\mathbf{q}, z)\int dz' \epsilon^{j}_{\alpha}(\mathbf{q}, z')
     \sum_{\beta}
     \left(\epsilon^i_\beta(q, z) \epsilon^{\ast j}_{\beta}(q, z') \frac{1}{i\omega_m - \omega_\mathbf{q}}
     + \epsilon^{i}_\beta(q, z) \epsilon^{j\ast}_{\beta}(q, z')\frac{1}{-i\omega_m - \omega_\mathbf{q}}
@@ -138,13 +140,13 @@ Using the orthonormality of the polarizations this becomes
 
 .. math::
 
-    D_{\alpha\alpha'}(q) =  \frac{2\pi c^2}{\omega_{\mathbf q}} \frac{2 \omega_\mathbf{q}}{(i\omega_m)^2 - \omega_\mathbf{q}^2} \delta_{\alpha\alpha'}
+    D_{\alpha\alpha'}(q) =  -\frac{2\pi c^2}{\omega_{\mathbf q}} \frac{2 \omega_\mathbf{q}}{(i\omega_m)^2 - \omega_\mathbf{q}^2} \delta_{\alpha\alpha'}
 
 We may then immediately invert this to obtain the action
 
 .. math::
 
-    S_A = \frac{1}{8 \pi c^2}\sum_q A_\alpha(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]A_{\alpha'}(q)
+    S_A = -\frac{1}{8 \pi c^2}\sum_q A_\alpha(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]A_{\alpha'}(q)
 
 The question then remains how these :math:`A_\alpha` fields couple to fermions.
 
@@ -240,8 +242,7 @@ Upon this transformation the photon action becomes
     \right]
     \mathbf{A}(q)
 
-On the other hand.
-We generally want all terms in the inverse propagator to have the same units.
+On the other hand we generally want all terms in the inverse propagator to have the same units.
 Looking at the coupling term (c.f. :cpp:func:`Coupling::ImDA`)
 
 .. math::
