@@ -147,47 +147,6 @@ public:
    * \Omega_\text{BS}\right)b_q\f]
    *
    * This defines the Hamiltonian of the BS mode.
-   *
-   * To do so we make the following approximations.
-   *
-   * The BS action can be written
-   * \f[ \underbrace{\frac{1}{g_d} - \frac{1}{g_s}}_{m_0} -
-   * \Omega^2_\text{BS}I_0(\Omega_\text{BS}^2) = 0,\f]
-   * where (c.f. \ref action_int()) the integral \f$I(\Omega^2) = -\Omega^2
-   * I_0(\Omega^2)\f$.
-   *
-   * Here we have already assumed that the BS mode dispersion is irrelevant for
-   * our purposes and noted that the supercurrent doesn't much affect the BS
-   * mode frequency.
-   * This allows us to write
-   * \f[m_0 = \Omega_\text{BS}^2 I_0(\Omega_\text{BS}^2)\f]
-   *
-   * For frequencies near \f$\Omega_\text{BS}\f$ we can drop the frequency
-   * dependence in \f$I_0\f$ and define \f$I_0(\Omega^2) \approx
-   * I_0(\Omega_\text{BS}^2) = \frac{1}{2}M\f$.
-   * Then the action becomes \f[\sum_q
-   * d_{-q} \left[\frac{1}{2}M\Omega_\text{BS}^2 -
-   * \frac{1}{2}M\Omega^2\right]d_q
-   * \f]
-   * or in real space/time
-   * \f[
-   * \mathcal{L} = \frac{1}{2}M\Omega_\text{BS}^2d^2 - \frac{1}{2}M\dot{d}^2
-   * \f]
-   *
-   * One difference from the usual derivation is the extra minus sign in our
-   * Lagrangian leading us to define
-   *
-   * \f[
-   * b_q = \frac{1}{\sqrt{2M\Omega_\text{BS}}}\left(i M\Omega_\text{BS}d_q -
-   * \Pi_q\right)\\ b^\dagger_q =
-   * -\frac{1}{\sqrt{2M\Omega_\text{BS}}}\left(iM\Omega_\text{BS}d_{-q} +
-   * \Pi_{-q}\right) \f]
-   *
-   * Thus the operator \f$d\f$ is given by
-   *
-   * \f[
-   * d_q = -i\frac{b^\dagger_{-q} - b_q}{\sqrt{2 M\Omega_\text{BS}}}
-   * \f]
    */
   double hamiltonian() const { return root(); }
 

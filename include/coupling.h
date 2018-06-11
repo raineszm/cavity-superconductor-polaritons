@@ -21,14 +21,12 @@ public:
   const Cavity cav;
   //! The associated mean field state
 
-  //! This also holds the related System
-  const State& state;
-
   explicit Coupling(const BS& bs_, const Cavity& cav_)
     : bs(bs_)
     , cav(cav_)
-    , state(bs.state)
   {}
+
+  const State& state() const { return bs.state; }
 
   /** The integrand for the imaginary part of the coupling
    *
@@ -45,14 +43,14 @@ public:
   double ImDA_int(double l, double theta, double omega) const
   {
     double fd = std::sqrt(2) * std::cos(2 * theta);
-    double drift = state.sys.drift_theta(state.sys.kf(), theta);
+    double drift = state().sys.drift_theta(state().sys.kf(), theta);
     double Ep = drift + l;
     double Em = drift - l;
 
     return fd *
-           (std::tanh(Ep / (2 * state.T)) - std::tanh(Em / (2 * state.T))) /
+           (std::tanh(Ep / (2 * state().T)) - std::tanh(Em / (2 * state().T))) /
            ((omega * omega - 4 * l * l) * 2 *
-            std::sqrt(l * l - state.delta * state.delta));
+            std::sqrt(l * l - state().delta * state().delta));
   }
 
   /** The integrand for the derivative of the imaginary part of the coupling
@@ -60,14 +58,14 @@ public:
   double d_ImDA_int(double l, double theta, double omega) const
   {
     double fd = std::sqrt(2) * std::cos(2 * theta);
-    double drift = state.sys.drift_theta(state.sys.kf(), theta);
+    double drift = state().sys.drift_theta(state().sys.kf(), theta);
     double Ep = drift + l;
     double Em = drift - l;
 
     return -omega * fd *
-           (std::tanh(Ep / (2 * state.T)) - std::tanh(Em / (2 * state.T))) /
+           (std::tanh(Ep / (2 * state().T)) - std::tanh(Em / (2 * state().T))) /
            (std::pow(omega * omega - 4 * l * l, 2) *
-            std::sqrt(l * l - state.delta * state.delta));
+            std::sqrt(l * l - state().delta * state().delta));
   }
 
   /** The coupling between the Bardasis Schrieffer mode and photons
@@ -97,36 +95,37 @@ public:
    */
   double ImDA(double omega) const
   {
-    return -2 * omega * state.delta * GPAR * state.sys.vs * state.sys.dos() *
+    return -2 * omega * state().delta * GPAR * state().sys.vs *
+           state().sys.dos() *
            gsl_xi_integrate(
              [this, omega](double l, double theta) {
                return ImDA_int(l, theta, omega);
              },
-             state.delta);
+             state().delta);
   }
 
   /** The derivative of the imaginary part of the coupling \f$dg/d\omega\f$
    */
   double d_ImDA(double omega) const
   {
-    return -2 * state.delta * GPAR * state.sys.vs * state.sys.dos() *
+    return -2 * state().delta * GPAR * state().sys.vs * state().sys.dos() *
            (gsl_xi_integrate(
               [this, omega](double l, double theta) {
                 return ImDA_int(l, theta, omega);
               },
-              state.delta) +
+              state().delta) +
             omega * gsl_xi_integrate(
                       [this, omega](double l, double theta) {
                         return d_ImDA_int(l, theta, omega);
                       },
-                      state.delta));
+                      state().delta));
   }
 
   double mode_coupling(double omega, double qx, double qy, int i) const
   {
     assert(i == 0 || i == 1);
     auto M = bs.M();
-    auto V = cav.polarizations(qx, qy, state.sys.theta_v);
+    auto V = cav.polarizations(qx, qy, state().sys.theta_v);
     auto vsdoteps = V(0, i);
     return 2 * std::sqrt(M_PI * C * C / (M * bs.root() * cav.omega(qx, qy))) *
            vsdoteps * ImDA(omega);
@@ -138,7 +137,7 @@ public:
   {
     assert(i == 0 || i == 1);
     auto M = bs.M();
-    auto V = cav.polarizations(qx, qy, state.sys.theta_v);
+    auto V = cav.polarizations(qx, qy, state().sys.theta_v);
     auto vsdoteps = V(0, i);
     return 2 * std::sqrt(M_PI * C * C / (M * bs.root() * cav.omega(qx, qy))) *
            vsdoteps * d_ImDA(omega);
@@ -161,12 +160,14 @@ public:
   {
     if (deriv) {
       return -0.5 *
-             (std::tanh(E1 / (2 * state.T)) - std::tanh(E2 / (2 * state.T))) /
+             (std::tanh(E1 / (2 * state().T)) -
+              std::tanh(E2 / (2 * state().T))) /
              std::pow(omega - E1 + E2, 2);
 
     } else {
       return 0.5 *
-             (std::tanh(E1 / (2 * state.T)) - std::tanh(E2 / (2 * state.T))) /
+             (std::tanh(E1 / (2 * state().T)) -
+              std::tanh(E2 / (2 * state().T))) /
              (omega - E1 + E2);
     }
   }
@@ -205,7 +206,7 @@ public:
   {
     assert(i < 2 and i >= 0);
     if (i == 0) {
-      return state.sys.vs;
+      return state().sys.vs;
     } else {
       return 0.;
     }
@@ -218,12 +219,12 @@ public:
   double v_comp(double kx, double ky, int i) const
   {
     assert(i < 2 and i >= 0);
-    auto v = std::hypot(kx, ky) / state.sys.m;
+    auto v = std::hypot(kx, ky) / state().sys.m;
     auto theta = std::atan2(ky, kx);
     if (i == 0) {
-      return v * std::cos(theta - state.sys.theta_v);
+      return v * std::cos(theta - state().sys.theta_v);
     } else {
-      return v * std::sin(theta - state.sys.theta_v);
+      return v * std::sin(theta - state().sys.theta_v);
     }
   }
 
@@ -276,8 +277,8 @@ public:
                        int j,
                        bool deriv) const
   {
-    auto xp = state.sys.xi(kx + qx / 2, ky + qy / 2);
-    auto xm = state.sys.xi(kx - qx / 2, ky - qy / 2);
+    auto xp = state().sys.xi(kx + qx / 2, ky + qy / 2);
+    auto xm = state().sys.xi(kx - qx / 2, ky - qy / 2);
 
     // We've rotated our axes so the 'x'-axis is along vs
     auto vi = v_comp(kx, ky, i);
@@ -285,16 +286,16 @@ public:
     auto vsi = vs_comp(i);
     auto vsj = vs_comp(j);
 
-    auto T0 = state.l2(xp, xm) * vi * vj + state.n2(xp, xm) * vsi * vsj;
-    auto T1 = state.p2(xp, xm) * vi * vj + state.m2(xp, xm) * vsi * vsj;
-    auto iT2 = state.mp(xp, xm) * (vsi * vj + vi * vsj);
-    auto T3 = state.ln(xp, xm) * (vsi * vj + vi * vsj);
+    auto T0 = state().l2(xp, xm) * vi * vj + state().n2(xp, xm) * vsi * vsj;
+    auto T1 = state().p2(xp, xm) * vi * vj + state().m2(xp, xm) * vsi * vsj;
+    auto iT2 = state().mp(xp, xm) * (vsi * vj + vi * vsj);
+    auto T3 = state().ln(xp, xm) * (vsi * vj + vi * vsj);
 
-    auto lp = std::hypot(xp, state.delta);
-    auto lm = std::hypot(xm, state.delta);
+    auto lp = std::hypot(xp, state().delta);
+    auto lm = std::hypot(xm, state().delta);
 
-    auto dp = state.sys.drift(kx + qx / 2, ky + qy / 2);
-    auto dm = state.sys.drift(kx - qx / 2, ky - qy / 2);
+    auto dp = state().sys.drift(kx + qx / 2, ky + qy / 2);
+    auto dm = state().sys.drift(kx - qx / 2, ky - qy / 2);
 
     auto pl = pi0_elems(dp, dm, lp, lm, omega, deriv);
 
@@ -348,17 +349,17 @@ public:
                              bool deriv) const
   {
     auto ret =
-      state.sys.dos() *
+      state().sys.dos() *
       gsl_xi_integrate(
         [this, omega, qx, qy, i, j, deriv](double x, double theta) {
           auto k1 =
-            std::sqrt(2 * state.sys.m *
-                      (x + state.sys.mu -
-                       0.5 * state.sys.m * state.sys.vs * state.sys.vs));
+            std::sqrt(2 * state().sys.m *
+                      (x + state().sys.mu -
+                       0.5 * state().sys.m * state().sys.vs * state().sys.vs));
           auto k2 =
-            std::sqrt(2 * state.sys.m *
-                      (-x + state.sys.mu -
-                       0.5 * state.sys.m * state.sys.vs * state.sys.vs));
+            std::sqrt(2 * state().sys.m *
+                      (-x + state().sys.mu -
+                       0.5 * state().sys.m * state().sys.vs * state().sys.vs));
           return photon_se_int(k1 * std::cos(theta),
                                k1 * std::sin(theta),
                                omega,
@@ -381,7 +382,7 @@ public:
 
     // Diamagnetic?
     // if (i == j && !deriv) {
-    //   ret += state.sys.n() / state.sys.m;
+    //   ret += state().sys.n() / state().sys.m;
     // }
 
     return 0.5 * GPAR * GPAR * ret;
@@ -440,7 +441,7 @@ public:
    */
   Matrix2d photon_se_mode(double omega, double qx, double qy) const
   {
-    Matrix2d V = cav.polarizations(qx, qy, state.sys.theta_v);
+    Matrix2d V = cav.polarizations(qx, qy, state().sys.theta_v);
 
     return 2 * M_PI * C * C * 2 / (cav.L() * cav.omega(qx, qy)) *
            V.transpose() *
@@ -454,7 +455,7 @@ public:
 
   Matrix2d d_photon_se_mode(double omega, double qx, double qy) const
   {
-    Matrix2d V = cav.polarizations(qx, qy, state.sys.theta_v);
+    Matrix2d V = cav.polarizations(qx, qy, state().sys.theta_v);
     return 2 * M_PI * C * C * 2 / (cav.L() * cav.omega(qx, qy)) *
            V.transpose() *
            (Matrix2d() << _photon_se_or_deriv(omega, qx, qy, 0, 0, true),

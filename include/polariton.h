@@ -31,28 +31,23 @@ public:
   double paraX;
   //! Enhancment of the dipole coupling \f$g\f$ between the modes
   double dipoleX;
-  const System& sys;
-  const State& state;
-  //! The Bardasis Schrieffer mode
-  const BS& bs;
-  //! The photonic sector
-  const Cavity& cav;
 
   Polariton(const Coupling& c_, double paraX_ = 1, double dipoleX_ = 1)
     : coupling(c_)
     , paraX(paraX_)
     , dipoleX(dipoleX_)
-    , sys(coupling.state.sys)
-    , state(coupling.state)
-    , bs(coupling.bs)
-    , cav(coupling.cav)
   {}
+
+  const System& sys() const { return coupling.state().sys; }
+  const State& state() const { return coupling.state(); }
+  const Cavity& cav() const { return coupling.cav; }
+  const BS& bs() const { return coupling.bs; }
 
   Matrix2d photon_sector(double omega, double qx, double qy) const
   {
 
     Matrix2d se = paraX * paraX * coupling.photon_se(omega, qx, qy);
-    Matrix2d cavaction = cav.action(omega, qx, qy, coupling.state.sys.theta_v);
+    Matrix2d cavaction = cav().action(omega, qx, qy, sys().theta_v);
     cavaction += se;
     return cavaction;
   }
@@ -61,8 +56,7 @@ public:
   {
 
     Matrix2d d_se = paraX * paraX * coupling.d_photon_se(omega, qx, qy);
-    Matrix2d d_cavaction =
-      cav.d_action(omega, qx, qy, coupling.state.sys.theta_v);
+    Matrix2d d_cavaction = cav().d_action(omega, qx, qy, sys().theta_v);
     d_cavaction += d_se;
     return d_cavaction;
   }
@@ -92,7 +86,7 @@ public:
     std::complex<double> c(0., paraX * dipoleX * coupling.ImDA(omega));
 
     Matrix3cd act = Matrix3cd::Zero();
-    act(0, 0) = bs.action(omega);
+    act(0, 0) = bs().action(omega);
     act(0, 1) = c;
     act(1, 0) = -c;
     act.bottomRightCorner<2, 2>() =
@@ -112,7 +106,7 @@ public:
     std::complex<double> c(0., paraX * dipoleX * coupling.d_ImDA(omega));
 
     Matrix3cd act = Matrix3cd::Zero();
-    act(0, 0) = bs.d_action(omega);
+    act(0, 0) = bs().d_action(omega);
     act(0, 1) = c;
     act(1, 0) = -c;
     act.bottomRightCorner<2, 2>() =
@@ -160,8 +154,8 @@ public:
     std::array<double, 3> roots; // The return array
     roots.fill(std::numeric_limits<double>::quiet_NaN());
 
-    const double xl = 0.6 * bs.root();
-    const double xu = 1.5 * bs.root();
+    const double xl = 0.6 * bs().root();
+    const double xu = 1.5 * bs().root();
     // 1.99 * coupling.state.delta;
     auto extrema = _extrema(qx, qy, xl, xu);
 
@@ -187,7 +181,7 @@ public:
             fsolver.set(gsl_det, xl, ext);
           }
 
-          roots[count++] = fsolver.solve(1e-8 * bs.root(), 1e-8);
+          roots[count++] = fsolver.solve(1e-8 * bs().root(), 1e-8);
         } catch (const gsl::GSLException&) {
         }
       }
@@ -203,7 +197,7 @@ public:
     try {
       // Find root between extrema
       fsolver.set(gsl_det, extrema[0], extrema[1]);
-      roots[count++] = fsolver.solve(1e-8 * bs.root(), 1e-8);
+      roots[count++] = fsolver.solve(1e-8 * bs().root(), 1e-8);
     } catch (const gsl::GSLException&) {
     }
 
@@ -225,7 +219,7 @@ public:
 
     auto gsl_d_det = make_gsl_function(d_det);
 
-    const double EPS = 1e-6 * bs.root();
+    const double EPS = 1e-6 * bs().root();
 
     auto d_det_fdf = [EPS, gsl_d_det](double omega) {
       auto d_det_val = GSL_FN_EVAL(&gsl_d_det, omega);
@@ -238,7 +232,7 @@ public:
 
     FDFSolver fdf_solver(gsl_root_fdfsolver_newton);
     auto gsl_d_det_fdf = make_gsl_function_fdf(d_det, d_det_fdf);
-    fdf_solver.set(gsl_d_det_fdf, bs.root());
+    fdf_solver.set(gsl_d_det_fdf, bs().root());
 
     extrema[0] = fdf_solver.solve(1e-10, 100UL, EPS);
 
@@ -252,7 +246,7 @@ public:
       }
 
       // Find other extremum
-      extrema[1] = fsolver.solve(1e-8 * bs.root(), 1e-8);
+      extrema[1] = fsolver.solve(1e-8 * bs().root(), 1e-8);
     } catch (const gsl::GSLException&) {
       extrema[1] = std::numeric_limits<double>::quiet_NaN();
     }
