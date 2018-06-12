@@ -47,7 +47,7 @@ public:
   {
 
     Matrix2d se = paraX * paraX * coupling.photon_se(omega, qx, qy);
-    Matrix2d cavaction = cav().action(omega, qx, qy, sys().theta_v);
+    Matrix2d cavaction = cav().gf(omega, qx, qy, sys().theta_v);
     cavaction += se;
     return cavaction;
   }
@@ -56,7 +56,7 @@ public:
   {
 
     Matrix2d d_se = paraX * paraX * coupling.d_photon_se(omega, qx, qy);
-    Matrix2d d_cavaction = cav().d_action(omega, qx, qy, sys().theta_v);
+    Matrix2d d_cavaction = cav().d_gf(omega, qx, qy, sys().theta_v);
     d_cavaction += d_se;
     return d_cavaction;
   }
@@ -78,15 +78,15 @@ public:
    * \f$A_\parallel\f$ and \f$A_\perp\f$ are the components of \f$\mathbf{A}\f$
    * parallel and perpendicular to the supercurrent.
    *
-   * \sa Coupling::ImDA(), Coupling::photon_se(), BS::action(),
-   * Cavity::action();
+   * \sa Coupling::ImDA(), Coupling::photon_se(), BS::gf(),
+   * Cavity::gf();
    */
-  Matrix3cd action(double omega, double qx, double qy) const
+  Matrix3cd gf(double omega, double qx, double qy) const
   {
     std::complex<double> c(0., paraX * dipoleX * coupling.ImDA(omega));
 
     Matrix3cd act = Matrix3cd::Zero();
-    act(0, 0) = bs().action(omega);
+    act(0, 0) = bs().gf(omega);
     act(0, 1) = c;
     act(1, 0) = -c;
     act.bottomRightCorner<2, 2>() =
@@ -94,19 +94,19 @@ public:
     return act;
   }
 
-  double det_action(double omega, double qx, double qy) const
+  double det_gf(double omega, double qx, double qy) const
   {
-    return std::real(action(omega, qx, qy).determinant());
+    return std::real(gf(omega, qx, qy).determinant());
   }
 
   /** The derivative of the inverse GF
    */
-  Matrix3cd d_action(double omega, double qx, double qy) const
+  Matrix3cd d_gf(double omega, double qx, double qy) const
   {
     std::complex<double> c(0., paraX * dipoleX * coupling.d_ImDA(omega));
 
     Matrix3cd act = Matrix3cd::Zero();
-    act(0, 0) = bs().d_action(omega);
+    act(0, 0) = bs().d_gf(omega);
     act(0, 1) = c;
     act(1, 0) = -c;
     act.bottomRightCorner<2, 2>() =
@@ -117,31 +117,31 @@ public:
   std::tuple<double, double> det_and_d(double omega, double qx, double qy) const
   {
 
-    auto A = action(omega, qx, qy);
-    double d_det = std::real((adjugate(A) * d_action(omega, qx, qy)).trace());
+    auto A = gf(omega, qx, qy);
+    double d_det = std::real((adjugate(A) * d_gf(omega, qx, qy)).trace());
     return std::tuple<double, double>(std::real(A.determinant()), d_det);
   }
 
-  double d_det_action(double omega, double qx, double qy) const
+  double d_det_gf(double omega, double qx, double qy) const
   {
     return std::get<1>(det_and_d(omega, qx, qy));
   }
 
-  /** The eigenvalues of action()
+  /** The eigenvalues of gf()
    */
   Vector3d eigval(double omega, double qx, double qy) const
   {
-    return action(omega, qx, qy).eigenvalues().real();
+    return gf(omega, qx, qy).eigenvalues().real();
   }
 
-  /** Find zeroes of action()
+  /** Find zeroes of gf()
    */
   std::array<double, 3> find_modes(double qx, double qy) const
   {
 
     // Define functions to be used in root finding
     auto det = [this, qx, qy](double omega) {
-      return det_action(omega, qx, qy);
+      return det_gf(omega, qx, qy);
     };
 
     // Here we use the fact that our functions has two local extrema (since it
@@ -214,7 +214,7 @@ public:
   {
 
     auto d_det = [this, qx, qy](double omega) {
-      return d_det_action(omega, qx, qy);
+      return d_det_gf(omega, qx, qy);
     };
 
     auto gsl_d_det = make_gsl_function(d_det);

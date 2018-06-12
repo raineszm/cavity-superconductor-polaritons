@@ -194,15 +194,14 @@ This makes the photonic Lagrangian
 .. math::
 
     \bar{a}_{q, \alpha}
-    \left(-i\Omega_m + \tilde{\omega}_\mathbf{q} + \hat{L}^{-1}\hat{\tilde{\Pi}}(\omega_r, \mathbf{q})(\hat{L}^{\dagger})^{-1}
+    \left(-i\Omega_m + \omega_\mathbf{q}Z^{-1}(\mathbf q) + \hat{L}^{-1}\hat{\tilde{\Pi}}(\omega_r, \mathbf{q})(\hat{L}^{\dagger})^{-1}
     \right) a_{q, \alpha}
 
-with :math:`\tilde{\omega}_{\mathbf q} = \omega_\mathbf{q} + \tilde\Pi(\omega_r, \mathbf{q})`,
 allowing us to define the effective Hamiltonian
 
 .. math::
 
-    \hat{H}_\text{phot} = \omega_{\mathbf{q}} + \hat{L}^{-1}\hat{\tilde{\Pi}}(\omega_r, \mathbf{q}){(\hat{L}^\dagger)}^{-1}
+    \hat{H}_\text{phot} = \omega_{\mathbf{q}}Z^{-1}(\mathbf q) + \hat{L}^{-1}\hat{\tilde{\Pi}}(\omega_r, \mathbf{q}){(\hat{L}^\dagger)}^{-1}
 
 Similarly, the coupling to the Bardasis-Schrieffer mode becomes
 

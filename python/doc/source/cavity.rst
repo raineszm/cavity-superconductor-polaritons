@@ -206,8 +206,8 @@ However, the cavity action in this basis becomes
 
 .. math::
 
-    S_A = \frac{1}{8 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right](U^{-1}(-\mathbf q))^T U^{-1}(\mathbf q)\mathbf{A}(q)\\
-    = \frac{1}{8 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
+    S_A = -\frac{1}{8 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right](U^{-1}(-\mathbf q))^T U^{-1}(\mathbf q)\mathbf{A}(q)\\
+    = -\frac{1}{8 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
     \begin{pmatrix}
     \left(\frac{\omega_q}{\omega_0}\right)^2 \cos^2 \theta_q + \sin^2 \theta_q& \left(\frac{\omega_q^2}{\omega_0^2} -1\right)\sin\theta_q \cos\theta_q\\
     \left(\frac{\omega_q^2}{\omega_0^2} -1\right)\sin\theta_q \cos\theta_q&\left(\frac{\omega_q}{\omega_0}\right)^2 \sin^2 \theta_q + \cos^2 \theta_q
@@ -235,7 +235,7 @@ Upon this transformation the photon action becomes
 
 .. math::
 
-    S_A = \frac{1}{16 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
+    S_A = -\frac{1}{16 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
     \left[
     \left(1 + \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
     - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin 2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
@@ -247,10 +247,10 @@ Looking at the coupling term (c.f. :cpp:func:`Coupling::ImDA`)
 
 .. math::
 
-    g_q \approx -2 \sqrt{\frac{2}{L}}\frac{e}{c} \nu v_s \Omega\Delta \int_\Delta^\infty
+    g_q \approx -2 \sqrt{\frac{2}{L}}\frac{e}{c} \nu v_s i\Omega_m\Delta \int_\Delta^\infty
    \frac{d\lambda}{\sqrt{\lambda^2 - \Delta^2}}
    \int_0^{2\pi}\frac{d\theta}{2\pi}
-   \frac{n_F(E^-(\lambda))-n_F(E^+(\lambda))}{(\Omega + i0^+)^2 -
+   \frac{n_F(E^-(\lambda))-n_F(E^+(\lambda))}{(i\Omega_m)^2 -
    (2\lambda)^2}f_d(\theta)
 
 By inspection the units of this term are
@@ -271,17 +271,17 @@ and the coupling between the excitations
 
 .. math::
 
-    g_q \approx -2 \frac{v_s}{c} \nu \Omega\Delta \int_\Delta^\infty
+    g_q \approx -2 \frac{v_s}{c} \nu i\Omega_m\Delta \int_\Delta^\infty
    \frac{d\lambda}{\sqrt{\lambda^2 - \Delta^2}}
    \int_0^{2\pi}\frac{d\theta}{2\pi}
-   \frac{n_F(E^-(\lambda))-n_F(E^+(\lambda))}{(\Omega + i0^+)^2 -
+   \frac{n_F(E^-(\lambda))-n_F(E^+(\lambda))}{(i \Omega_m)^2 -
    (2\lambda)^2}f_d(\theta)
 
 and the photon action
 
 .. math::
 
-    S_A = \frac{L}{32\pi e^2 c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
+    S_A = -\frac{L}{32\pi e^2 c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
     \left[
     \left(1 + \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
     - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin 2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
@@ -290,9 +290,10 @@ and the photon action
 
 or using :math:`\alpha=\frac{e^2}{c}`
 
+.. _photon_action:
 .. math::
 
-    S_A = \frac{\alpha^2 L}{32\pi (\alpha c)^3}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
+    S_A = -\frac{\alpha^2 L}{32\pi (\alpha c)^3}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
     \left[
     \left(1 + \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
     - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin 2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)

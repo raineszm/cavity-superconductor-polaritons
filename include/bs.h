@@ -55,7 +55,7 @@ public:
    * For more on the :math:`\xi` approx see :ref:`xi-approx`
    * \endverbatim
    *
-   * \sa action()
+   * \sa gf()
    */
   double action_int(double l, double theta, double omega) const
   {
@@ -96,7 +96,7 @@ public:
   }
 
   //! The value of the BS Mode inverse GF at frequency \f$\Omega\f$
-  double action(double omega) const
+  double gf(double omega) const
   {
     return -state.sys.dos() *
            (mass + 2 * gsl_xi_integrate(
@@ -107,7 +107,7 @@ public:
   }
 
   //! Derivative of the BS mode inverse GF wrt \f$\Omega\f$
-  double d_action(double omega) const
+  double d_gf(double omega) const
   {
     return -2 * state.sys.dos() *
            gsl_xi_integrate(
@@ -119,7 +119,7 @@ public:
 
   //! The pole of the Bardasis Schrieffer mode GF
 
-  //! Obtained by solving for where action() is zero
+  //! Obtained by solving for where gf() is zero
   double root() const
   {
     // If the cached value is still good return it
@@ -131,7 +131,7 @@ public:
     _mass = mass;
     _state_hash = std::hash<State>{}(state);
 
-    auto f = [this](double x) { return action(x); };
+    auto f = [this](double x) { return gf(x); };
 
     auto gsl_f = gsl_function_pp<decltype(f)>(f);
     auto solver = FSolver::create<decltype(f)>(

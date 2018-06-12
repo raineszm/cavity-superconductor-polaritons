@@ -13,7 +13,7 @@ using Eigen::Matrix2d;
 
 //! \note All values returned from this class are missing the factor of
 //! \f$\sqrt{2/L}\f$ in the effective paramagnetic coupling. This factor is
-//! reinstanted in Polariton::action()
+//! reinstanted in Polariton::gf()
 class Coupling
 {
 public:
@@ -91,7 +91,7 @@ public:
    * \note We take into account the angular factor arising from \f$v_s\cdot A\f$
    * when building the polariton matrix.
    *
-   * \sa ImDA_int(), Polariton::action()
+   * \sa ImDA_int(), Polariton::gf()
    */
   double ImDA(double omega) const
   {
@@ -266,7 +266,7 @@ public:
    * \mathbf{v} &\to \frac{k}{m} (\cos(\theta - \theta_s),
    * \sin(\theta-\theta_s))^T \f]
    *
-   * \sa State::, photon_se(), Polarition::action()
+   * \sa State::, photon_se(), Polarition::gf()
    */
   double photon_se_int(double kx,
                        double ky,
@@ -418,7 +418,7 @@ public:
    *  S = \frac{1}{\beta}\sum_q \bar{a}_q \left[-i\omega_m + \omega_q +
    * \tilde{\Pi}(q)\right] a_q \f]
    *
-   * In particular, (c.f. \ref photon_se(), \ref Polariton::action()), the
+   * In particular, (c.f. \ref photon_se(), \ref Polariton::gf()), the
    * self energy we have previously defined enters as
    *
    * \f[

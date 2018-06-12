@@ -1,5 +1,12 @@
-//! \file cavity.h
-//!  We use Gaussian Hartree Units
+/**
+ * @brief the physics of the photons
+ *
+ * @file cavity.h
+ * @author Zach Raines
+ * @date 2018-06-12
+ *
+ * We use Gaussian Hartree Units
+ */
 #pragma once
 #include <Eigen/Core>
 #include <cmath>
@@ -15,26 +22,64 @@ const double C = 1 / ALPHA;
 //! The paramagnetic coupling strength
 const double GPAR = 1 / C;
 
-//! The physics of the cavity modes
+/**
+ * @brief The physics of the cavity modes
+ *
+ */
 class Cavity
 {
 public:
-  //! Cavity frequency
+  /**
+   * @brief The photon 'mass'
+   *
+   */
   double omega0;
 
   explicit Cavity(double omega0_)
     : omega0(omega0_)
   {}
 
-  //! The dispersion of the cavity
-  //! \f[\omega^2 = \omega_0^2 + c^2 q^2\f]
+  /**
+   * @brief The cavity dispersion
+   *
+   * @param qx momentum along \f$v_s\f$
+   * @param qy momentum along \f$\hat z \times v_s\f$
+   * @return double
+   *
+   * The bare photon cavity disperions \f$\omega_q^2 = \omega_0^2 + c^2q^2\f$.
+   */
   double omega(double qx, double qy) const
   {
     return std::sqrt(omega0 * omega0 + C * C * (qx * qx + qy * qy));
   }
 
+  /**
+   * @brief The size of the cavity
+   *
+   * We determine this by relating it to the photon 'mass' \f$\omega_0\f$
+   * as \f$L=\tfrac{\pi c}{\omega_0}\f$.
+   *
+   * @return double
+   */
   double L() const { return M_PI * C / omega0; }
 
+  /**
+   * @brief The matrix structure of the inverse photon Green's function in the
+   * \f$\parallel-\perp\f$ field basis.
+   *
+   * @param qx momentum along \f$v_s\f$
+   * @param qy momentum along \f$\hat z \times v_s\f$
+   * @param theta_s the angle that the supercurrent makes with system \f$x\f$
+   * axis
+   * @return Matrix2d
+   * @sa gf()
+   *
+   * \f[
+   * \left(1 +\frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
+   * - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin
+   * 2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
+   * \f]
+   */
   Matrix2d matrix_structure(double qx, double qy, double theta_s) const
   {
     auto wq = this->omega(qx, qy);
@@ -50,20 +95,32 @@ public:
     return (Matrix2d() << P0 + P3, P1, P1, P0 - P3).finished();
   }
 
-  /** The inverse GF of the photon modes
-
-  \f[
-    S_A = \frac{L \alpha^2}{32 \pi (c\alpha)^3}\sum_q \mathbf{A}(-q) \left[ (i
-  \omega_m)^2 - \omega_\mathbf{q}^2\right] \left[ \left(1 +
-  \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
-  - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin
-  2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
-  \right]
-  \mathbf{A}(q)
-  \f]
-  * \sa matrix_structure()
-  */
-  Matrix2d action(double omega, double qx, double qy, double theta_s) const
+  /**
+   * @brief The inverse Green's function of the photon fields in the
+   * \f$\parallel-\perp\f$ basis as derived above.
+   *
+   * @param omega the frequency
+   * @param qx momentum along \f$v_s\f$
+   * @param qy momentum along \f$\hat z \times v_s\f$
+   * @param theta_s the angle that the supercurrent makes with system \f$x\f$
+   * @return Matrix2d
+   * @seealso matrix_structure()
+   *
+   * We take the inverse Green's function from the above action and analytically
+   * continue it to real frequency
+   *
+   *
+   * \f[
+   * D^{-1}(\omega, \mathbf{q}) = \frac{L \alpha^2}{32 \pi (c\alpha)^3}\left[
+   * (\omega + i0^+
+   * )^2 - \omega_\mathbf{q}^2\right] \left[ \left(1 +
+   * \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
+   * - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin
+   * 2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
+   * \right]
+   * \f]
+   */
+  Matrix2d gf(double omega, double qx, double qy, double theta_s) const
   {
     auto omega_q = this->omega(qx, qy);
     auto prefactor = L() * std::pow(ALPHA, 2) *
@@ -73,7 +130,20 @@ public:
     return prefactor * matrix_structure(qx, qy, theta_s);
   }
 
-  Matrix2d d_action(double omega, double qx, double qy, double theta_s) const
+  /**
+   * @brief The derivative of the cavity inverse photon green's function w.r.t
+   * frequency
+   *
+   * @param omega the frequency
+   * @param qx momentum along \f$v_s\f$
+   * @param qy momentum along \f$\hat z \times v_s\f$
+   * @param theta_s the angle that the supercurrent makes with system \f$x\f$
+   * @return Matrix2d
+   * @seealso gf()
+   *
+   * \f[ \frac{\partial D^{-1}(\omega, \mathbf q)}{d\omega}\f]
+   */
+  Matrix2d d_gf(double omega, double qx, double qy, double theta_s) const
   {
     auto prefactor =
       L() * std::pow(ALPHA, 2) * omega / (16 * M_PI * std::pow(C * ALPHA, 3));

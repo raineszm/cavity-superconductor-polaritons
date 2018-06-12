@@ -13,8 +13,8 @@ bind_cavity(py::module& m)
     .def(py::init<double>(), "omega0"_a)
     // Attributes
     .def_readwrite("omega0", &Cavity::omega0)
-    .def("action", &Cavity::action)
-    .def("d_action", &Cavity::d_action)
+    .def("gf", &Cavity::gf)
+    .def("d_gf", &Cavity::d_gf)
     .def("omega", &Cavity::omega);
   m.attr("GPAR") = GPAR;
   m.attr("ALPHA") = ALPHA;
