@@ -62,7 +62,7 @@ public:
    * @param theta the angle along the gap minumum
    * @param omega the frequency
    * @return double
-   * @seealso ImDA()
+   * @see ImDA()
    *
    * In evaluating the integral we pull out the constant prefactor
    * \f$-2 \frac{e}{c} \nu v_s i \Omega\Delta\f$
@@ -96,7 +96,7 @@ public:
    * @param theta the angle along the gap minumum
    * @param omega the frequency
    * @return double
-   * @seealso d_ImDA(), ImDA()
+   * @see d_ImDA(), ImDA()
    */
   double d_ImDA_int(double l, double theta, double omega) const
   {
@@ -121,7 +121,7 @@ public:
    *
    * @param omega the frequency
    * @return double
-   * @seealso ImDA_int(), Polariton::gf()
+   * @see ImDA_int(), Polariton::gf()
    *
    * This enters the action
    *  \f[ -i\sum_q g(i\Omega_m) \left(A^\parallel_q \
@@ -165,7 +165,7 @@ public:
    *
    * @param omega frequency
    * @return double
-   * @seealso ImDA()
+   * @see ImDA()
    */
   double d_ImDA(double omega) const
   {
@@ -215,7 +215,7 @@ public:
    * @param omega photon frequency
    * @param deriv is this the self-energy or its derivative w.r.t Freq
    * @return double
-   * @seealso photon_se_int(), photon_se()
+   * @see photon_se_int(), photon_se()
    *
    * \f[\pi_0(E_1, E_2, \omega) =
    * \frac{n_F(E_2) - n_F(E_1)}{i\Omega_m - E_1 + E_2}\f]
@@ -254,7 +254,7 @@ public:
    * @param omega
    * @param deriv
    * @return std::array<double, 4>
-   * @seealso pi0(), photon_se()
+   * @see pi0(), photon_se()
    *
    * Specifically we return
    * \f[\{\operatorname{tr}\pi_0\tau_0, \operatorname{tr}\pi_0\tau_1,
@@ -280,7 +280,7 @@ public:
    *
    * @param i component of vector
    * @return double
-   * @seealso v_comp()
+   * @see v_comp()
    *
    * Here we operate in the basis where the \f$x\f$ axis is along
    * \f$\mathbf{v}_s\f$.
@@ -302,7 +302,7 @@ public:
    * @param ky y component of momentum
    * @param i component of vector
    * @return double
-   * @seealso vs_comp()
+   * @see vs_comp()
    */
   double v_comp(double kx, double ky, int i) const
   {
@@ -328,7 +328,7 @@ public:
    * @param j right index
    * @param deriv is this the self enregy or its derivative?
    * @return double
-   * @seealso State::, photon_se(), Polarition::gf()
+   * @see State::, photon_se(), Polarition::gf()
    *
    * This term can be written in the form
    * \f[
@@ -410,7 +410,7 @@ public:
    * @param i
    * @param j
    * @return double
-   * @seealso photon_se_int(), System::xi_k(), System::n()
+   * @see photon_se_int(), System::xi_k(), System::n()
    *
    * The self-energy is given by
    * \f[

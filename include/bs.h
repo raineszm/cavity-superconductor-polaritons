@@ -36,9 +36,9 @@ public:
    *
    * @note That we define this variable such that \f$m_0 = \nu M\f$
    * where \f$M\f$ is the mass defined here and \f$\nu\f$ is the
-   * density of states @ref dos().
+   * density of states @ref System::dos().
    *
-   * @seealso gf_int()
+   * @see gf_int()
    */
   double mass;
   //! The associated mean field state
@@ -64,7 +64,7 @@ public:
    * @param theta the angle along the Gap minimum
    * @param omega the frequency
    * @return double
-   * @seealso gf()
+   * @see gf()
    *
    * This integrand defines the function \f$I((i\Omega_m)^2) = \sum_\mathbf{k}
    * f(i\Omega, \mathbf{k})\f$ appearing in the BS mode action \f[ f((i
@@ -115,7 +115,7 @@ public:
    * @param theta the angle along the Gap minimum
    * @param omega the frequency
    * @return double
-   * @seealso d_gf(), gf_int()
+   * @see d_gf(), gf_int()
    */
   double d_gf_int(double l, double theta, double omega) const
   {

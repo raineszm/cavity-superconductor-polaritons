@@ -107,7 +107,7 @@ public:
    * @param qy momentum along \f$\hat z \times v_s\f$
    * @param theta_s the angle that the supercurrent makes with system \f$x\f$
    * @return Matrix2d
-   * @seealso matrix_structure()
+   * @see matrix_structure()
    *
    * We take the inverse Green's function from the above action and analytically
    * continue it to real frequency
@@ -142,7 +142,7 @@ public:
    * @param qy momentum along \f$\hat z \times v_s\f$
    * @param theta_s the angle that the supercurrent makes with system \f$x\f$
    * @return Matrix2d
-   * @seealso gf()
+   * @see gf()
    *
    * \f[ \frac{\partial D^{-1}(\omega, \mathbf q)}{d\omega}\f]
    */

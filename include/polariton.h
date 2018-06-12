@@ -1,3 +1,10 @@
+/**
+ * @brief the polaritons
+ *
+ * @file polariton.h
+ * @author Zach Raines
+ * @date 2018-06-12
+ */
 #pragma once
 
 #include <Eigen/Dense>
@@ -20,7 +27,9 @@ using Eigen::Vector3d;
 #include "roots.h"
 #include "utils.h"
 
-/** The hybridized photon-Bardasis-Schrieffer object
+/**
+ * @brief The hybridized photon-Bardasis-Schrieffer object
+ *
  */
 class Polariton
 {
@@ -32,6 +41,13 @@ public:
   //! Enhancment of the dipole coupling \f$g\f$ between the modes
   double dipoleX;
 
+  /**
+   * @brief Construct a new Polariton object
+   *
+   * @param c_
+   * @param paraX_
+   * @param dipoleX_
+   */
   Polariton(const Coupling& c_, double paraX_ = 1, double dipoleX_ = 1)
     : coupling(c_)
     , paraX(paraX_)
@@ -61,25 +77,32 @@ public:
     return d_cavaction;
   }
 
-  /** The inverse GF of the polariton
+  /**
+   * @brief The inverse GF of the polariton
+   *
+   * @param omega
+   * @param qx
+   * @param qy
+   * @return Matrix3cd
+   * @see Coupling::ImDA(), Coupling::photon_se(), BS::gf(), Cavity::gf()
+   *
+   * The action
    * \f[
-   * S_\text{pol} = \sum_q
+   * S_\text{pol} = -\frac{1}{\beta}\sum_q
    * \begin{pmatrix}
    * d_\perp(-q)& A_\parallel(-q)& A_\perp(-q)
    * \end{pmatrix}
    * \begin{pmatrix}
-   * S^{-1}(\Omega)&ig(\Omega)&0\\
-   * -ig(\Omega)& D_0^{-1}(q) - \Pi_{\parallel,\parallel}(q)&
+   * S^{-1}(i\Omega_m)&ig(i\Omega_m)&0\\
+   * -ig(i\Omega_m)& D_0^{-1}(q) - \Pi_{\parallel,\parallel}(q)&
    * -\Pi^{\parallel,\perp}(q)\\ 0 & -\Pi^{\perp,\parallel}(q)& D_0^{-1}(q) -
    * \Pi^{\perp,\perp}(q) \end{pmatrix} \begin{pmatrix} d_\perp(q)\\
-   * A_\parallel(q)\\ A_\perp(q) \end{pmatrix} \f] This method calculates the
-   * central matrix of the above. Here \f$D^{-1}\f$ is the bare cavity inverse
-   * GF and \f$S^{-1}\f$ is the BS inverse GF.
-   * \f$A_\parallel\f$ and \f$A_\perp\f$ are the components of \f$\mathbf{A}\f$
-   * parallel and perpendicular to the supercurrent.
-   *
-   * \sa Coupling::ImDA(), Coupling::photon_se(), BS::gf(),
-   * Cavity::gf();
+   * A_\parallel(q)\\ A_\perp(q) \end{pmatrix} \f]
+   * defines and inverse Greens' function which we analytically continue to real
+   * frequency Here \f$D^{-1}\f$ is the bare cavity inverse GF and \f$G^{-1}\f$
+   * is the BS inverse GF. \f$A_\parallel\f$ and \f$A_\perp\f$ are the
+   * components of \f$\mathbf{A}\f$ parallel and perpendicular to the
+   * supercurrent.
    */
   Matrix3cd gf(double omega, double qx, double qy) const
   {
@@ -140,9 +163,7 @@ public:
   {
 
     // Define functions to be used in root finding
-    auto det = [this, qx, qy](double omega) {
-      return det_gf(omega, qx, qy);
-    };
+    auto det = [this, qx, qy](double omega) { return det_gf(omega, qx, qy); };
 
     // Here we use the fact that our functions has two local extrema (since it
     // has 3 roots) We find the two extrem then look for the roots between each
