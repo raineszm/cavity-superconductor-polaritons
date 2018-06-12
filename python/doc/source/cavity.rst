@@ -279,7 +279,6 @@ and the coupling between the excitations
 
 and the photon action
 
-
 .. math::
 
     S_A = \frac{L}{32\pi e^2 c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]

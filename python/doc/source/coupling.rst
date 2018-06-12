@@ -92,21 +92,19 @@ or explicitly
 Photon Self-Energy
 ==================
 
-Consider the addition of the photonic self-energy to the photon action.
-
-The thermal photon action is (c.f. :cpp:func:`Coupling::photon_se`)
+Consider the addition of the photonic self-energy to the photon action (c.f. :cpp:func:`Coupling::photon_se`)
 
 .. math::
 
-    S = \frac{1}{8\pi c^2 \beta}\sum_q\mathbf{A}_{-q}(L/2)\left(
-        \omega_\mathbf{q}^2 - (i\Omega_m)^2 + \hat{\Pi}(i\Omega_m, \mathbf q)\right)\mathbf{A}_q(L/2)
+    S = \frac{1}{\beta}\sum_q\mathbf{A}_{-q}(L/2)
+        \hat{\Pi}(i\Omega_m, \mathbf q)\mathbf{A}_q(L/2)
 
 Going to the :ref:`mode basis <photon-mode>`
 
 .. math::
 
     \frac{1}{\beta}\sum_{q}
-    \frac{1}{4\omega_\mathbf{q}}
+    \frac{2\pi c^2}{\omega_\mathbf{q}}
     \left(\bm{\epsilon}_\alpha(-q, L/2) a_{\alpha,-q} + \bm{\epsilon}_\alpha(q, L/2)^* a^\dagger_{q, \alpha}\right)
     \hat{\Pi}(i \Omega_m, \mathbf q)
     \left(\bm{\epsilon}_\beta(q, L/2) a_{\beta,q} + \bm{\epsilon}_\beta(-q, L/2)^* a^\dagger_{-q, \beta}\right)
@@ -116,7 +114,7 @@ Ignoring the counter rotating terms
 .. math::
 
     \frac{1}{\beta}\sum_{q}
-    \frac{1}{4\omega_\mathbf{q}}
+    \frac{2\pi c^2}{\omega_\mathbf{q}}
      a_{\alpha,-q}\bm{\epsilon}_\alpha(-q, L/2)
     \hat{\Pi}(i \Omega_m, \mathbf q)
     \bm{\epsilon}_\beta(-q, L/2)^* a^\dagger_{-q, \beta}
@@ -130,7 +128,7 @@ Flipping the momentum index
 .. math::
 
     \frac{1}{\beta}\sum_{q}
-    \frac{1}{4\omega_\mathbf{q}}
+    \frac{2\pi c^2}{\omega_\mathbf{q}}
      a^\dagger_{q, \alpha} 
     \bm{\epsilon}_\alpha(q, L/2)^* 
      \left[
@@ -147,7 +145,7 @@ We thus define
 
 .. math::
 
-   \tilde{\Pi}_{\alpha\beta}(q) = \frac{1}{2\omega_q}\bm{\epsilon}^*_\alpha(q, L/2)
+   \tilde{\Pi}_{\alpha\beta}(q) = \frac{4\pi c^2}{\omega_q}\bm{\epsilon}^*_\alpha(q, L/2)
     \hat{\Pi}(i\Omega_m, \mathbf q)
     \bm{\epsilon}_\beta(q, L/2)
 
@@ -155,23 +153,8 @@ The thermal photon action is then
 
 .. math::
 
-    S = \frac{1}{\beta}\sum_q a^\dagger_{q, \alpha}\left(-i\Omega_m + \Omega_\mathbf{q} + \tilde{\Pi}_{\alpha\beta}(i \Omega_m, \mathbf{q})\right)a_{q,\beta}
+    S = \frac{1}{\beta}\sum_q a^\dagger_{q, \alpha}\left(-i\Omega_m + \omega_\mathbf{q} + \tilde{\Pi}_{\alpha\beta}(i \Omega_m, \mathbf{q})\right)a_{q,\beta}
 
-Finally to make contact with code, when integrating out the fermions one obtains a term of the form
-
-.. math::
-
-    \frac{1}{\beta} \sum_q \mathbf{A}_{-q} \hat{P}(i\Omega_m, \mathbf{q}) \mathbf{A}_q
-
-This :math:`P` is what is implemented in :cpp:func:`Coupling::photon_se()`.
-A quick comparison shows us that
-
-.. math::
-
-    \tilde{\Pi}_{\alpha\beta}(i\Omega_m, \mathbf q) 
-    = -\frac{4\pi c^2}{\omega_q}\bm{\epsilon}^*_\alpha(q, L/2)
-    \hat{P}(i\Omega_m, \mathbf q)
-    \bm{\epsilon}_\beta(q, L/2)
 
 Renormalization
 ---------------
@@ -181,20 +164,22 @@ At :math:`q=0`
 
 .. math::
 
-   S = -i\Omega_m + \omega_0 + \tilde{\Pi}_{\alpha\beta}(i \omega_m, 0)
+   S = \frac{1}{\beta} \sum_q \bar{a}_{q, \alpha}\left(
+       -i\Omega_m + \omega_0 + \tilde{\Pi}_{\alpha\beta}(i \Omega_m, 0)
+       \right)a_{q, \alpha}
 
 The renormalized mass :math:`\omega_r` is the frequency at which this action vanishes.
 This allows us to expand
 
 .. math::
 
-    \tilde{\Pi} \approx (\hat{Z}-1)\left(\omega_r - i \Omega_m  - \omega_0\right) + \hat{\tilde{\Pi}}(\omega_r, \mathbf{q}) + \cdots
+    \tilde{\Pi} \approx (\hat{Z}(\mathbf q)-1)\left(\omega_r - i \Omega_m\right) + \hat{\tilde{\Pi}}(\omega_r, \mathbf{q}) + \cdots
 
 where
 
 .. math::
 
-    1 - \hat{Z} = \left.\frac{\partial\Pi(i\Omega, 0)}{\partial(i\Omega)}\right|_{i\Omega=\omega_r-\omega_0}
+    1 - \hat{Z}(\mathbf q) = \left.\frac{\partial\Pi(i\Omega, \mathbf{q})}{\partial(i\Omega)}\right|_{i\Omega=\omega_r}
 
 
 Assuming :math:`\hat{Z}` is positive definite it admits a Cholesky decomposition :math:`\hat{Z} = \hat{L} \hat{L}^\dagger`.
@@ -202,19 +187,22 @@ We then absorb the matrix :math:`\hat{L}` in the definition of our field operato
 
 .. math::
 
-    \tilde{a} = \hat{L}^\dagger a
+    a \to \hat{L}^\dagger a
 
 This makes the photonic Lagrangian
 
 .. math::
 
-    \mathcal{L} = -i\omega_m + \tilde{\omega_\mathbf{q}} + \hat{L}^{-1}\hat{\tilde{\Pi}}(\omega_r, \mathbf{q})(\hat{L}^{\dagger})^{-1}
+    \bar{a}_{q, \alpha}
+    \left(-i\Omega_m + \tilde{\omega}_\mathbf{q} + \hat{L}^{-1}\hat{\tilde{\Pi}}(\omega_r, \mathbf{q})(\hat{L}^{\dagger})^{-1}
+    \right) a_{q, \alpha}
 
+with :math:`\tilde{\omega}_{\mathbf q} = \omega_\mathbf{q} + \tilde\Pi(\omega_r, \mathbf{q})`,
 allowing us to define the effective Hamiltonian
 
 .. math::
 
-    \hat{H}_\text{phot} = \tilde{\omega}_{\mathbf{q}} + \hat{L}^{-1}\hat{\tilde{\Pi}}(\omega_r, \mathbf{q}){(\hat{L}^\dagger)}^{-1}
+    \hat{H}_\text{phot} = \omega_{\mathbf{q}} + \hat{L}^{-1}\hat{\tilde{\Pi}}(\omega_r, \mathbf{q}){(\hat{L}^\dagger)}^{-1}
 
 Similarly, the coupling to the Bardasis-Schrieffer mode becomes
 
