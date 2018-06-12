@@ -1,3 +1,10 @@
+/**
+ * @brief The Bardasis Schrieffer mode
+ *
+ * @file bs.h
+ * @author Zach Raines
+ * @date 2018-06-12
+ */
 #pragma once
 #include "integrate.h"
 #include "roots.h"
@@ -6,7 +13,10 @@
 #include <cmath>
 #include <functional>
 
-//! Describes the Bardasis-Schrieffer mode of the system
+/**
+ * @brief Describes the Bardasis-Schrieffer mode of the system
+ *
+ */
 class BS
 {
 private:
@@ -15,49 +25,74 @@ private:
   mutable double _root;
 
 public:
-  /** The bare Bardasis-Schrieffer 'mass'
+  /**
+   * @brief The bare Bardasis-Schrieffer 'mass'
    *
    * The mass of the BS mode is given by solving
    * \f[
-   * \underbrace{\frac{1}{g_d} - \frac{1}{g_s}}_{m_0} + I(\omega^2)\f]
-   * where \f$I(\omega^2)\f$ is the integrand described by
-   * action_int()
+   * \underbrace{\frac{1}{g_d} - \frac{1}{g_s}}_{m_0} + I(\Omega^2)\f]
+   * where \f$I(\Omega^2)\f$ is the integrand described by
+   * gf_int()
    *
-   * In particular however, we divide the gap equation by \f$\nu\f$.
+   * @note That we define this variable such that \f$m_0 = \nu M\f$
+   * where \f$M\f$ is the mass defined here and \f$\nu\f$ is the
+   * density of states @ref dos().
+   *
+   * @seealso gf_int()
    */
   double mass;
   //! The associated mean field state
   const State state;
 
+  /**
+   * @brief Construct a new BS object
+   *
+   * @param mass_
+   * @param state_
+   */
   BS(double mass_, const State& state_)
     : mass(mass_)
     , state(state_)
   {}
 
-  /** The integrand of the function \f$I(\omega^2)\f$ appearing in
+  /**
+   * @brief The integrand of the function \f$I(\omega^2)\f$ appearing in
    * the BS mode mass eqn.
    *
-   * \f[
-   * f(\Omega^2) =
-   * \Omega^2 \frac{1}{2\lambda_k} \frac{n_F(E^-_\mathbf{k}) -
-   * n_F(E^+_\mathbf{k})}{(\Omega + i0^+)^2-(2\lambda_k)^2} + 2\lambda_k
-   * \cos(4\theta_k) \frac{n_F(E^-_\mathbf{k}) - n_F(E^+_\mathbf{k})}{(\Omega +
-   * i0^+)^2-(2\lambda_k)^2}
+   * @param l the BDG quasiparticle energy (without the dopplershift)
+   * \f$\lambda\f$
+   * @param theta the angle along the Gap minimum
+   * @param omega the frequency
+   * @return double
+   * @seealso gf()
+   *
+   * This integrand defines the function \f$I((i\Omega_m)^2) = \sum_\mathbf{k}
+   * f(i\Omega, \mathbf{k})\f$ appearing in the BS mode action \f[ f((i
+   * \Omega_m)^2, \mathbf{k}) = (i\Omega_m)^2 \frac{1}{2\lambda_k}
+   * \frac{n_F(E^-_\mathbf{k}) -
+   * n_F(E^+_\mathbf{k})}{(i\Omega_m)^2-(2\lambda_k)^2} + 2\lambda_k
+   * \cos(4\theta_k) \frac{n_F(E^-_\mathbf{k}) - n_F(E^+_\mathbf{k})}{(i\Omega_m
+   * )^2-(2\lambda_k)^2}
    * \f]
    *
    * \note This integral will be calculated within the \f$\xi\f$ approximation
-   * as \f[ I(\omega^2) = \int \frac{d^2k}{(2\pi)^2} f(\mathbf{k}, \omega^2)
-   * \approx 2\nu\int_\Delta^\infty \frac{\lambda d\lambda}{\sqrt{\lambda^2 -
-   * \Delta^2}} \int_0^{2\pi}\frac{d\theta}{2\pi} f(\lambda, \theta,
-   * \omega^2)\f] In particular we group the factor of the quasiparticle density
+   * as \f[ I((i\Omega_m)^2) = \int \frac{d^2k}{(2\pi)^2} f((i\Omega_m)^2,
+   * \mathbf{k}) \approx 2\nu\int_\Delta^\infty \frac{\lambda
+   * d\lambda}{\sqrt{\lambda^2 - \Delta^2}} \int_0^{2\pi}\frac{d\theta}{2\pi}
+   * f((i\Omega_m)^2, \lambda, \theta,
+   * )
+   * \f]
+   * In particular we group the factor of the quasiparticle density
    * of states into the integrand.
    * \verbatim embed:rst:leading-asterisk
    * For more on the :math:`\xi` approx see :ref:`xi-approx`
    * \endverbatim
    *
-   * \sa gf()
+   * @note We will be using the integral in the retarded inverse Green's
+   * function for the BS mode, so we analytically continue \f$i\Omega_m \to
+   * \omega + i0^+\f$.
    */
-  double action_int(double l, double theta, double omega) const
+  double gf_int(double l, double theta, double omega) const
   {
     double drift = state.sys.drift_theta(state.sys.kf(), theta);
 
@@ -71,7 +106,18 @@ public:
            (2 * std::sqrt(l * l - state.delta * state.delta));
   }
 
-  double d_action_int(double l, double theta, double omega) const
+  /**
+   * @brief The integrand of the derivative of \f$I((i\Omega)^2)\f$ w.r.t
+   * frequency
+   *
+   * @param l the BDG quasiparticle energy (without the dopplershift)
+   * \f$\lambda\f$
+   * @param theta the angle along the Gap minimum
+   * @param omega the frequency
+   * @return double
+   * @seealso d_gf(), gf_int()
+   */
+  double d_gf_int(double l, double theta, double omega) const
   {
     double drift = state.sys.drift_theta(state.sys.kf(), theta);
 
@@ -95,13 +141,33 @@ public:
            (2 * std::sqrt(l * l - state.delta * state.delta));
   }
 
-  //! The value of the BS Mode inverse GF at frequency \f$\Omega\f$
+  /**
+   * @brief The Bardasis-Schrieffer inverse Green's function
+   *
+   * @param omega the frequency \f$\omega\f$
+   * @return double
+   *
+   * The BS action
+   *
+   * \f[
+   * S = \frac{1}{\beta}\sum_q \left[
+   *     \underbrace{\frac{1}{g_d} - \frac{1}{g_s}}_{m_0} +
+   * I((i\Omega_\text{BS})^2) \right] \f]
+   *
+   * Defines a Green's function
+   *
+   * \f[
+   *  G^{-1}(i\Omega_m) = -I((i\Omega_m)^2) - m_0
+   * \f]
+   *
+   * @note We analytically continue \f$i\Omega_m \to \omega + i0^+\f$
+   */
   double gf(double omega) const
   {
     return -state.sys.dos() *
            (mass + 2 * gsl_xi_integrate(
                          [this, omega](double l, double theta) {
-                           return action_int(l, theta, omega);
+                           return gf_int(l, theta, omega);
                          },
                          state.delta));
   }
@@ -112,7 +178,7 @@ public:
     return -2 * state.sys.dos() *
            gsl_xi_integrate(
              [this, omega](double l, double theta) {
-               return d_action_int(l, theta, omega);
+               return d_gf_int(l, theta, omega);
              },
              state.delta);
   }
@@ -140,7 +206,10 @@ public:
     return (_root = solver.solve(1e-8 * state.delta, 0));
   }
 
-  /** The Hamiltonian of the BS mode operators
+  /**
+   * @brief The Hamiltonian of the BS mode operators
+   *
+   * @return double
    *
    * We can define mode operators \f$b,b^\dagger\f$ such the BS action can be
    * rewritten \f[\frac{1}{\beta}\sum_q \bar{b}_q \left(-i \omega_m +
@@ -152,5 +221,5 @@ public:
 
   /** The kinetic mass of the BS mode
    */
-  double M() const { return 2 * state.sys.dos() * mass / (root() * root()); }
+  double M() const { return 2 * d_gf(bs.root()); }
 };

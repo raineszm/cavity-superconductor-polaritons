@@ -1,3 +1,10 @@
+/**
+ * @brief The coupling through the electronic system
+ *
+ * @file coupling.h
+ * @author Zach Raines
+ * @date 2018-06-12
+ */
 #pragma once
 #include <Eigen/Core>
 #include <array>
@@ -9,36 +16,64 @@
 
 using Eigen::Matrix2d;
 
-//! The coupling between the Superconductor and Cavity
-
-//! \note All values returned from this class are missing the factor of
-//! \f$\sqrt{2/L}\f$ in the effective paramagnetic coupling. This factor is
-//! reinstanted in Polariton::gf()
+/**
+ * @brief The coupling between the Superconductor and Cavity
+ */
 class Coupling
 {
 public:
+  /**
+   * @brief The Bardasis-Schrieffer mode
+   *
+   */
   const BS bs;
+  /**
+   * @brief The cavity photons
+   *
+   */
   const Cavity cav;
-  //! The associated mean field state
 
+  /**
+   * @brief Construct a new Coupling object
+   *
+   * @param bs_
+   * @param cav_
+   */
   explicit Coupling(const BS& bs_, const Cavity& cav_)
     : bs(bs_)
     , cav(cav_)
   {}
 
+  /**
+   * @brief The Meanfield state of the electrons
+   *
+   * @return const State&
+   */
   const State& state() const { return bs.state; }
 
-  /** The integrand for the imaginary part of the coupling
+  /**
+   *
+   */
+
+  /**
+   * @brief The integrand for the imaginary part of the coupling
+   *
+   * @param l the BdG quasiparticle energy
+   * @param theta the angle along the gap minumum
+   * @param omega the frequency
+   * @return double
+   * @seealso ImDA()
    *
    * In evaluating the integral we pull out the constant prefactor
-   * \f$-2 \frac{e}{c} \nu v_s \Omega\Delta\f$
+   * \f$-2 \frac{e}{c} \nu v_s i \Omega\Delta\f$
    * leaving the integrand
    * \f[
    * \frac{1}{\sqrt{\lambda^2 - \Delta^2}}
-   * \frac{n_F(E^-(\lambda))-n_F(E^+(\lambda))}{(\Omega + i0^+)^2 -
+   * \frac{n_F(E^-(\lambda))-n_F(E^+(\lambda))}{(i\Omega_m)^2 -
    * (2\lambda)^2}f_d(\theta) \f]
    *
-   * \sa ImDA()
+   * @note This result will appear in the retarded Green's function so we
+   * analytically continue \f$i\Omega_m \to \omega + i0^+\f$.
    */
   double ImDA_int(double l, double theta, double omega) const
   {
@@ -53,7 +88,15 @@ public:
             std::sqrt(l * l - state().delta * state().delta));
   }
 
-  /** The integrand for the derivative of the imaginary part of the coupling
+  /**
+   * @brief The integrand for the derivative of the imaginary part of the
+   * coupling w.r.t \f$\omega\f$
+   *
+   * @param l the BdG quasiparticle energy
+   * @param theta the angle along the gap minumum
+   * @param omega the frequency
+   * @return double
+   * @seealso d_ImDA(), ImDA()
    */
   double d_ImDA_int(double l, double theta, double omega) const
   {
@@ -68,30 +111,42 @@ public:
             std::sqrt(l * l - state().delta * state().delta));
   }
 
-  /** The coupling between the Bardasis Schrieffer mode and photons
+  /**
+   *
+   */
+
+  /**
+   * @brief The coupling between the Bardasis Schrieffer mode and photons
+   * appearing in the inverse Green's function
+   *
+   * @param omega the frequency
+   * @return double
+   * @seealso ImDA_int(), Polariton::gf()
    *
    * This enters the action
-   *  \f[ i\sum_q g_q \left(A^\parallel_q \ \bar{d}_{\perp,q} -
-   * A^{\parallel\ast}_q d_{\perp,q}\right)\f]
-   * with
-   * \f[
-   *  g_q = -\frac{e}{c} v_s \Omega\Delta \sum_{\mathbf{k}}
-   * \frac{n_F(E^-_\mathbf{k})-n_F(E^+_\mathbf{k}) }{(\Omega + i0^+)^2 -
+   *  \f[ -i\sum_q g(i\Omega_m) \left(A^\parallel_q \
+   * \bar{d}_{\perp,q} - A^{\parallel\ast}_q d_{\perp,q}\right)\f]
+   *
+   * with \f[ g_(i\Omega_m)
+   * = \frac{e}{c} v_s i\Omega_m\Delta \sum_{\mathbf{k}}
+   * \frac{n_F(E^-_\mathbf{k})-n_F(E^+_\mathbf{k}) }{(i\Omega_m)^2 -
    * (2\lambda_k)^2}\frac{f_d(\mathbf{k})}{\lambda_k} \f]
    * where here we use unrationalized (Gaussian) units
    *
    * We rewrite the integral in the \f$\xi\f$ approximation
    * \f[
-   *  g_q \approx -2 \frac{e}{c} \nu v_s \Omega\Delta \int_\Delta^\infty
-   * \frac{\lambda d\lambda}{\sqrt{\lambda^2 - \Delta^2}}
+   *  g(i\Omega_m) \approx 2 \frac{e}{c} \nu v_s i\Omega_m\Delta
+   * \int_\Delta^\infty \frac{\lambda d\lambda}{\sqrt{\lambda^2 - \Delta^2}}
    * \int_0^{2\pi}\frac{d\theta}{2\pi}
-   * \frac{n_F(E^-(\lambda))-n_F(E^+(\lambda))}{(\Omega + i0^+)^2 -
+   * \frac{n_F(E^-(\lambda))-n_F(E^+(\lambda))}{(i\Omega_m)^2 -
    * (2\lambda)^2}\frac{f_d(\theta)}{\lambda} \f]
    *
-   * \note We take into account the angular factor arising from \f$v_s\cdot A\f$
+   * @note We take into account the angular factor arising from \f$v_s\cdot A\f$
    * when building the polariton matrix.
    *
-   * \sa ImDA_int(), Polariton::gf()
+   * @note This term will be analitically continued and appear in the inverse GF
+   * as \f$-g(\omega + i0^+)\f$
+   *
    */
   double ImDA(double omega) const
   {
@@ -104,7 +159,13 @@ public:
              state().delta);
   }
 
-  /** The derivative of the imaginary part of the coupling \f$dg/d\omega\f$
+  /**
+   * @brief The derivative of the imaginary part of the coupling
+   * \f$dg/d\omega\f$
+   *
+   * @param omega frequency
+   * @return double
+   * @seealso ImDA()
    */
   double d_ImDA(double omega) const
   {
@@ -143,18 +204,29 @@ public:
            vsdoteps * d_ImDA(omega);
   }
 
-  /** The polarization bubble entering into the photon self energy
+  /**
+   */
+
+  /**
+   * @brief The polarization bubble entering into the photon self energy
+   *
+   * @param E1 quasiparticle energy
+   * @param E2 quasiparticle energy
+   * @param omega photon frequency
+   * @param deriv is this the self-energy or its derivative w.r.t Freq
+   * @return double
+   * @seealso photon_se_int(), photon_se()
    *
    * \f[\pi_0(E_1, E_2, \omega) =
-   * \frac{n_F(E_2) - n_F(E_1)}{\omega + i0 - E_1 + E_2}\f]
+   * \frac{n_F(E_2) - n_F(E_1)}{i\Omega_m - E_1 + E_2}\f]
    *
    * For numerical convenience we make use of the relation
    * \f$n_f = \tfrac{1 - \tanh}{2}\f$ to rewrite this as
    * \f[\pi_0(E_1, E_2, \omega) =
-   * \frac{1}{2}\frac{\tanh\frac{E_1}{2T}- \tanh\frac{E_2}{2T}}{\omega + i0 -
+   * \frac{1}{2}\frac{\tanh\frac{E_1}{2T}- \tanh\frac{E_2}{2T}}{i\Omega_m+ i0 -
    * E_1 + E_2}\f]
    *
-   * \sa photon_se_int(), photon_se()
+   * @note This is analytically continued to real frequency
    */
   double pi0(double E1, double E2, double omega, bool deriv) const
   {
@@ -173,12 +245,20 @@ public:
   }
 
   /**
-   * The traces of pi0() with the pauli matrices.
+   * @brief The traces of pi0() with the pauli matrices.
+   *
+   * @param d1
+   * @param d2
+   * @param l1
+   * @param l2
+   * @param omega
+   * @param deriv
+   * @return std::array<double, 4>
+   * @seealso pi0(), photon_se()
+   *
    * Specifically we return
    * \f[\{\operatorname{tr}\pi_0\tau_0, \operatorname{tr}\pi_0\tau_1,
    * -i\operatorname{tr}\pi_0\tau_2, \operatorname{tr}\pi_0\tau_3\}\f]
-   *
-   * \sa pi0(), photon_se()
    */
   std::array<double, 4> pi0_elems(double d1,
                                   double d2,
@@ -195,12 +275,15 @@ public:
     return { { p00 + p11, p01 + p10, p01 - p10, p00 - p11 } };
   }
 
-  /** Select the \f$i\f$ components of \f$\mathbf{v}_s\f$
+  /**
+   * @brief Select the \f$i\f$ components of \f$\mathbf{v}_s\f$
+   *
+   * @param i component of vector
+   * @return double
+   * @seealso v_comp()
    *
    * Here we operate in the basis where the \f$x\f$ axis is along
    * \f$\mathbf{v}_s\f$.
-   *
-   * \sa v_comp()
    */
   double vs_comp(int i) const
   {
@@ -212,9 +295,14 @@ public:
     }
   }
 
-  /** Select the \f$i\f$ components of \f$\mathbf{v}\f$
+  /**
+   * @brief Select the \f$i\f$ components of \f$\mathbf{v}\f$
    *
-   * \sa vs_comp()
+   * @param kx x component of momentum
+   * @param ky y component of momentum
+   * @param i component of vector
+   * @return double
+   * @seealso vs_comp()
    */
   double v_comp(double kx, double ky, int i) const
   {
@@ -228,7 +316,19 @@ public:
     }
   }
 
-  /** The photon self-energy due to renormalization by the s-wave state
+  /**
+   * @brief The photon self-energy due to renormalization by the s-wave state
+   *
+   * @param kx x component of electron momentum
+   * @param ky y component of electron momentum
+   * @param omega photon frequency
+   * @param qx x component of photon momentum
+   * @param qy y component of photon momentum
+   * @param i left index
+   * @param j right index
+   * @param deriv is this the self enregy or its derivative?
+   * @return double
+   * @seealso State::, photon_se(), Polarition::gf()
    *
    * This term can be written in the form
    * \f[
@@ -266,7 +366,6 @@ public:
    * \mathbf{v} &\to \frac{k}{m} (\cos(\theta - \theta_s),
    * \sin(\theta-\theta_s))^T \f]
    *
-   * \sa State::, photon_se(), Polarition::gf()
    */
   double photon_se_int(double kx,
                        double ky,
@@ -302,7 +401,16 @@ public:
     return T0 * pl[0] + T1 * pl[1] + iT2 * pl[2] + T3 * pl[3];
   }
 
-  /** Evaluates the photon self-energy
+  /**
+   * @brief Evaluates the photon self-energy
+   *
+   * @param omega photon frequency
+   * @param qx
+   * @param qy
+   * @param i
+   * @param j
+   * @return double
+   * @seealso photon_se_int(), System::xi_k(), System::n()
    *
    * The self-energy is given by
    * \f[
@@ -332,7 +440,6 @@ public:
    * \int_0^{2\pi}\frac{d\theta}{2\pi} \left[ g(\xi, \theta, \mathbf{q}) +
    * g(-\xi, \theta, \mathbf{q})\right] \f]
    *
-   * \sa photon_se_int(), System::xi_k(), System::n()
    *
    * @{
    */
@@ -397,7 +504,13 @@ public:
       .finished();
   }
 
-  /** The derivative of the photon self energy w.r.t frequency
+  /**
+   * @brief The derivative of the photon self energy w.r.t frequency
+   *
+   * @param omega
+   * @param qx
+   * @param qy
+   * @return Matrix2d
    *
    * \f[\frac{d\Pi(\omega, \mathbf{q})}{d\omega}\f]
    */

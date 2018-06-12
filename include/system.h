@@ -1,3 +1,10 @@
+/**
+ * @brief The electronic system
+ *
+ * @file system.h
+ * @author Zach Raines
+ * @date 2018-06-12
+ */
 #pragma once
 
 #include "integrate.h"
@@ -5,9 +12,11 @@
 #include <cmath>
 #include <functional>
 
-//! The material properties of the system
-
-//! This class is the first instantiated in any code.
+/**
+ * @brief The material properties of the system
+ *
+ * This class is the first instantiated in any code.
+ */
 class System
 {
 public:
@@ -22,6 +31,15 @@ public:
   //! The angle that the superfluid velocity makes with the x axis
   double theta_v;
 
+  /**
+   * @brief Construct a new System object
+   *
+   * @param m_
+   * @param mu_
+   * @param Tc_
+   * @param vs_
+   * @param theta_v_
+   */
   System(double m_, double mu_, double Tc_, double vs_, double theta_v_)
     : m(m_)
     , mu(mu_)
@@ -41,8 +59,14 @@ public:
     return (kx * kx + ky * ky) / (2 * m) - mu + 0.5 * m * vs * vs;
   }
 
-  //! The "bare" energy plus the superfluid term
-  //! \f[\xi_{\mathbf k} = \frac{k^2}{2m} - \mu + \frac{1}{2} m v_s^2\f]
+  /**
+   * @brief The "bare" energy plus the superfluid term
+   *
+   * @param k the magnitude of the electronic momentum
+   * @return double
+   *
+   * \f[\xi_{\mathbf k} = \frac{k^2}{2m} - \mu + \frac{1}{2} m v_s^2\f]
+   */
   double xi_k(double k) const
   {
     return k * k / (2 * m) - mu + 0.5 * m * vs * vs;
@@ -68,18 +92,30 @@ public:
     return drift_theta(std::hypot(kx, ky), std::atan2(ky, kx));
   }
 
-  //! The Doppler shift term \f$\mathbf{v}_s \cdot \mathbf{k}\f$
+  /**
+   * @brief The Doppler shift term \f$\mathbf{v}_s \cdot \mathbf{k}\f$
+   *
+   * @param k the magnitude of the electron momentum
+   * @param theta the angle the momentum makes with the x axis
+   * @return double
+   */
   double drift_theta(double k, double theta) const
   {
     return vs * k * std::cos(theta - theta_v);
   }
 
-  /** The gap equation for the s-wave state written in the form
-  \f[2\nu \int_0^\infty d\xi \left(\left[
-  \int \frac{d\theta}{2\pi} \frac{\tanh\frac{v_s \cdot k + E}{2T} -
-  \tanh\frac{v_s \cdot k - E}{2T}}{4E} \right] -
-  \frac{\tanh\frac{\xi}{2T_c}}{2\xi}\right)\f]
-  */
+  /**
+   * @brief The gap equation for the s-wave state written in the form
+   *
+   * @param T temperature
+   * @param delta the gap
+   * @return double
+   *
+   * \f[2\nu \int_0^\infty d\xi \left(\left[
+   * \int \frac{d\theta}{2\pi} \frac{\tanh\frac{v_s \cdot k + E}{2T} -
+   * \tanh\frac{v_s \cdot k - E}{2T}}{4E} \right] -
+   * \frac{\tanh\frac{\xi}{2T_c}}{2\xi}\right)\f]
+   */
   double gap_eq(double T, double delta) const
   {
     return 2 * dos() *
@@ -90,7 +126,15 @@ public:
              0.);
   }
 
-  //! The integrand of the gap equation
+  /**
+   * @brief The integrand appearing in the gap equation
+   *
+   * @param x the quasiparticle energy
+   * @param theta angle on the Fermi surface
+   * @param T temperature
+   * @param delta gap size
+   * @return double
+   */
   double gap_eq_int(double x, double theta, double T, double delta) const
   {
 

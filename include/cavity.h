@@ -97,7 +97,10 @@ public:
 
   /**
    * @brief The inverse Green's function of the photon fields in the
-   * \f$\parallel-\perp\f$ basis as derived above.
+   * \f$\parallel-\perp\f$ basis
+   * @verbatim embed:rst:leading-asterisk
+   * As derived in :ref:`photon-action`
+   * @endverbatim
    *
    * @param omega the frequency
    * @param qx momentum along \f$v_s\f$

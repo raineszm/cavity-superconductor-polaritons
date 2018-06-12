@@ -11,7 +11,7 @@ The BS Matsubara action can be written
     S = \frac{1}{\beta}\sum_q \left[
         \underbrace{\frac{1}{g_d} - \frac{1}{g_s}}_{m_0} - (i\Omega)^2_\text{BS}I_0((i\Omega_\text{BS})^2) \right]
 
-where (c.f. :cpp:func:`action_int()`) the integral :math:`I(\Omega^2)|_{v_s=0} = -\Omega^2
+where (c.f. :cpp:func:`BS::gf_int()`) defines the integral :math:`I(\Omega^2)|_{v_s=0} = -\Omega^2
 I_0(\Omega^2)`.
 
 Here we have already assumed that the BS mode dispersion is irrelevant for

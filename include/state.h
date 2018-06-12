@@ -1,10 +1,20 @@
+/**
+ * @brief Properties of the superconducting state
+ *
+ * @file state.h
+ * @author Zach Raines
+ * @date 2018-06-12
+ */
 #pragma once
 
 #include "roots.h"
 #include "system.h"
 #include <cmath>
 
-//! Mean Field solution
+/**
+ * @brief Mean field solution
+ *
+ */
 class State
 {
 public:
@@ -15,6 +25,13 @@ public:
   //! Order parameter
   double delta;
 
+  /**
+   * @brief Construct a new State object
+   *
+   * @param sys_
+   * @param T_
+   * @param D
+   */
   State(const System& sys_, double T_, double D)
     : T(T_)
     , sys(sys_)
@@ -31,6 +48,13 @@ public:
   //! Solve the mean field problem for System sys at temperature \f$T\f$
 
   //! This includes the effects of the superfluid velocity \f$v_s\f$
+  /**
+   * @brief Solve for the gap given a system and a temperature
+   *
+   * @param sys the system being studied
+   * @param T temperature
+   * @return State
+   */
   inline static State solve(const System& sys, double T)
   {
     if (T >= sys.Tc) {

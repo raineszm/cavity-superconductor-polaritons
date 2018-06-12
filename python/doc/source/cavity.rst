@@ -290,7 +290,11 @@ and the photon action
 
 or using :math:`\alpha=\frac{e^2}{c}`
 
-.. _photon_action:
+.. _photon-action:
+
+Photon Action in Supercurrent Basis
+""""""""""""""""""""""""""""""""""""
+
 .. math::
 
     S_A = -\frac{\alpha^2 L}{32\pi (\alpha c)^3}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
