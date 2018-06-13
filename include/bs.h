@@ -221,5 +221,5 @@ public:
 
   /** The kinetic mass of the BS mode
    */
-  double M() const { return 2 * d_gf(bs.root()); }
+  double M() const { return 2 * d_gf(root()); }
 };
