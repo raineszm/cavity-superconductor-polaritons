@@ -6,6 +6,10 @@
 Welcome to Bardasis Schrieffer Polaritons's documentation!
 ==========================================================
 
+.. only:: builder_html
+
+    This code is based on :download:`this version of Andrew's notes<ext/Bardasis-Schrieffer Polaritons.pdf>`.
+
 .. _units:
 
 Choice of units
@@ -50,13 +54,9 @@ Code
 ====
 
 
-
-C++
-----
-
 .. toctree::
    :maxdepth: 2
-   :caption: C++ modules:
+   :caption: C++ modules
 
    system
    state
@@ -64,9 +64,6 @@ C++
    cavity
    coupling
    polariton
-
-Python
-------
 
 .. toctree::
     :caption: Python modules
