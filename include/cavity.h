@@ -72,7 +72,7 @@ public:
    * @param theta_s the angle that the supercurrent makes with system \f$x\f$
    * axis
    * @return Matrix2d
-   * @sa gf()
+   * @sa inf_gf()
    *
    * \f[
    * \left(1 +\frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
@@ -123,7 +123,7 @@ public:
    * \right]
    * \f]
    */
-  Matrix2d gf(double omega, double qx, double qy, double theta_s) const
+  Matrix2d inf_gf(double omega, double qx, double qy, double theta_s) const
   {
     auto omega_q = this->omega(qx, qy);
     auto prefactor = L() * std::pow(ALPHA, 2) *
@@ -142,11 +142,11 @@ public:
    * @param qy momentum along \f$\hat z \times v_s\f$
    * @param theta_s the angle that the supercurrent makes with system \f$x\f$
    * @return Matrix2d
-   * @see gf()
+   * @see inf_gf()
    *
    * \f[ \frac{\partial D^{-1}(\omega, \mathbf q)}{d\omega}\f]
    */
-  Matrix2d d_gf(double omega, double qx, double qy, double theta_s) const
+  Matrix2d d_inf_gf(double omega, double qx, double qy, double theta_s) const
   {
     auto prefactor =
       L() * std::pow(ALPHA, 2) * omega / (16 * M_PI * std::pow(C * ALPHA, 3));

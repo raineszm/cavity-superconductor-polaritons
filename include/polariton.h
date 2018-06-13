@@ -63,7 +63,7 @@ public:
   {
 
     Matrix2d se = paraX * paraX * coupling.photon_se(omega, qx, qy);
-    Matrix2d cavaction = cav().gf(omega, qx, qy, sys().theta_v);
+    Matrix2d cavaction = cav().inf_gf(omega, qx, qy, sys().theta_v);
     cavaction += se;
     return cavaction;
   }
@@ -72,19 +72,19 @@ public:
   {
 
     Matrix2d d_se = paraX * paraX * coupling.d_photon_se(omega, qx, qy);
-    Matrix2d d_cavaction = cav().d_gf(omega, qx, qy, sys().theta_v);
+    Matrix2d d_cavaction = cav().d_inf_gf(omega, qx, qy, sys().theta_v);
     d_cavaction += d_se;
     return d_cavaction;
   }
 
   /**
-   * @brief The inverse GF of the polariton
+   * @brief The inverse inf_gf of the polariton
    *
-   * @param omega
-   * @param qx
-   * @param qy
+   * @param omega frequency
+   * @param qx component of momentum
+   * @param qy component of momentum
    * @return Matrix3cd
-   * @see Coupling::ImDA(), Coupling::photon_se(), BS::gf(), Cavity::gf()
+   * @see Coupling::ImDA(), Coupling::photon_se(), BS::inf_gf(), Cavity::inf_gf()
    *
    * The action
    * \f[
@@ -99,17 +99,17 @@ public:
    * \Pi^{\perp,\perp}(q) \end{pmatrix} \begin{pmatrix} d_\perp(q)\\
    * A_\parallel(q)\\ A_\perp(q) \end{pmatrix} \f]
    * defines and inverse Greens' function which we analytically continue to real
-   * frequency Here \f$D^{-1}\f$ is the bare cavity inverse GF and \f$G^{-1}\f$
-   * is the BS inverse GF. \f$A_\parallel\f$ and \f$A_\perp\f$ are the
+   * frequency Here \f$D^{-1}\f$ is the bare cavity inverse inf_gf and \f$G^{-1}\f$
+   * is the BS inverse inf_gf. \f$A_\parallel\f$ and \f$A_\perp\f$ are the
    * components of \f$\mathbf{A}\f$ parallel and perpendicular to the
    * supercurrent.
    */
-  Matrix3cd gf(double omega, double qx, double qy) const
+  Matrix3cd inf_gf(double omega, double qx, double qy) const
   {
     std::complex<double> c(0., paraX * dipoleX * coupling.ImDA(omega));
 
     Matrix3cd act = Matrix3cd::Zero();
-    act(0, 0) = bs().gf(omega);
+    act(0, 0) = bs().inf_gf(omega);
     act(0, 1) = c;
     act(1, 0) = -c;
     act.bottomRightCorner<2, 2>() =
@@ -117,19 +117,19 @@ public:
     return act;
   }
 
-  double det_gf(double omega, double qx, double qy) const
+  double det_inf_gf(double omega, double qx, double qy) const
   {
-    return std::real(gf(omega, qx, qy).determinant());
+    return std::real(inf_gf(omega, qx, qy).determinant());
   }
 
-  /** The derivative of the inverse GF
+  /** The derivative of the inverse inf_gf
    */
-  Matrix3cd d_gf(double omega, double qx, double qy) const
+  Matrix3cd d_inf_gf(double omega, double qx, double qy) const
   {
     std::complex<double> c(0., paraX * dipoleX * coupling.d_ImDA(omega));
 
     Matrix3cd act = Matrix3cd::Zero();
-    act(0, 0) = bs().d_gf(omega);
+    act(0, 0) = bs().d_inf_gf(omega);
     act(0, 1) = c;
     act(1, 0) = -c;
     act.bottomRightCorner<2, 2>() =
@@ -140,30 +140,30 @@ public:
   std::tuple<double, double> det_and_d(double omega, double qx, double qy) const
   {
 
-    auto A = gf(omega, qx, qy);
-    double d_det = std::real((adjugate(A) * d_gf(omega, qx, qy)).trace());
+    auto A = inf_gf(omega, qx, qy);
+    double d_det = std::real((adjugate(A) * d_inf_gf(omega, qx, qy)).trace());
     return std::tuple<double, double>(std::real(A.determinant()), d_det);
   }
 
-  double d_det_gf(double omega, double qx, double qy) const
+  double d_det_inf_gf(double omega, double qx, double qy) const
   {
     return std::get<1>(det_and_d(omega, qx, qy));
   }
 
-  /** The eigenvalues of gf()
+  /** The eigenvalues of inf_gf()
    */
   Vector3d eigval(double omega, double qx, double qy) const
   {
-    return gf(omega, qx, qy).eigenvalues().real();
+    return inf_gf(omega, qx, qy).eigenvalues().real();
   }
 
-  /** Find zeroes of gf()
+  /** Find zeroes of inf_gf()
    */
   std::array<double, 3> find_modes(double qx, double qy) const
   {
 
     // Define functions to be used in root finding
-    auto det = [this, qx, qy](double omega) { return det_gf(omega, qx, qy); };
+    auto det = [this, qx, qy](double omega) { return det_inf_gf(omega, qx, qy); };
 
     // Here we use the fact that our functions has two local extrema (since it
     // has 3 roots) We find the two extrem then look for the roots between each
@@ -235,7 +235,7 @@ public:
   {
 
     auto d_det = [this, qx, qy](double omega) {
-      return d_det_gf(omega, qx, qy);
+      return d_det_inf_gf(omega, qx, qy);
     };
 
     auto gsl_d_det = make_gsl_function(d_det);

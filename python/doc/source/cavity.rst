@@ -258,7 +258,7 @@ By inspection the units of this term are
 .. math::
     [g_q] = [e \nu \frac{v_s}{c}/\sqrt{L}]
 
-By inspecting the BS action (c.f. :cpp:func:`BS::action`) one can see that the Bardasis-Schrieffer inverse GF
+By inspecting the BS action (c.f. :cpp:func:`BS::action`) one can see that the Bardasis-Schrieffer inverse inf_gf
 has the same units as :math:`\nu`.
 As such it makes sense to absorb the factor :math:`\sqrt{\tfrac{2}{L}}e` into the photon fields.
 This makes the paramagnetic coupling

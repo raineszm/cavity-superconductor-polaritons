@@ -121,7 +121,7 @@ public:
    *
    * @param omega the frequency
    * @return double
-   * @see ImDA_int(), Polariton::gf()
+   * @see ImDA_int(), Polariton::inf_gf()
    *
    * This enters the action
    *  \f[ -i\sum_q g(i\Omega_m) \left(A^\parallel_q \
@@ -144,7 +144,7 @@ public:
    * @note We take into account the angular factor arising from \f$v_s\cdot A\f$
    * when building the polariton matrix.
    *
-   * @note This term will be analitically continued and appear in the inverse GF
+   * @note This term will be analitically continued and appear in the inverse inf_gf
    * as \f$-g(\omega + i0^+)\f$
    *
    */
@@ -342,7 +342,7 @@ public:
    * @param j right index
    * @param deriv is this the self enregy or its derivative?
    * @return double
-   * @see State::, photon_se(), Polarition::gf()
+   * @see State::, photon_se(), Polarition::inf_gf()
    *
    * This term can be written in the form
    * \f[
@@ -554,7 +554,7 @@ public:
    *  S = \frac{1}{\beta}\sum_q \bar{a}_q \left[-i\omega_m + \omega_q +
    * \tilde{\Pi}(q)\right] a_q \f]
    *
-   * In particular, (c.f. \ref photon_se(), \ref Polariton::gf()), the
+   * In particular, (c.f. \ref photon_se(), \ref Polariton::inf_gf()), the
    * self energy we have previously defined enters as
    *
    * \f[

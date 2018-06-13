@@ -32,13 +32,13 @@ public:
    * \f[
    * \underbrace{\frac{1}{g_d} - \frac{1}{g_s}}_{m_0} + I(\Omega^2)\f]
    * where \f$I(\Omega^2)\f$ is the integrand described by
-   * gf_int()
+   * inf_gf_int()
    *
    * @note That we define this variable such that \f$m_0 = \nu M\f$
    * where \f$M\f$ is the mass defined here and \f$\nu\f$ is the
    * density of states @ref System::dos().
    *
-   * @see gf_int()
+   * @see inf_gf_int()
    */
   double mass;
   //! The associated mean field state
@@ -64,7 +64,7 @@ public:
    * @param theta the angle along the Gap minimum
    * @param omega the frequency
    * @return double
-   * @see gf()
+   * @see inf_gf()
    *
    * This integrand defines the function \f$I((i\Omega_m)^2) = \sum_\mathbf{k}
    * f(i\Omega, \mathbf{k})\f$ appearing in the BS mode action \f[ f((i
@@ -92,7 +92,7 @@ public:
    * function for the BS mode, so we analytically continue \f$i\Omega_m \to
    * \omega + i0^+\f$.
    */
-  double gf_int(double l, double theta, double omega) const
+  double inf_gf_int(double l, double theta, double omega) const
   {
     double drift = state.sys.drift_theta(state.sys.kf(), theta);
 
@@ -115,9 +115,9 @@ public:
    * @param theta the angle along the Gap minimum
    * @param omega the frequency
    * @return double
-   * @see d_gf(), gf_int()
+   * @see d_inf_gf(), inf_gf_int()
    */
-  double d_gf_int(double l, double theta, double omega) const
+  double d_inf_gf_int(double l, double theta, double omega) const
   {
     double drift = state.sys.drift_theta(state.sys.kf(), theta);
 
@@ -162,30 +162,30 @@ public:
    *
    * @note We analytically continue \f$i\Omega_m \to \omega + i0^+\f$
    */
-  double gf(double omega) const
+  double inf_gf(double omega) const
   {
     return -state.sys.dos() *
            (mass + 2 * gsl_xi_integrate(
                          [this, omega](double l, double theta) {
-                           return gf_int(l, theta, omega);
+                           return inf_gf_int(l, theta, omega);
                          },
                          state.delta));
   }
 
-  //! Derivative of the BS mode inverse GF wrt \f$\Omega\f$
-  double d_gf(double omega) const
+  //! Derivative of the BS mode inverse inf_gf wrt \f$\Omega\f$
+  double d_inf_gf(double omega) const
   {
     return -2 * state.sys.dos() *
            gsl_xi_integrate(
              [this, omega](double l, double theta) {
-               return d_gf_int(l, theta, omega);
+               return d_inf_gf_int(l, theta, omega);
              },
              state.delta);
   }
 
-  //! The pole of the Bardasis Schrieffer mode GF
+  //! The pole of the Bardasis Schrieffer mode inf_gf
 
-  //! Obtained by solving for where gf() is zero
+  //! Obtained by solving for where inf_gf() is zero
   double root() const
   {
     // If the cached value is still good return it
@@ -197,7 +197,7 @@ public:
     _mass = mass;
     _state_hash = std::hash<State>{}(state);
 
-    auto f = [this](double x) { return gf(x); };
+    auto f = [this](double x) { return inf_gf(x); };
 
     auto gsl_f = gsl_function_pp<decltype(f)>(f);
     auto solver = FSolver::create<decltype(f)>(
@@ -221,5 +221,5 @@ public:
 
   /** The kinetic mass of the BS mode
    */
-  double M() const { return 2 * d_gf(root()); }
+  double M() const { return 2 * d_inf_gf(root()); }
 };
