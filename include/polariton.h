@@ -44,9 +44,9 @@ public:
   /**
    * @brief Construct a new Polariton object
    *
-   * @param c_
-   * @param paraX_
-   * @param dipoleX_
+   * @param c_ #coupling
+   * @param paraX_ #paraX
+   * @param dipoleX_ #dipoleX
    */
   Polariton(const Coupling& c_, double paraX_ = 1, double dipoleX_ = 1)
     : coupling(c_)
@@ -54,37 +54,58 @@ public:
     , dipoleX(dipoleX_)
   {}
 
+  //! @cond
   const System& sys() const { return coupling.state().sys; }
   const State& state() const { return coupling.state(); }
   const Cavity& cav() const { return coupling.cav; }
   const BS& bs() const { return coupling.bs; }
+  //! @endcond
 
+  /**
+   * @brief The inverse Green's function of the photon sector
+   *
+   * @param omega photon frequency
+   * @param qx component of photon momentum
+   * @param qy component of photon momentum
+   * @return Matrix2d
+   *
+   * This includes the self energy term
+   */
   Matrix2d photon_sector(double omega, double qx, double qy) const
   {
 
     Matrix2d se = paraX * paraX * coupling.photon_se(omega, qx, qy);
-    Matrix2d cavaction = cav().inf_gf(omega, qx, qy, sys().theta_v);
-    cavaction += se;
-    return cavaction;
+    Matrix2d cav_igf = cav().inv_gf(omega, qx, qy, sys().theta_v);
+    cav_igf += se;
+    return cav_igf;
   }
 
+  /**
+   * @brief Derivative of the photon sector w.r.t frequency
+   * @param omega photon frequency
+   * @param qx component of photon momentum
+   * @param qy component of photon momentum
+   * @return Matrix2d
+   * @see photon_sector()
+   */
   Matrix2d d_photon_sector(double omega, double qx, double qy) const
   {
 
     Matrix2d d_se = paraX * paraX * coupling.d_photon_se(omega, qx, qy);
-    Matrix2d d_cavaction = cav().d_inf_gf(omega, qx, qy, sys().theta_v);
+    Matrix2d d_cavaction = cav().d_inv_gf(omega, qx, qy, sys().theta_v);
     d_cavaction += d_se;
     return d_cavaction;
   }
 
   /**
-   * @brief The inverse inf_gf of the polariton
+   * @brief The inverse inv_gf of the polariton
    *
    * @param omega frequency
    * @param qx component of momentum
    * @param qy component of momentum
    * @return Matrix3cd
-   * @see Coupling::ImDA(), Coupling::photon_se(), BS::inf_gf(), Cavity::inf_gf()
+   * @see Coupling::ImDA(), Coupling::photon_se(), BS::inv_gf(),
+   * Cavity::inv_gf()
    *
    * The action
    * \f[
@@ -99,17 +120,17 @@ public:
    * \Pi^{\perp,\perp}(q) \end{pmatrix} \begin{pmatrix} d_\perp(q)\\
    * A_\parallel(q)\\ A_\perp(q) \end{pmatrix} \f]
    * defines and inverse Greens' function which we analytically continue to real
-   * frequency Here \f$D^{-1}\f$ is the bare cavity inverse inf_gf and \f$G^{-1}\f$
-   * is the BS inverse inf_gf. \f$A_\parallel\f$ and \f$A_\perp\f$ are the
-   * components of \f$\mathbf{A}\f$ parallel and perpendicular to the
+   * frequency Here \f$D^{-1}\f$ is the bare cavity inverse inv_gf and
+   * \f$G^{-1}\f$ is the BS inverse inv_gf. \f$A_\parallel\f$ and \f$A_\perp\f$
+   * are the components of \f$\mathbf{A}\f$ parallel and perpendicular to the
    * supercurrent.
    */
-  Matrix3cd inf_gf(double omega, double qx, double qy) const
+  Matrix3cd inv_gf(double omega, double qx, double qy) const
   {
     std::complex<double> c(0., paraX * dipoleX * coupling.ImDA(omega));
 
     Matrix3cd act = Matrix3cd::Zero();
-    act(0, 0) = bs().inf_gf(omega);
+    act(0, 0) = bs().inv_gf(omega);
     act(0, 1) = c;
     act(1, 0) = -c;
     act.bottomRightCorner<2, 2>() =
@@ -117,19 +138,35 @@ public:
     return act;
   }
 
-  double det_inf_gf(double omega, double qx, double qy) const
+  /**
+   * @brief The determinant of the inverse Green's function of the fields
+   *
+   * @param omega frequnecy
+   * @param qx momentum
+   * @param qy momentum
+   * @return double
+   * @see det_and_d()
+   */
+  double det_inv_gf(double omega, double qx, double qy) const
   {
-    return std::real(inf_gf(omega, qx, qy).determinant());
+    return std::real(inv_gf(omega, qx, qy).determinant());
   }
 
-  /** The derivative of the inverse inf_gf
+  /**
+   * @brief The derivative of the inverse GF w.r.t frequency
+   *
+   * @param omega frequnecy
+   * @param qx momentum
+   * @param qy momentum
+   * @return Matrix3cd
+   * @see inv_gf()
    */
-  Matrix3cd d_inf_gf(double omega, double qx, double qy) const
+  Matrix3cd d_inv_gf(double omega, double qx, double qy) const
   {
     std::complex<double> c(0., paraX * dipoleX * coupling.d_ImDA(omega));
 
     Matrix3cd act = Matrix3cd::Zero();
-    act(0, 0) = bs().d_inf_gf(omega);
+    act(0, 0) = bs().d_inv_gf(omega);
     act(0, 1) = c;
     act(1, 0) = -c;
     act.bottomRightCorner<2, 2>() =
@@ -137,33 +174,71 @@ public:
     return act;
   }
 
+  /**
+   * @brief The determinant of the inverse GF and it's derivative
+   *
+   * @param omega frequency
+   * @param qx momentum
+   * @param qy momentum
+   * @return std::tuple<double, double> (det, deriv)
+   * @see det_inv_gf(), d_det_inv_gf()
+   */
   std::tuple<double, double> det_and_d(double omega, double qx, double qy) const
   {
 
-    auto A = inf_gf(omega, qx, qy);
-    double d_det = std::real((adjugate(A) * d_inf_gf(omega, qx, qy)).trace());
+    auto A = inv_gf(omega, qx, qy);
+    double d_det = std::real((adjugate(A) * d_inv_gf(omega, qx, qy)).trace());
     return std::tuple<double, double>(std::real(A.determinant()), d_det);
   }
 
-  double d_det_inf_gf(double omega, double qx, double qy) const
+  /**
+   * @brief The derivative of the determinant of the inverse GF w.r.t frequency
+   *
+   * @param omega frequency
+   * @param qx momentum
+   * @param qy momentum
+   * @return double
+   *
+   * @see inv_gf(), d_inv_gf()
+   */
+  double d_det_inv_gf(double omega, double qx, double qy) const
   {
     return std::get<1>(det_and_d(omega, qx, qy));
   }
 
-  /** The eigenvalues of inf_gf()
+  /**
+   * @brief The eigenvalues of inv_gf()
+   *
+   * @param omega frequency
+   * @param qx momentum
+   * @param qy momentum
+   * @return Vector3d
    */
   Vector3d eigval(double omega, double qx, double qy) const
   {
-    return inf_gf(omega, qx, qy).eigenvalues().real();
+    return inv_gf(omega, qx, qy).eigenvalues().real();
   }
 
-  /** Find zeroes of inf_gf()
+  /**
+   * @brief Find the frequencies at which inv_gf() has a zero eigenvalue
+   *
+   * @param qx momentum
+   * @param qy momentum
+   * @return std::array<double, 3> a sorted list of frequencies
+   *
+   * The frequencies returned correspond to the on-shell energies of the
+   * associated modes.
+   *
+   * @note this returns a NaN if for those modes which are not found within the
+   * chosen interval
    */
   std::array<double, 3> find_modes(double qx, double qy) const
   {
 
     // Define functions to be used in root finding
-    auto det = [this, qx, qy](double omega) { return det_inf_gf(omega, qx, qy); };
+    auto det = [this, qx, qy](double omega) {
+      return det_inv_gf(omega, qx, qy);
+    };
 
     // Here we use the fact that our functions has two local extrema (since it
     // has 3 roots) We find the two extrem then look for the roots between each
@@ -228,6 +303,17 @@ public:
     return roots;
   }
 
+  /**
+   * @brief Find the local extrema of the determinant
+   *
+   * @param qx momentum
+   * @param qy momentum
+   * @param xl lower frequency bound
+   * @param xu upper frequency bound
+   * @return std::array<double, 2> the extrema
+   *
+   * This is used in the rootfinding algorithm
+   */
   std::array<double, 2> _extrema(double qx,
                                  double qy,
                                  double xl,
@@ -235,7 +321,7 @@ public:
   {
 
     auto d_det = [this, qx, qy](double omega) {
-      return d_det_inf_gf(omega, qx, qy);
+      return d_det_inv_gf(omega, qx, qy);
     };
 
     auto gsl_d_det = make_gsl_function(d_det);

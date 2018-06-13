@@ -14,9 +14,9 @@ bind_bs(py::module& m)
     // Attributes
     .def_readonly("state", &BS::state)
     .def_readwrite("mass", &BS::mass)
-    .def("inf_gf_int", &BS::inf_gf_int)
-    .def("d_inf_gf_int", &BS::d_inf_gf_int)
-    .def("inf_gf", &BS::inf_gf)
-    .def("d_inf_gf", &BS::d_inf_gf)
+    .def("inv_gf_int", &BS::inv_gf_int)
+    .def("d_inv_gf_int", &BS::d_inv_gf_int)
+    .def("inv_gf", &BS::inv_gf)
+    .def("d_inv_gf", &BS::d_inv_gf)
     .def_property_readonly("root", &BS::root);
 }
