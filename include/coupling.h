@@ -182,6 +182,16 @@ public:
                       state().delta));
   }
 
+  /**
+   * @brief The coupling between the Bardasis Schrieffer mode operator and
+   * photon mode operator
+   *
+   * @param omega the frequency of the modes
+   * @param qx x component of photon momentum
+   * @param qy y component of photon momentum
+   * @param i which photon polarization
+   * @return double
+   */
   double mode_coupling(double omega, double qx, double qy, int i) const
   {
     assert(i == 0 || i == 1);
@@ -192,7 +202,14 @@ public:
            vsdoteps * ImDA(omega);
   }
 
-  /** The derivative of the mode coupling \f$dg/d\omega\f$
+  /**
+   * @brief The derivative of the mode coupling \f$dg/d\omega\f$
+   *
+   * @param omega the frequency of the modes
+   * @param qx x component of photon momentum
+   * @param qy y component of photon momentum
+   * @param i which photon polarization
+   * @return double
    */
   double d_mode_coupling(double omega, double qx, double qy, int i) const
   {
@@ -203,9 +220,6 @@ public:
     return 2 * std::sqrt(M_PI * C * C / (M * bs.root() * cav.omega(qx, qy))) *
            vsdoteps * d_ImDA(omega);
   }
-
-  /**
-   */
 
   /**
    * @brief The polarization bubble entering into the photon self energy
@@ -247,12 +261,12 @@ public:
   /**
    * @brief The traces of pi0() with the pauli matrices.
    *
-   * @param d1
-   * @param d2
-   * @param l1
-   * @param l2
-   * @param omega
-   * @param deriv
+   * @param d1 doppler shift
+   * @param d2 doppler shift
+   * @param l1 quasiparticle energy
+   * @param l2 quasi particle energy
+   * @param omega photon frequency
+   * @param deriv is this for the self-energy or its derivativer
    * @return std::array<double, 4>
    * @see pi0(), photon_se()
    *
@@ -405,10 +419,10 @@ public:
    * @brief Evaluates the photon self-energy
    *
    * @param omega photon frequency
-   * @param qx
-   * @param qy
-   * @param i
-   * @param j
+   * @param qx component of photon momentum
+   * @param qy component of photon momentum
+   * @param i left index of self-energy
+   * @param j right index of self-energy
    * @return double
    * @see photon_se_int(), System::xi_k(), System::n()
    *
@@ -507,9 +521,9 @@ public:
   /**
    * @brief The derivative of the photon self energy w.r.t frequency
    *
-   * @param omega
-   * @param qx
-   * @param qy
+   * @param omega photon frequency
+   * @param qx coponenet of photon momentum
+   * @param qy coponenet of photon momentum
    * @return Matrix2d
    *
    * \f[\frac{d\Pi(\omega, \mathbf{q})}{d\omega}\f]
@@ -524,8 +538,17 @@ public:
   }
 
   /**
-   * The self-energy as experienced by the photon mode operators i.e. the action
-   * is
+   */
+
+  /**
+   * @brief The self-energy as experienced by the photon mode operators
+   *
+   * @param omega photon frequency
+   * @param qx component of momentum
+   * @param qy component of momentum
+   * @return Matrix2d
+   *
+   * The action is
    *
    * \f[
    *  S = \frac{1}{\beta}\sum_q \bar{a}_q \left[-i\omega_m + \omega_q +
@@ -566,6 +589,14 @@ public:
            V;
   }
 
+  /**
+   * @brief The derivative of the mode self energy w.r.t frequency
+   *
+   * @param omega photon frequency
+   * @param qx component of momentum
+   * @param qy component of momentum
+   * @return Matrix2d
+   */
   Matrix2d d_photon_se_mode(double omega, double qx, double qy) const
   {
     Matrix2d V = cav.polarizations(qx, qy, state().sys.theta_v);

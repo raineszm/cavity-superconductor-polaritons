@@ -2,7 +2,7 @@ Coupling
 =========
 
 Coupling in the Mode Basis
-============================
+--------------------------
 
 As detailed in :doc:`cavity`, in terms of the mode operators
 
@@ -90,7 +90,7 @@ or explicitly
    (2\lambda)^2}f_d(\theta)
 
 Photon Self-Energy
-==================
+------------------
 
 Consider the addition of the photonic self-energy to the photon action (c.f. :cpp:func:`Coupling::photon_se`)
 

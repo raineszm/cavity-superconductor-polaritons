@@ -63,7 +63,7 @@ that for :math:`b` and replace :math:`\phi` everywhere else by
     \phi_q = \frac{b_q + b^\dagger_{-q}}{\sqrt{2m\omega_q}}
 
 In Matsubara Time
-=================
+-----------------
 
 Consider the Euclidean action
 
