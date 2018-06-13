@@ -206,13 +206,16 @@ public:
    * @return double
    * @see State::, photon_se(), Polarition::inv_gf()
    *
+   *
    * This term can be written in the form
    * \f[
-   * -\Pi^{ij}(\mathbf{q}, \Omega) =
+   * \Pi^{ij}(\mathbf{q}, \Omega) =
    * \frac{e^2}{2c^2} \sum_\mathbf{k}
    * \sum_l \operatorname{tr}\left[\hat\pi_0(\mathbf{k} + \mathbf{q}/2,
    * \mathbf{k} - \mathbf{q}/2, \Omega) \hat\tau_l\right]T^{ij}_l(\mathbf{k},
    * \mathbf{q}) \f]
+   *
+   * where \f$\pi_0\f$ is given by @ref pi0().
    *
    * In this notation \f[
    * T^{ij}_0 =\ell_\mathbf{k,q}^2 v^i v^j + n_\mathbf{k,q}^2\, v_s^i v_s^j\\
@@ -222,7 +225,7 @@ public:
    * T^{ij}_3 = \ell_\mathbf{k,q}n_\mathbf{k,q}\left(v_s^i v^j +
    * v^i v_s^j\right) \f]
    *
-   * For covenience we take the the components \f$i=\{0,1\}\f$ and be along and
+   * For covenience we take the the components \f$i=\{0,1\}\f$ to be along and
    * perpendicular to \f$\mathbf{v}_s\f$ respectively. Specifically, if
    * \f$\theta_s\f$ is the angle that \f$\mathbf{v}_s\f$ makes with the
    * \f$x\f$-axis, we define the new photon operators \f[ \begin{pmatrix}
@@ -409,7 +412,7 @@ public:
    *
    * The self-energy is given by
    * \f[
-   * -\Pi^{ij}(\mathbf{q}, \Omega) =
+   * \Pi^{ij}(\mathbf{q}, \Omega) =
    * \frac{e^2}{2c^2} \sum_\mathbf{k}
    * \sum_l \operatorname{tr}\left[\hat\pi_0(\mathbf{k} + \mathbf{q}/2,
    * \mathbf{k} - \mathbf{q}/2, \Omega) \hat\tau_l\right]T^{ij}_l(\mathbf{k},
@@ -418,7 +421,9 @@ public:
    *
    * Numerically it is convenient to evaluate this integral in polar coordinates
    * via the change of variables \f$k=\sqrt{2m(\xi + \mu - \frac{1}{2}m
-   * v_s^2)}\f$ \f[ -\Pi^{ij}(\mathbf{q}, \Omega) =
+   * v_s^2)}\f$
+   *
+   * \f[ \Pi^{ij}(\mathbf{q}, \Omega) =
    *  \frac{e^2}{2c^2} \nu \int_{-\mu + \frac{1}{2}m
    * v_s^2}^\infty d\xi \int_0^{2\pi}\frac{d\theta}{2\pi} \sum_l
    * \operatorname{tr}\left[\hat\pi_0(\mathbf{k} + \mathbf{q}/2, \mathbf{k} -
@@ -430,12 +435,12 @@ public:
    * \mathbf{q}) = \sum_l \operatorname{tr}\left[\hat\pi_0(\mathbf{k} +
    * \mathbf{q}/2, \mathbf{k} - \mathbf{q}/2, \Omega)
    * \hat\tau_l\right]T^{ij}_l(\mathbf{k}, \mathbf{q}) \f] i.e. photon_se_int(),
-   * we can express the integral as \f[ -\Pi^{ij}(\mathbf{q}, \Omega)\approx
+   * we can express the integral as
+   *
+   * \f[ \Pi^{ij}(\mathbf{q}, \Omega)\approx
    * \frac{e^2}{2c^2} \nu \int_0^\infty d\xi
    * \int_0^{2\pi}\frac{d\theta}{2\pi} \left[ g(\xi, \theta, \mathbf{q}) +
    * g(-\xi, \theta, \mathbf{q})\right] \f]
-   *
-   *
    */
   double photon_se(double omega, double qx, double qy, int i, int j) const
   {

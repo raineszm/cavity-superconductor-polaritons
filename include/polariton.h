@@ -68,15 +68,21 @@ public:
    * @param qx component of photon momentum
    * @param qy component of photon momentum
    * @return Matrix2d
+   * @see Cavity::inv_gf(), Coupling::photon_se()
+   *
    *
    * This includes the self energy term
+   *
+   * \f[
+   * D^{-1}(i\Omega_m, \mathbf{q}) = D_0^{-1}((i\Omega_m)^2, \mathbf q) -
+   * \Pi(i\Omega_m, \mathbf{q})\f]
    */
   Matrix2d photon_sector(double omega, double qx, double qy) const
   {
 
     Matrix2d se = paraX * paraX * coupling.photon_se(omega, qx, qy);
     Matrix2d cav_igf = cav().inv_gf(omega, qx, qy, sys().theta_s);
-    cav_igf += se;
+    cav_igf -= se;
     return cav_igf;
   }
 
@@ -93,7 +99,7 @@ public:
 
     Matrix2d d_se = paraX * paraX * coupling.d_photon_se(omega, qx, qy);
     Matrix2d d_cavaction = cav().d_inv_gf(omega, qx, qy, sys().theta_s);
-    d_cavaction += d_se;
+    d_cavaction -= d_se;
     return d_cavaction;
   }
 
@@ -105,7 +111,7 @@ public:
    * @param qy component of momentum
    * @return Matrix3cd
    * @see Coupling::ImDA(), Coupling::photon_se(), BS::inv_gf(),
-   * Cavity::inv_gf()
+   * Cavity::inv_gf(), photon_sector()
    *
    * The action
    * \f[
@@ -119,7 +125,7 @@ public:
    * -\Pi^{\parallel,\perp}(q)\\ 0 & -\Pi^{\perp,\parallel}(q)& D_0^{-1}(q) -
    * \Pi^{\perp,\perp}(q) \end{pmatrix} \begin{pmatrix} d_\perp(q)\\
    * A_\parallel(q)\\ A_\perp(q) \end{pmatrix} \f]
-   * defines and inverse Greens' function which we analytically continue to real
+   * defines an inverse Greens' function which we analytically continue to real
    * frequency Here \f$D^{-1}\f$ is the bare cavity inverse inv_gf and
    * \f$G^{-1}\f$ is the BS inverse inv_gf. \f$A_\parallel\f$ and \f$A_\perp\f$
    * are the components of \f$\mathbf{A}\f$ parallel and perpendicular to the
