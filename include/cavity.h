@@ -155,7 +155,7 @@ public:
   }
 
   /** The polarization vectors of the problem at \f$z=L/2\f$ in the basis where
-   * \f$\theta_v\f$ defines the \f$x\f$-axis.
+   * \f$\theta_s\f$ defines the \f$x\f$-axis.
    *
    * The vectors are along the columns
    * The factor \f$i\sqrt{\tfrac{2}{L}}\f$ is not includes.

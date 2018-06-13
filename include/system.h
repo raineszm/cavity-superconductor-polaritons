@@ -29,7 +29,7 @@ public:
   //! The superfluid velocity
   double vs;
   //! The angle that the superfluid velocity makes with the x axis
-  double theta_v;
+  double theta_s;
 
   /**
    * @brief Construct a new System object
@@ -38,20 +38,20 @@ public:
    * @param mu_
    * @param Tc_
    * @param vs_
-   * @param theta_v_
+   * @param theta_s_
    */
-  System(double m_, double mu_, double Tc_, double vs_, double theta_v_)
+  System(double m_, double mu_, double Tc_, double vs_, double theta_s_)
     : m(m_)
     , mu(mu_)
     , Tc(Tc_)
     , vs(vs_)
-    , theta_v(theta_v_)
+    , theta_s(theta_s_)
   {}
 
   bool operator==(const System& rhs) const
   {
     return m == rhs.m && mu == rhs.mu && Tc == rhs.Tc && vs == rhs.vs &&
-           theta_v == rhs.theta_v;
+           theta_s == rhs.theta_s;
   }
 
   double xi(double kx, double ky) const
@@ -101,7 +101,7 @@ public:
    */
   double drift_theta(double k, double theta) const
   {
-    return vs * k * std::cos(theta - theta_v);
+    return vs * k * std::cos(theta - theta_s);
   }
 
   /**
@@ -142,6 +142,46 @@ public:
     double d = drift_theta(kf(), theta);
     return c(l, d, T) - tanh_over(x, Tc) / 2;
   }
+
+  /**
+   * @brief Select the \f$i\f$ components of \f$\mathbf{v}_s\f$
+   *
+   * @param i component of vector
+   * @return double
+   * @see v_comp()
+   *
+   * Here we operate in the basis where the \f$x\f$ axis is along
+   * \f$\mathbf{v}_s\f$.
+   */
+  double vs_comp(int i) const
+  {
+    assert(i < 2 and i >= 0);
+    if (i == 0) {
+      return vs;
+    } else {
+      return 0.;
+    }
+  }
+
+  /**
+   * @brief Select the \f$i\f$ components of \f$\mathbf{v}\f$
+   *
+   * @param kx x component of momentum
+   * @param ky y component of momentum
+   * @param i component of vector
+   * @return double
+   * @see vs_comp()
+   */
+  double v_comp(double kx, double ky, int i) const
+  {
+    assert(i < 2 and i >= 0);
+    auto v = std::hypot(kx, ky) / m;
+    auto theta = std::atan2(ky, kx);
+    if (i == 0) {
+      return v * std::cos(theta - theta_s);
+    } else
+      return v * std::sin(theta - theta_s);
+  }
 };
 
 //! \cond
@@ -157,8 +197,8 @@ struct hash<System>
     result_type const hmu = std::hash<double>{}(s.mu);
     result_type const hTc = std::hash<double>{}(s.Tc);
     result_type const hvs = std::hash<double>{}(s.vs);
-    result_type const htheta_v = std::hash<double>{}(s.theta_v);
-    return hm ^ (hmu << 1) ^ (hTc << 2) ^ (hvs << 3) ^ (htheta_v << 4);
+    result_type const htheta_s = std::hash<double>{}(s.theta_s);
+    return hm ^ (hmu << 1) ^ (hTc << 2) ^ (hvs << 3) ^ (htheta_s << 4);
   }
 };
 }

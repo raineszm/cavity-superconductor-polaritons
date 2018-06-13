@@ -14,13 +14,13 @@ bind_system(py::module& m)
          "mu"_a,
          "Tc"_a,
          "vs"_a,
-         "theta_v"_a = 0.)
+         "theta_s"_a = 0.)
     // Attributes
     .def_readonly("m", &System::m)
     .def_readonly("mu", &System::mu)
     .def_readonly("Tc", &System::Tc)
     .def_readonly("vs", &System::vs)
-    .def_readonly("theta_v", &System::theta_v)
+    .def_readonly("theta_s", &System::theta_s)
     .def("gap_eq", &System::gap_eq, "the gap equation")
     .def("gap_eq_int",
          &System::gap_eq_int,
@@ -36,7 +36,7 @@ bind_system(py::module& m)
     // Pickle
     .def(py::pickle(
       [](const System& sys) {
-        return py::make_tuple(sys.m, sys.mu, sys.Tc, sys.vs, sys.theta_v);
+        return py::make_tuple(sys.m, sys.mu, sys.Tc, sys.vs, sys.theta_s);
       },
       [](py::tuple t) {
         return new System(t[0].cast<double>(),

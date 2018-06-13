@@ -36,8 +36,8 @@ public:
   /**
    * @brief Construct a new Coupling object
    *
-   * @param bs_
-   * @param cav_
+   * @param bs_ #bs
+   * @param cav_ #cav
    */
   explicit Coupling(const BS& bs_, const Cavity& cav_)
     : bs(bs_)
@@ -45,14 +45,19 @@ public:
   {}
 
   /**
-   * @brief The Meanfield state of the electrons
-   *
-   * @return const State&
+   * @cond
    */
   const State& state() const { return bs.state; }
+  /**
+   * @endcond
+   */
 
   /**
+   * @name Field Coupling
    *
+   * Coupling between the field amplitudes \f$A,d\f$
+   *
+   * @{
    */
 
   /**
@@ -110,10 +115,6 @@ public:
            (std::pow(omega * omega - 4 * l * l, 2) *
             std::sqrt(l * l - state().delta * state().delta));
   }
-
-  /**
-   *
-   */
 
   /**
    * @brief The coupling between the Bardasis Schrieffer mode and photons
@@ -182,43 +183,99 @@ public:
                       state().delta));
   }
 
-  /**
-   * @brief The coupling between the Bardasis Schrieffer mode operator and
-   * photon mode operator
-   *
-   * @param omega the frequency of the modes
-   * @param qx x component of photon momentum
-   * @param qy y component of photon momentum
-   * @param i which photon polarization
-   * @return double
+  /** @}
    */
-  double mode_coupling(double omega, double qx, double qy, int i) const
-  {
-    assert(i == 0 || i == 1);
-    auto M = bs.M();
-    auto V = cav.polarizations(qx, qy, state().sys.theta_v);
-    auto vsdoteps = V(0, i);
-    return 2 * std::sqrt(M_PI * C * C / (M * bs.root() * cav.omega(qx, qy))) *
-           vsdoteps * ImDA(omega);
-  }
 
   /**
-   * @brief The derivative of the mode coupling \f$dg/d\omega\f$
+   * @name Photon Self-Energy
    *
-   * @param omega the frequency of the modes
+   * @{
+   */
+
+  /**
+   * @brief The photon self-energy due to renormalization by the s-wave state
+   *
+   * @param kx x component of electron momentum
+   * @param ky y component of electron momentum
+   * @param omega photon frequency
    * @param qx x component of photon momentum
    * @param qy y component of photon momentum
-   * @param i which photon polarization
+   * @param i left index
+   * @param j right index
+   * @param deriv is this the self enregy or its derivative?
    * @return double
+   * @see State::, photon_se(), Polarition::inv_gf()
+   *
+   * This term can be written in the form
+   * \f[
+   * -\Pi^{ij}(\mathbf{q}, \Omega) =
+   * \frac{e^2}{2c^2} \sum_\mathbf{k}
+   * \sum_l \operatorname{tr}\left[\hat\pi_0(\mathbf{k} + \mathbf{q}/2,
+   * \mathbf{k} - \mathbf{q}/2, \Omega) \hat\tau_l\right]T^{ij}_l(\mathbf{k},
+   * \mathbf{q}) \f]
+   *
+   * In this notation \f[
+   * T^{ij}_0 =\ell_\mathbf{k,q}^2 v^i v^j + n_\mathbf{k,q}^2\, v_s^i v_s^j\\
+   * T^{ij}_1 = p_\mathbf{k,q}^2 v^i v^j + m_\mathbf{k,q}^2\, v_s^i v_s^j\\
+   * T^{ij}_2 = -i p_\mathbf{k,q}m_\mathbf{k,q}\left(v_s^i v^j + v^i
+   * v_s^j\right)\\
+   * T^{ij}_3 = \ell_\mathbf{k,q}n_\mathbf{k,q}\left(v_s^i v^j +
+   * v^i v_s^j\right) \f]
+   *
+   * For covenience we take the the components \f$i=\{0,1\}\f$ and be along and
+   * perpendicular to \f$\mathbf{v}_s\f$ respectively. Specifically, if
+   * \f$\theta_s\f$ is the angle that \f$\mathbf{v}_s\f$ makes with the
+   * \f$x\f$-axis, we define the new photon operators \f[ \begin{pmatrix}
+   * A_\parallel\\
+   * A_\perp
+   * \end{pmatrix}
+   * = \hat{R}(\theta_s)
+   * \begin{pmatrix}
+   * A_x\\
+   * A_y
+   * \end{pmatrix}
+   * \f]
+   * where \f$\hat{R}\f$ is a rotation matrix.
+   * This induces the transformation \f$\mathbf{v} \to
+   * R^{-1}(\theta_s)\mathbf{v}\f$ on the velocities. Concretely then \f[
+   * \mathbf{v}_s &\to (v_s, 0)^T\\
+   * \mathbf{v} &\to \frac{k}{m} (\cos(\theta - \theta_s),
+   * \sin(\theta-\theta_s))^T \f]
+   *
    */
-  double d_mode_coupling(double omega, double qx, double qy, int i) const
+  double photon_se_int(double kx,
+                       double ky,
+                       double omega,
+                       double qx,
+                       double qy,
+                       int i,
+                       int j,
+                       bool deriv) const
   {
-    assert(i == 0 || i == 1);
-    auto M = bs.M();
-    auto V = cav.polarizations(qx, qy, state().sys.theta_v);
-    auto vsdoteps = V(0, i);
-    return 2 * std::sqrt(M_PI * C * C / (M * bs.root() * cav.omega(qx, qy))) *
-           vsdoteps * d_ImDA(omega);
+    auto xp = state().sys.xi(kx + qx / 2, ky + qy / 2);
+    auto xm = state().sys.xi(kx - qx / 2, ky - qy / 2);
+
+    // We've rotated our axes so the 'x'-axis is along vs
+    const System& sys = state().sys;
+    auto vi = sys.v_comp(kx, ky, i);
+    auto vj = sys.v_comp(kx, ky, j);
+    auto vsi = sys.vs_comp(i);
+    auto vsj = sys.vs_comp(j);
+
+    auto T0 = state().l2(xp, xm) * vi * vj + state().n2(xp, xm) * vsi * vsj;
+    auto T1 = state().p2(xp, xm) * vi * vj + state().m2(xp, xm) * vsi * vsj;
+    auto iT2 = state().mp(xp, xm) * (vsi * vj + vi * vsj);
+    auto T3 = state().ln(xp, xm) * (vsi * vj + vi * vsj);
+
+    auto lp = std::hypot(xp, state().delta);
+    auto lm = std::hypot(xm, state().delta);
+
+    auto dp = state().sys.drift(kx + qx / 2, ky + qy / 2);
+    auto dm = state().sys.drift(kx - qx / 2, ky - qy / 2);
+
+    auto pl = pi0_elems(dp, dm, lp, lm, omega, deriv);
+
+    return T0 * pl[0] + T1 * pl[1] + iT2 * pl[2] + T3 * pl[3];
   }
 
   /**
@@ -289,179 +346,7 @@ public:
     return { { p00 + p11, p01 + p10, p01 - p10, p00 - p11 } };
   }
 
-  /**
-   * @brief Select the \f$i\f$ components of \f$\mathbf{v}_s\f$
-   *
-   * @param i component of vector
-   * @return double
-   * @see v_comp()
-   *
-   * Here we operate in the basis where the \f$x\f$ axis is along
-   * \f$\mathbf{v}_s\f$.
-   */
-  double vs_comp(int i) const
-  {
-    assert(i < 2 and i >= 0);
-    if (i == 0) {
-      return state().sys.vs;
-    } else {
-      return 0.;
-    }
-  }
-
-  /**
-   * @brief Select the \f$i\f$ components of \f$\mathbf{v}\f$
-   *
-   * @param kx x component of momentum
-   * @param ky y component of momentum
-   * @param i component of vector
-   * @return double
-   * @see vs_comp()
-   */
-  double v_comp(double kx, double ky, int i) const
-  {
-    assert(i < 2 and i >= 0);
-    auto v = std::hypot(kx, ky) / state().sys.m;
-    auto theta = std::atan2(ky, kx);
-    if (i == 0) {
-      return v * std::cos(theta - state().sys.theta_v);
-    } else {
-      return v * std::sin(theta - state().sys.theta_v);
-    }
-  }
-
-  /**
-   * @brief The photon self-energy due to renormalization by the s-wave state
-   *
-   * @param kx x component of electron momentum
-   * @param ky y component of electron momentum
-   * @param omega photon frequency
-   * @param qx x component of photon momentum
-   * @param qy y component of photon momentum
-   * @param i left index
-   * @param j right index
-   * @param deriv is this the self enregy or its derivative?
-   * @return double
-   * @see State::, photon_se(), Polarition::inv_gf()
-   *
-   * This term can be written in the form
-   * \f[
-   * -\Pi^{ij}(\mathbf{q}, \Omega) =
-   * \frac{e^2}{2c^2} \sum_\mathbf{k}
-   * \sum_l \operatorname{tr}\left[\hat\pi_0(\mathbf{k} + \mathbf{q}/2,
-   * \mathbf{k} - \mathbf{q}/2, \Omega) \hat\tau_l\right]T^{ij}_l(\mathbf{k},
-   * \mathbf{q}) \f]
-   *
-   * In this notation \f[
-   * T^{ij}_0 =\ell_\mathbf{k,q}^2 v^i v^j + n_\mathbf{k,q}^2\, v_s^i v_s^j\\
-   * T^{ij}_1 = p_\mathbf{k,q}^2 v^i v^j + m_\mathbf{k,q}^2\, v_s^i v_s^j\\
-   * T^{ij}_2 = -i p_\mathbf{k,q}m_\mathbf{k,q}\left(v_s^i v^j + v^i
-   * v_s^j\right)\\
-   * T^{ij}_3 = \ell_\mathbf{k,q}n_\mathbf{k,q}\left(v_s^i v^j +
-   * v^i v_s^j\right) \f]
-   *
-   * For covenience we take the the components \f$i=\{0,1\}\f$ and be along and
-   * perpendicular to \f$\mathbf{v}_s\f$ respectively. Specifically, if
-   * \f$\theta_s\f$ is the angle that \f$\mathbf{v}_s\f$ makes with the
-   * \f$x\f$-axis, we define the new photon operators \f[ \begin{pmatrix}
-   * A_\parallel\\
-   * A_\perp
-   * \end{pmatrix}
-   * = \hat{R}(\theta_s)
-   * \begin{pmatrix}
-   * A_x\\
-   * A_y
-   * \end{pmatrix}
-   * \f]
-   * where \f$\hat{R}\f$ is a rotation matrix.
-   * This induces the transformation \f$\mathbf{v} \to
-   * R^{-1}(\theta_s)\mathbf{v}\f$ on the velocities. Concretely then \f[
-   * \mathbf{v}_s &\to (v_s, 0)^T\\
-   * \mathbf{v} &\to \frac{k}{m} (\cos(\theta - \theta_s),
-   * \sin(\theta-\theta_s))^T \f]
-   *
-   */
-  double photon_se_int(double kx,
-                       double ky,
-                       double omega,
-                       double qx,
-                       double qy,
-                       int i,
-                       int j,
-                       bool deriv) const
-  {
-    auto xp = state().sys.xi(kx + qx / 2, ky + qy / 2);
-    auto xm = state().sys.xi(kx - qx / 2, ky - qy / 2);
-
-    // We've rotated our axes so the 'x'-axis is along vs
-    auto vi = v_comp(kx, ky, i);
-    auto vj = v_comp(kx, ky, j);
-    auto vsi = vs_comp(i);
-    auto vsj = vs_comp(j);
-
-    auto T0 = state().l2(xp, xm) * vi * vj + state().n2(xp, xm) * vsi * vsj;
-    auto T1 = state().p2(xp, xm) * vi * vj + state().m2(xp, xm) * vsi * vsj;
-    auto iT2 = state().mp(xp, xm) * (vsi * vj + vi * vsj);
-    auto T3 = state().ln(xp, xm) * (vsi * vj + vi * vsj);
-
-    auto lp = std::hypot(xp, state().delta);
-    auto lm = std::hypot(xm, state().delta);
-
-    auto dp = state().sys.drift(kx + qx / 2, ky + qy / 2);
-    auto dm = state().sys.drift(kx - qx / 2, ky - qy / 2);
-
-    auto pl = pi0_elems(dp, dm, lp, lm, omega, deriv);
-
-    return T0 * pl[0] + T1 * pl[1] + iT2 * pl[2] + T3 * pl[3];
-  }
-
-  /**
-   * @brief Evaluates the photon self-energy
-   *
-   * @param omega photon frequency
-   * @param qx component of photon momentum
-   * @param qy component of photon momentum
-   * @param i left index of self-energy
-   * @param j right index of self-energy
-   * @return double
-   * @see photon_se_int(), System::xi_k(), System::n()
-   *
-   * The self-energy is given by
-   * \f[
-   * -\Pi^{ij}(\mathbf{q}, \Omega) =
-   * \frac{e^2}{2c^2} \sum_\mathbf{k}
-   * \sum_l \operatorname{tr}\left[\hat\pi_0(\mathbf{k} + \mathbf{q}/2,
-   * \mathbf{k} - \mathbf{q}/2, \Omega) \hat\tau_l\right]T^{ij}_l(\mathbf{k},
-   * \mathbf{q}) \f]
-   * as described in photon_se_int().
-   *
-   * Numerically it is convenient to evaluate this integral in polar coordinates
-   * via the change of variables \f$k=\sqrt{2m(\xi + \mu - \frac{1}{2}m
-   * v_s^2)}\f$ \f[ -\Pi^{ij}(\mathbf{q}, \Omega) =
-   *  \frac{e^2}{2c^2} \nu \int_{-\mu + \frac{1}{2}m
-   * v_s^2}^\infty d\xi \int_0^{2\pi}\frac{d\theta}{2\pi} \sum_l
-   * \operatorname{tr}\left[\hat\pi_0(\mathbf{k} + \mathbf{q}/2, \mathbf{k} -
-   * \mathbf{q}/2, \Omega) \hat\tau_l\right]T^{ij}_l(\mathbf{k}, \mathbf{q}) \f]
-   *
-   * We then make use of the fact that \f$\mu\f$ is the largest energy scale in
-   * the problem and take the lower limit of the \f$\xi\f$ integral to
-   * \f$-\infty\f$ and symmetrize in \f$\xi\f$. Defining \f[ g(\xi, \theta,
-   * \mathbf{q}) = \sum_l \operatorname{tr}\left[\hat\pi_0(\mathbf{k} +
-   * \mathbf{q}/2, \mathbf{k} - \mathbf{q}/2, \Omega)
-   * \hat\tau_l\right]T^{ij}_l(\mathbf{k}, \mathbf{q}) \f] i.e. photon_se_int(),
-   * we can express the integral as \f[ -\Pi^{ij}(\mathbf{q}, \Omega)\approx
-   * \frac{e^2}{2c^2} \nu \int_0^\infty d\xi
-   * \int_0^{2\pi}\frac{d\theta}{2\pi} \left[ g(\xi, \theta, \mathbf{q}) +
-   * g(-\xi, \theta, \mathbf{q})\right] \f]
-   *
-   *
-   * @{
-   */
-  double photon_se(double omega, double qx, double qy, int i, int j) const
-  {
-    return _photon_se_or_deriv(omega, qx, qy, i, j, false);
-  }
-
+  //! @cond
   double _photon_se_or_deriv(double omega,
                              double qx,
                              double qy,
@@ -509,6 +394,54 @@ public:
     return 0.5 * GPAR * GPAR * ret;
   }
 
+  //!@endcond
+
+  /**
+   * @brief Evaluates the photon self-energy
+   *
+   * @param omega photon frequency
+   * @param qx component of photon momentum
+   * @param qy component of photon momentum
+   * @param i left index of self-energy
+   * @param j right index of self-energy
+   * @return double
+   * @see photon_se_int(), System::xi_k(), System::n()
+   *
+   * The self-energy is given by
+   * \f[
+   * -\Pi^{ij}(\mathbf{q}, \Omega) =
+   * \frac{e^2}{2c^2} \sum_\mathbf{k}
+   * \sum_l \operatorname{tr}\left[\hat\pi_0(\mathbf{k} + \mathbf{q}/2,
+   * \mathbf{k} - \mathbf{q}/2, \Omega) \hat\tau_l\right]T^{ij}_l(\mathbf{k},
+   * \mathbf{q}) \f]
+   * as described in photon_se_int().
+   *
+   * Numerically it is convenient to evaluate this integral in polar coordinates
+   * via the change of variables \f$k=\sqrt{2m(\xi + \mu - \frac{1}{2}m
+   * v_s^2)}\f$ \f[ -\Pi^{ij}(\mathbf{q}, \Omega) =
+   *  \frac{e^2}{2c^2} \nu \int_{-\mu + \frac{1}{2}m
+   * v_s^2}^\infty d\xi \int_0^{2\pi}\frac{d\theta}{2\pi} \sum_l
+   * \operatorname{tr}\left[\hat\pi_0(\mathbf{k} + \mathbf{q}/2, \mathbf{k} -
+   * \mathbf{q}/2, \Omega) \hat\tau_l\right]T^{ij}_l(\mathbf{k}, \mathbf{q}) \f]
+   *
+   * We then make use of the fact that \f$\mu\f$ is the largest energy scale in
+   * the problem and take the lower limit of the \f$\xi\f$ integral to
+   * \f$-\infty\f$ and symmetrize in \f$\xi\f$. Defining \f[ g(\xi, \theta,
+   * \mathbf{q}) = \sum_l \operatorname{tr}\left[\hat\pi_0(\mathbf{k} +
+   * \mathbf{q}/2, \mathbf{k} - \mathbf{q}/2, \Omega)
+   * \hat\tau_l\right]T^{ij}_l(\mathbf{k}, \mathbf{q}) \f] i.e. photon_se_int(),
+   * we can express the integral as \f[ -\Pi^{ij}(\mathbf{q}, \Omega)\approx
+   * \frac{e^2}{2c^2} \nu \int_0^\infty d\xi
+   * \int_0^{2\pi}\frac{d\theta}{2\pi} \left[ g(\xi, \theta, \mathbf{q}) +
+   * g(-\xi, \theta, \mathbf{q})\right] \f]
+   *
+   *
+   */
+  double photon_se(double omega, double qx, double qy, int i, int j) const
+  {
+    return _photon_se_or_deriv(omega, qx, qy, i, j, false);
+  }
+
   Matrix2d photon_se(double omega, double qx, double qy) const
   {
     return (Matrix2d() << photon_se(omega, qx, qy, 0, 0),
@@ -537,7 +470,61 @@ public:
       .finished();
   }
 
+  //! @}
+
   /**
+   * @name Mode Basis Coupling
+   *
+   * Coupling between the mode operators \f$a^\dagger,b^\dagger\f$
+   * @{
+   */
+
+  /**
+   * @brief The coupling between the Bardasis Schrieffer mode operator and
+   * photon mode operator
+   *
+   * @param omega the frequency of the modes
+   * @param qx x component of photon momentum
+   * @param qy y component of photon momentum
+   * @param i which photon polarization
+   * @return double
+   */
+  double mode_coupling(double omega, double qx, double qy, int i) const
+  {
+    assert(i == 0 || i == 1);
+    auto M = bs.M();
+    auto V = cav.polarizations(qx, qy, state().sys.theta_s);
+    auto vsdoteps = V(0, i);
+    return 2 * std::sqrt(M_PI * C * C / (M * bs.root() * cav.omega(qx, qy))) *
+           vsdoteps * ImDA(omega);
+  }
+
+  /**
+   * @brief The derivative of the mode coupling \f$dg/d\omega\f$
+   *
+   * @param omega the frequency of the modes
+   * @param qx x component of photon momentum
+   * @param qy y component of photon momentum
+   * @param i which photon polarization
+   * @return double
+   */
+  double d_mode_coupling(double omega, double qx, double qy, int i) const
+  {
+    assert(i == 0 || i == 1);
+    auto M = bs.M();
+    auto V = cav.polarizations(qx, qy, state().sys.theta_s);
+    auto vsdoteps = V(0, i);
+    return 2 * std::sqrt(M_PI * C * C / (M * bs.root() * cav.omega(qx, qy))) *
+           vsdoteps * d_ImDA(omega);
+  }
+
+  /**
+   * @}
+   */
+
+  /**
+   * @name Photon Mode Self Energy
+   * @{
    */
 
   /**
@@ -577,7 +564,7 @@ public:
    */
   Matrix2d photon_se_mode(double omega, double qx, double qy) const
   {
-    Matrix2d V = cav.polarizations(qx, qy, state().sys.theta_v);
+    Matrix2d V = cav.polarizations(qx, qy, state().sys.theta_s);
 
     return 2 * M_PI * C * C * 2 / (cav.L() * cav.omega(qx, qy)) *
            V.transpose() *
@@ -599,7 +586,7 @@ public:
    */
   Matrix2d d_photon_se_mode(double omega, double qx, double qy) const
   {
-    Matrix2d V = cav.polarizations(qx, qy, state().sys.theta_v);
+    Matrix2d V = cav.polarizations(qx, qy, state().sys.theta_s);
     return 2 * M_PI * C * C * 2 / (cav.L() * cav.omega(qx, qy)) *
            V.transpose() *
            (Matrix2d() << _photon_se_or_deriv(omega, qx, qy, 0, 0, true),
@@ -609,5 +596,8 @@ public:
              .finished() *
            V;
   }
-  //@}
+
+  /**
+   * @}
+   */
 };
