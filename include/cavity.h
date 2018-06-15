@@ -165,11 +165,10 @@ public:
   Matrix2d polarizations(double qx, double qy, double theta_s) const
   {
     double e2_factor = omega0 / omega(qx, qy);
-    double q = std::hypot(qx, qy);
     double theta_q = std::atan2(qy, qx);
 
-    auto q1 = q * std::cos(theta_q - theta_s);
-    auto q2 = q * std::sin(theta_q - theta_s);
+    auto q1 = std::cos(theta_q - theta_s);
+    auto q2 = std::sin(theta_q - theta_s);
 
     return (Matrix2d() << -q2, e2_factor * q1, -q1, -e2_factor * q2).finished();
   }
