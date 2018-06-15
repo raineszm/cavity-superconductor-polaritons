@@ -31,8 +31,21 @@ bind_polariton(py::module& m)
     .def("d_det_inv_gf", &Polariton::d_det_inv_gf)
     .def("det_and_d", &Polariton::det_and_d)
     .def("eigval", &Polariton::eigval)
-    .def("_extrema", &Polariton::_extrema)
-    .def("find_modes", &Polariton::find_modes);
+    .def("_extrema",
+         &Polariton::_extrema,
+         "find extrema",
+         "qx"_a,
+         "qy"_a,
+         "xl"_a,
+         "xu"_a,
+         "ftol"_a = 1e-10)
+    .def("find_modes",
+         &Polariton::find_modes,
+         "find the modes",
+         "qx"_a,
+         "qy"_a,
+         "ftol"_a = 1e-10,
+         "double_root_tol"_a = 1e-17);
 
   py::class_<ModePolariton>(m, "ModePolariton", polariton)
     .def(py::init<const Coupling&, double, double>(),

@@ -263,7 +263,7 @@ public:
     roots.fill(std::numeric_limits<double>::quiet_NaN());
 
     const double xl = 0.6 * bs().root();
-    const double xu = 1.5 * bs().root();
+    const double xu = 1.9 * state().delta;
     // 1.99 * coupling.state.delta;
     auto extrema = _extrema(qx, qy, xl, xu, ftol);
 
