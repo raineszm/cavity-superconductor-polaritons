@@ -297,7 +297,7 @@ public:
    * For numerical convenience we make use of the relation
    * \f$n_f = \tfrac{1 - \tanh}{2}\f$ to rewrite this as
    * \f[\pi_0(E_1, E_2, \omega) =
-   * \frac{1}{2}\frac{\tanh\frac{E_1}{2T}- \tanh\frac{E_2}{2T}}{i\Omega_m+ i0 -
+   * \frac{1}{2}\frac{\tanh\frac{E_1}{2T}- \tanh\frac{E_2}{2T}}{i\Omega_m-
    * E_1 + E_2}\f]
    *
    * @note This is analytically continued to real frequency

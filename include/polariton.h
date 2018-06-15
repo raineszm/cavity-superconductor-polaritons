@@ -98,9 +98,9 @@ public:
   {
 
     Matrix2d d_se = paraX * paraX * coupling.d_photon_se(omega, qx, qy);
-    Matrix2d d_cavaction = cav().d_inv_gf(omega, qx, qy, sys().theta_s);
-    d_cavaction -= d_se;
-    return d_cavaction;
+    Matrix2d d_cav_igf = cav().d_inv_gf(omega, qx, qy, sys().theta_s);
+    d_cav_igf -= d_se;
+    return d_cav_igf;
   }
 
   /**
