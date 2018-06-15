@@ -241,7 +241,10 @@ public:
    * @note this returns a NaN if for those modes which are not found within the
    * chosen interval
    */
-  std::array<double, 3> find_modes(double qx, double qy) const
+  std::array<double, 3> find_modes(double qx,
+                                   double qy,
+                                   double ftol = 1e-10,
+                                   double double_root_tol = 1e-17) const
   {
 
     // Define functions to be used in root finding
@@ -262,7 +265,7 @@ public:
     const double xl = 0.6 * bs().root();
     const double xu = 1.5 * bs().root();
     // 1.99 * coupling.state.delta;
-    auto extrema = _extrema(qx, qy, xl, xu);
+    auto extrema = _extrema(qx, qy, xl, xu, ftol);
 
     FSolver fsolver(gsl_root_fsolver_brent);
     size_t count = 0;
@@ -274,7 +277,7 @@ public:
       }
       // Check for double root
       // We expect only one such double root
-      if (std::fabs(det(ext)) < 1e-17) {
+      if (std::fabs(det(ext)) < double_root_tol) {
         roots[count++] = ext;
         roots[count++] = ext;
       } else {
@@ -326,7 +329,8 @@ public:
   std::array<double, 2> _extrema(double qx,
                                  double qy,
                                  double xl,
-                                 double xu) const
+                                 double xu,
+                                 double ftol = 1e-10) const
   {
 
     auto d_det = [this, qx, qy](double omega) {
@@ -350,7 +354,7 @@ public:
     auto gsl_d_det_fdf = make_gsl_function_fdf(d_det, d_det_fdf);
     fdf_solver.set(gsl_d_det_fdf, bs().root());
 
-    extrema[0] = fdf_solver.solve(1e-10, 100UL, EPS);
+    extrema[0] = fdf_solver.solve(ftol, 100UL, EPS);
 
     FSolver fsolver(gsl_root_fsolver_brent);
 

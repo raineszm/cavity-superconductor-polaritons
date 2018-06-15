@@ -19,6 +19,8 @@ bind_polariton(py::module& m)
          "dipoleX"_a = 1.)
     // Attributes
     .def_readonly("coupling", &Polariton::coupling)
+    .def_readonly("paraX", &Polariton::paraX)
+    .def_readonly("dipoleX", &Polariton::dipoleX)
     .def_property_readonly("sys", &Polariton::sys)
     .def_property_readonly("state", &Polariton::state)
     .def_property_readonly("bs", &Polariton::bs)

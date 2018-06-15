@@ -15,7 +15,8 @@ bind_cavity(py::module& m)
     .def_readwrite("omega0", &Cavity::omega0)
     .def("inv_gf", &Cavity::inv_gf)
     .def("d_inv_gf", &Cavity::d_inv_gf)
-    .def("omega", &Cavity::omega);
+    .def("omega", &Cavity::omega)
+    .def("polarizations", &Cavity::polarizations);
   m.attr("GPAR") = GPAR;
   m.attr("ALPHA") = ALPHA;
   m.attr("C") = C;

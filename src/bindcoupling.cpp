@@ -26,6 +26,8 @@ bind_coupling(py::module& m)
     .def("ImDA", &Coupling::ImDA)
     .def("d_ImDA", &Coupling::d_ImDA)
     .def("ImDA_int", &Coupling::ImDA_int)
+    .def("mode_coupling", &Coupling::mode_coupling)
+    .def("d_mode_coupling", &Coupling::d_mode_coupling)
     .def("pi0_elems", &Coupling::pi0_elems)
     .def("photon_se",
          py::overload_cast<double, double, double>(&Coupling::photon_se,

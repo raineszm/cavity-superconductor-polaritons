@@ -18,5 +18,6 @@ bind_bs(py::module& m)
     .def("d_inv_gf_int", &BS::d_inv_gf_int)
     .def("inv_gf", &BS::inv_gf)
     .def("d_inv_gf", &BS::d_inv_gf)
-    .def_property_readonly("root", &BS::root);
+    .def_property_readonly("root", &BS::root)
+    .def_property_readonly("M", &BS::M);
 }
