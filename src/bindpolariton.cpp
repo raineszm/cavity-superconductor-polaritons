@@ -11,7 +11,8 @@ using namespace py::literals;
 void
 bind_polariton(py::module& m)
 {
-  py::class_<Polariton>(m, "Polariton")
+  py::class_<Polariton> polariton(m, "Polariton");
+  polariton
     .def(py::init<const Coupling&, double, double>(),
          "coupling"_a,
          "paraX"_a = 1.,
@@ -30,4 +31,10 @@ bind_polariton(py::module& m)
     .def("eigval", &Polariton::eigval)
     .def("_extrema", &Polariton::_extrema)
     .def("find_modes", &Polariton::find_modes);
+
+  py::class_<ModePolariton>(m, "ModePolariton", polariton)
+    .def(py::init<const Coupling&, double, double>(),
+         "coupling"_a,
+         "paraX"_a = 1.,
+         "dipoleX"_a = 1.);
 }

@@ -19,6 +19,7 @@
 
 using Eigen::Matrix2d;
 using Eigen::Matrix3cd;
+using Eigen::Matrix3d;
 using Eigen::Vector3d;
 
 #include "bs.h"
@@ -53,6 +54,8 @@ public:
     , paraX(paraX_)
     , dipoleX(dipoleX_)
   {}
+
+  virtual ~Polariton() = default;
 
   //! @cond
   const System& sys() const { return coupling.state().sys; }
@@ -131,7 +134,7 @@ public:
    * are the components of \f$\mathbf{A}\f$ parallel and perpendicular to the
    * supercurrent.
    */
-  Matrix3cd inv_gf(double omega, double qx, double qy) const
+  virtual Matrix3cd inv_gf(double omega, double qx, double qy) const
   {
     std::complex<double> c(0., paraX * dipoleX * coupling.ImDA(omega));
 
@@ -167,7 +170,7 @@ public:
    * @return Matrix3cd
    * @see inv_gf()
    */
-  Matrix3cd d_inv_gf(double omega, double qx, double qy) const
+  virtual Matrix3cd d_inv_gf(double omega, double qx, double qy) const
   {
     std::complex<double> c(0., paraX * dipoleX * coupling.d_ImDA(omega));
 
@@ -366,5 +369,83 @@ public:
 
     std::sort(extrema.begin(), extrema.end());
     return extrema;
+  }
+};
+
+/**
+ * @brief Find polaritons in the mode basis
+ *
+ */
+class ModePolariton : public Polariton
+{
+
+public:
+  using Polariton::Polariton;
+  virtual ~ModePolariton() = default;
+  /**
+   * @brief The inverse inv_gf of the polariton
+   *
+   * @param omega frequency
+   * @param qx component of momentum
+   * @param qy component of momentum
+   * @return Matrix3cd
+   * @see Coupling::mode_coupling(), Coupling::photon_se_mode(),
+   * BS::hamiltonian(), Cavity::omega()
+   *
+   * The action
+   * \f[
+   * S_\text{pol} = -\frac{1}{\beta}\sum_q
+   * \begin{pmatrix}
+   * \bar{b}_q& \bar{a}_1(q)& \bar{a}_2(q)
+   * \end{pmatrix}
+   * \begin{pmatrix}
+   * i\Omega - \Omega_\text{BS}&-g_\text{eff}(i\Omega_m, \mathbf{q})&0\\
+   * -g_\text{eff}(i\Omega_m, \mathbf{q})& i\Omega_m - \omega_\mathbf{q} -
+   * \Pi^{(0, 0)}(q)&
+   * -\Pi^{(0, 1)}(q)\\ 0 & -\Pi^{(1, 0)}(q)& i \Omega_m - \omega_\mathbf{q}
+   * \Pi^{(1,1)}(q) \end{pmatrix} \begin{pmatrix} b_q\\
+   * a_1(q)\\ a_2(q) \end{pmatrix} \f]
+   * defines an inverse Greens' function which we analytically continue to real
+   * frequency
+   */
+  virtual Matrix3cd inv_gf(double omega, double qx, double qy) const override
+  {
+    double c0 = paraX * dipoleX * coupling.mode_coupling(omega, qx, qy, 0);
+    double c1 = paraX * dipoleX * coupling.mode_coupling(omega, qx, qy, 1);
+
+    Matrix3d igf = Matrix3d::Zero();
+    igf(0, 0) = omega - bs().hamiltonian();
+    igf(0, 1) = -c0;
+    igf(1, 0) = -c0;
+    igf(0, 2) = -c1;
+    igf(2, 0) = -c1;
+    igf.bottomRightCorner<2, 2>() =
+      (omega - cav().omega(qx, qy)) * Matrix2d::Identity() -
+      coupling.photon_se_mode(omega, qx, qy);
+    return igf.cast<std::complex<double>>();
+  }
+
+  /**
+   * @brief The derivative of the inverse GF w.r.t frequency
+   *
+   * @param omega frequnecy
+   * @param qx momentum
+   * @param qy momentum
+   * @return Matrix3cd
+   * @see inv_gf()
+   */
+  virtual Matrix3cd d_inv_gf(double omega, double qx, double qy) const override
+  {
+    double c0 = paraX * dipoleX * coupling.d_mode_coupling(omega, qx, qy, 0);
+    double c1 = paraX * dipoleX * coupling.d_mode_coupling(omega, qx, qy, 1);
+    Matrix3d igf = Matrix3d::Zero();
+    igf(0, 0) = 1.;
+    igf(0, 1) = -c0;
+    igf(1, 0) = -c0;
+    igf(0, 2) = -c1;
+    igf(2, 0) = -c1;
+    igf.bottomRightCorner<2, 2>() =
+      Matrix2d::Identity() - coupling.d_photon_se_mode(omega, qx, qy);
+    return igf.cast<std::complex<double>>();
   }
 };
