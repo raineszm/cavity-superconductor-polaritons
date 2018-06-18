@@ -1,12 +1,13 @@
-from . import _bardasis_schrieffer as bsm
 import csv
 import itertools as it
+from pathlib import Path
+
 import numpy as np
 import tqdm
-from pathlib import Path
-from polariton import niobium
-from materials import NIOBIUM
 
+from . import _bardasis_schrieffer as bsm
+from .materials import NIOBIUM
+from .polariton import niobium
 
 TREL = 0.4  # T/T_c
 VREL = 0.6  # vs/v_c
@@ -30,13 +31,17 @@ def data(fname, qs, thetas):
     p = niobium(
         VREL * vc(), Trel=TREL, dipoleX=DIPOLEX, root_rel=ROOTREL, cls=bsm.ModePolariton
     )
-    writer = csv.DictWriter(fname, ["q", "theta", "omega"])
-    writer.writeheader()
-    for (theta, q) in tqdm.tqdm(it.product(thetas, qs)):
-        qx = q * np.cos(theta)
-        qy = q * np.sin(theta)
 
-        modes = p.find_modes(qx, qy)
-        for m in modes:
-            writer.writerow({"q": q, "theta": theta, "omega": m})
+    with open(fname, "w") as f:
+        writer = csv.DictWriter(f, ["q", "theta", "omega"])
+        writer.writeheader()
+        for (theta, q) in tqdm.tqdm_notebook(
+            it.product(thetas, qs), total=len(thetas) * len(qs)
+        ):
+            qx = q * np.cos(theta)
+            qy = q * np.sin(theta)
 
+            H = p.hamiltonian(qx, qy)
+            modes = np.linalg.eigvalsh(H)
+            for m in modes:
+                writer.writerow({"q": q, "theta": theta, "omega": m})
