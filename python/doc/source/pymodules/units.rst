@@ -1,7 +1,7 @@
 units
 =====
 
-.. automodule:: units
+.. automodule:: bardasis_schrieffer.units
 
    
    

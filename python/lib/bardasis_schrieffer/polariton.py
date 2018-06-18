@@ -1,6 +1,6 @@
-import bardasis_schrieffer as bsm
+from . import _bardasis_schrieffer as bsm
 
-from materials import NIOBIUM
+from .materials import NIOBIUM
 
 
 def build_polariton(

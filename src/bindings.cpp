@@ -23,7 +23,7 @@ bind_polariton(py::module&);
 void
 bind_cavity(py::module&);
 
-PYBIND11_MODULE(bardasis_schrieffer, m)
+PYBIND11_MODULE(_bardasis_schrieffer, m)
 {
   gsl_set_error_handler(&gsl::error_handler);
 

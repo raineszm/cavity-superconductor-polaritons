@@ -1,4 +1,4 @@
-import bardasis_schrieffer as bsm
+from . import _bardasis_schrieffer as bsm
 import csv
 import itertools as it
 import numpy as np
@@ -15,8 +15,8 @@ ROOTREL = 0.95
 
 
 def vc():
-    sys0 = bardasis_schrieffer.System(vs=0., **NIOBIUM)
-    state0 = bardasis_schrieffer.State.solve(sys0, TREL * NIOBIUM["Tc"])
+    sys0 = bsm.System(vs=0., **NIOBIUM)
+    state0 = bsm.State.solve(sys0, TREL * NIOBIUM["Tc"])
     return (
         state0.delta / sys0.kf
     )  # The critical superfluid velocity via Landau's argument

@@ -1,7 +1,7 @@
 materials
 =========
 
-.. automodule:: materials
+.. automodule:: bardasis_schrieffer.materials
 
    
    

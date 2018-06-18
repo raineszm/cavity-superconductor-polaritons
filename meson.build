@@ -37,12 +37,12 @@ deps = [
     gsl
     ]
 
-py.extension_module('bardasis_schrieffer',
+py.extension_module('_bardasis_schrieffer',
     ext_files,
     include_directories: include_dirs,
     dependencies : deps,
     install : true,
-    install_dir : join_paths(meson.build_root(), '..', 'python', 'lib'))
+    install_dir : join_paths(meson.build_root(), '..', 'python', 'lib', 'bardasis_schrieffer'))
 
 executable('debug', debug_files, 
     include_directories: include_dirs,

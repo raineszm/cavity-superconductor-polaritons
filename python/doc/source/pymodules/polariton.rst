@@ -1,7 +1,7 @@
 polariton
 =========
 
-.. automodule:: polariton
+.. automodule:: bardasis_schrieffer.polariton
 
    
    

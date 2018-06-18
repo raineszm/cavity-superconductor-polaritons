@@ -233,6 +233,9 @@ public:
    *
    * @param qx momentum
    * @param qy momentum
+   * @param ftol the tolerance in the derivative to be considered an extremum
+   * @param double_root_tol the cutoff below which to declare something a double
+   * root
    * @return std::array<double, 3> a sorted list of frequencies
    *
    * The frequencies returned correspond to the on-shell energies of the
@@ -243,8 +246,8 @@ public:
    */
   std::array<double, 3> find_modes(double qx,
                                    double qy,
-                                   double ftol = 1e-10,
-                                   double double_root_tol = 1e-17) const
+                                   double ftol /* = 1e-10*/,
+                                   double double_root_tol /* = 1e-17*/) const
   {
 
     // Define functions to be used in root finding
@@ -322,7 +325,8 @@ public:
    * @param qy momentum
    * @param xl lower frequency bound
    * @param xu upper frequency bound
-   * @return std::array<double, 2> the extrema
+   * @param ftol the tolerance in the derivative to be considered an extremum
+   * @return std::array<double, 2> the positions of the extrema
    *
    * This is used in the rootfinding algorithm
    */
@@ -330,7 +334,7 @@ public:
                                  double qy,
                                  double xl,
                                  double xu,
-                                 double ftol = 1e-10) const
+                                 double ftol /*= 1e-10*/) const
   {
 
     auto d_det = [this, qx, qy](double omega) {

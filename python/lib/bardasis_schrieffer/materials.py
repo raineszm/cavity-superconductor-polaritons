@@ -4,7 +4,7 @@ Material parameters for various known superconductors.
 Units are converted to Gaussian atomic units
 """
 
-from units import ureg, Q_
+from .units import ureg, Q_
 
 # Atomic units in meV
 """Material parameters for Niobium """
