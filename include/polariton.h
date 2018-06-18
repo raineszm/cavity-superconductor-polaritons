@@ -425,7 +425,7 @@ public:
     igf(2, 0) = -c1;
     igf.bottomRightCorner<2, 2>() =
       (omega - cav().omega(qx, qy)) * Matrix2d::Identity() -
-      coupling.photon_se_mode(omega, qx, qy);
+      paraX * paraX * coupling.photon_se_mode(omega, qx, qy);
     return igf.cast<std::complex<double>>();
   }
 
@@ -449,7 +449,7 @@ public:
     igf(0, 2) = -c1;
     igf(2, 0) = -c1;
     igf.bottomRightCorner<2, 2>() =
-      Matrix2d::Identity() - coupling.d_photon_se_mode(omega, qx, qy);
+      Matrix2d::Identity() -
     return igf.cast<std::complex<double>>();
   }
 };
