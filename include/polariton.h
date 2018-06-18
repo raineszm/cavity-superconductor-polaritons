@@ -450,6 +450,26 @@ public:
     igf(2, 0) = -c1;
     igf.bottomRightCorner<2, 2>() =
       Matrix2d::Identity() -
+      paraX * paraX * coupling.d_photon_se_mode(omega, qx, qy);
     return igf.cast<std::complex<double>>();
+  }
+
+  Matrix3d hamiltonian(double qx, double qy) const
+  {
+    double c0 =
+      paraX * dipoleX * coupling.mode_coupling(bs().root(), qx, qy, 0);
+    double c1 =
+      paraX * dipoleX * coupling.mode_coupling(bs().root(), qx, qy, 1);
+
+    Matrix3d H = Matrix3d::Zero();
+    H(0, 0) = bs().hamiltonian();
+    H(0, 1) = c0;
+    H(1, 0) = c0;
+    H(0, 2) = c1;
+    H(2, 0) = c1;
+    H.bottomRightCorner<2, 2>() =
+      cav().omega(qx, qy) * Matrix2d::Identity() +
+      paraX * paraX * coupling.photon_se_mode(cav().omega0, qx, qy);
+    return H;
   }
 };

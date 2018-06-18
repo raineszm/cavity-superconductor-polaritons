@@ -51,5 +51,6 @@ bind_polariton(py::module& m)
     .def(py::init<const Coupling&, double, double>(),
          "coupling"_a,
          "paraX"_a = 1.,
-         "dipoleX"_a = 1.);
+         "dipoleX"_a = 1.)
+    .def("hamiltonian", &ModePolariton::hamiltonian);
 }
