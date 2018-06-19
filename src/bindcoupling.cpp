@@ -29,14 +29,7 @@ bind_coupling(py::module& m)
     .def("mode_coupling", &Coupling::mode_coupling)
     .def("d_mode_coupling", &Coupling::d_mode_coupling)
     .def("pi0_elems", &Coupling::pi0_elems)
-    .def("photon_se",
-         py::overload_cast<double, double, double>(&Coupling::photon_se,
-                                                   py::const_),
-         "Photon self energy matrix")
-    .def("photon_se",
-         py::overload_cast<double, double, double, int, int>(
-           &Coupling::photon_se, py::const_),
-         "Photon self energy matrix components")
+    .def("photon_se", &Coupling::photon_se, "Photon self energy matrix")
     .def("_photon_se_or_deriv", &Coupling::_photon_se_or_deriv)
     .def("d_photon_se", &Coupling::d_photon_se)
     .def("photon_se_int", &Coupling::photon_se_int)

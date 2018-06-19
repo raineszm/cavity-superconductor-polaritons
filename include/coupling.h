@@ -420,17 +420,12 @@ public:
    * \int_0^{2\pi}\frac{d\theta}{2\pi} \left[ g(\xi, \theta, \mathbf{q}) +
    * g(-\xi, \theta, \mathbf{q})\right] \f]
    */
-  double photon_se(double omega, double qx, double qy, int i, int j) const
-  {
-    return _photon_se_or_deriv(omega, qx, qy, i, j, false);
-  }
-
   Matrix2d photon_se(double omega, double qx, double qy) const
   {
-    return (Matrix2d() << photon_se(omega, qx, qy, 0, 0),
-            photon_se(omega, qx, qy, 0, 1),
-            photon_se(omega, qx, qy, 1, 0),
-            photon_se(omega, qx, qy, 1, 1))
+    return (Matrix2d() << _photon_se_or_deriv(omega, qx, qy, 0, 0, false),
+            _photon_se_or_deriv(omega, qx, qy, 0, 1, false),
+            _photon_se_or_deriv(omega, qx, qy, 1, 0, false),
+            _photon_se_or_deriv(omega, qx, qy, 1, 1, false))
       .finished();
   }
 
