@@ -465,7 +465,7 @@ public:
                 coupling.mode_coupling(bs().root(), qx, qy, 1) };
     g *= paraX * dipoleX;
 
-    auto LLT = coupling.wf_renorm(qx, qy);
+    auto LLT = coupling.wf_renorm(qx, qy, paraX);
     auto L = LLT.matrixL();
     auto L_ = L.adjoint();
     L.solveInPlace(g);

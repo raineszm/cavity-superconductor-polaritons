@@ -582,7 +582,7 @@ public:
 
   auto wf_renorm(double qx, double qy) const
   {
-    auto Z = Matrix2d::Identity() + d_photon_se_mode(cav.omega0, qx, qy);
+             paraX * paraX * d_photon_se_mode(cav.omega0, qx, qy);
     return Z.llt();
   }
 
