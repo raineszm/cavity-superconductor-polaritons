@@ -473,7 +473,8 @@ public:
     auto M = bs.M();
     auto V = cav.polarizations(qx, qy, state().sys.theta_s);
     auto vsdoteps = V(0, i);
-    return 2 * std::sqrt(M_PI * C * C / (M * bs.root() * cav.omega(qx, qy))) *
+    return 2 *
+           std::sqrt(M_PI * C / (ALPHA * M * bs.root() * cav.omega(qx, qy))) *
            vsdoteps * ImDA(omega);
   }
 
@@ -492,7 +493,8 @@ public:
     auto M = bs.M();
     auto V = cav.polarizations(qx, qy, state().sys.theta_s);
     auto vsdoteps = V(0, i);
-    return 2 * std::sqrt(M_PI * C * C / (M * bs.root() * cav.omega(qx, qy))) *
+    return 2 *
+           std::sqrt(M_PI * C / (ALPHA * M * bs.root() * cav.omega(qx, qy))) *
            vsdoteps * d_ImDA(omega);
   }
 
@@ -544,12 +546,12 @@ public:
   {
     Matrix2d V = cav.polarizations(qx, qy, state().sys.theta_s);
 
-    return 2 * M_PI * C * C * 2 / (cav.L() * cav.omega(qx, qy)) *
+    return 4 * M_PI * C / (ALPHA * cav.L() * cav.omega(qx, qy)) *
            V.transpose() *
-           (Matrix2d() << photon_se(omega, qx, qy, 0, 0),
-            photon_se(omega, qx, qy, 0, 1),
-            photon_se(omega, qx, qy, 1, 0),
-            photon_se(omega, qx, qy, 1, 1))
+           (Matrix2d() << _photon_se_or_deriv(omega, qx, qy, 0, 0, false),
+            _photon_se_or_deriv(omega, qx, qy, 0, 1, false),
+            _photon_se_or_deriv(omega, qx, qy, 1, 0, false),
+            _photon_se_or_deriv(omega, qx, qy, 1, 1, false))
              .finished() *
            V;
   }
@@ -565,7 +567,7 @@ public:
   Matrix2d d_photon_se_mode(double omega, double qx, double qy) const
   {
     Matrix2d V = cav.polarizations(qx, qy, state().sys.theta_s);
-    return 2 * M_PI * C * C * 2 / (cav.L() * cav.omega(qx, qy)) *
+    return 4 * M_PI * C / (ALPHA * cav.L() * cav.omega(qx, qy)) *
            V.transpose() *
            (Matrix2d() << _photon_se_or_deriv(omega, qx, qy, 0, 0, true),
             _photon_se_or_deriv(omega, qx, qy, 0, 1, true),
@@ -575,8 +577,9 @@ public:
            V;
   }
 
-  auto wf_renorm(double qx, double qy) const
+  auto wf_renorm(double qx, double qy, double paraX) const
   {
+    auto Z = Matrix2d::Identity() -
              paraX * paraX * d_photon_se_mode(cav.omega0, qx, qy);
     return Z.llt();
   }
