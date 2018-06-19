@@ -273,8 +273,8 @@ public:
     auto lp = std::hypot(xp, state().delta);
     auto lm = std::hypot(xm, state().delta);
 
-    auto dp = state().sys.drift(kx + qx / 2, ky + qy / 2);
-    auto dm = state().sys.drift(kx - qx / 2, ky - qy / 2);
+    auto dp = sys.drift(kx + qx / 2, ky + qy / 2);
+    auto dm = sys.drift(kx - qx / 2, ky - qy / 2);
 
     auto pl = pi0_elems(dp, dm, lp, lm, omega, deriv);
 
@@ -357,18 +357,15 @@ public:
                              int j,
                              bool deriv) const
   {
+    const auto& sys = state().sys;
     auto ret =
-      state().sys.dos() *
+      sys.dos() *
       gsl_xi_integrate(
-        [this, omega, qx, qy, i, j, deriv](double x, double theta) {
+        [this, sys, omega, qx, qy, i, j, deriv](double x, double theta) {
           auto k1 =
-            std::sqrt(2 * state().sys.m *
-                      (x + state().sys.mu -
-                       0.5 * state().sys.m * state().sys.vs * state().sys.vs));
-          auto k2 =
-            std::sqrt(2 * state().sys.m *
-                      (-x + state().sys.mu -
-                       0.5 * state().sys.m * state().sys.vs * state().sys.vs));
+            std::sqrt(2 * sys.m * (x + sys.mu - 0.5 * sys.m * sys.vs * sys.vs));
+          auto k2 = std::sqrt(2 * sys.m *
+                              (-x + sys.mu - 0.5 * sys.m * sys.vs * sys.vs));
           return photon_se_int(k1 * std::cos(theta),
                                k1 * std::sin(theta),
                                omega,
