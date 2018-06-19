@@ -170,6 +170,6 @@ public:
     auto q1 = std::cos(theta_q - theta_s);
     auto q2 = std::sin(theta_q - theta_s);
 
-    return (Matrix2d() << -q2, e2_factor * q1, -q1, -e2_factor * q2).finished();
+    return (Matrix2d() << -q2, e2_factor * q1, q1, e2_factor * q2).finished();
   }
 };
