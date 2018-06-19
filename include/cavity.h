@@ -9,6 +9,7 @@
  */
 #pragma once
 #include <Eigen/Core>
+#include "utils.h"
 #include <cmath>
 
 using Eigen::Matrix2d;
@@ -42,15 +43,14 @@ public:
   /**
    * @brief The cavity dispersion
    *
-   * @param qx momentum along \f$v_s\f$
-   * @param qy momentum along \f$\hat z \times v_s\f$
+   * @param q momentum
    * @return double
    *
    * The bare photon cavity disperions \f$\omega_q^2 = \omega_0^2 + c^2q^2\f$.
    */
-  double omega(double qx, double qy) const
+  double omega(double q) const
   {
-    return std::sqrt(omega0 * omega0 + C * C * (qx * qx + qy * qy));
+    return std::sqrt(omega0 * omega0 + C * C * q * q);
   }
 
   /**
@@ -80,17 +80,13 @@ public:
    * 2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
    * \f]
    */
-  Matrix2d matrix_structure(double qx, double qy, double theta_s) const
+  Matrix2d matrix_structure(double q, double theta_q) const
   {
-    auto wq = this->omega(qx, qy);
-    auto q = std::hypot(qx, qy);
-    auto theta_q = q == 0 ? 0. : std::atan2(qy, qx);
+    auto wq = this->omega(q);
 
     auto P0 = 1 + wq * wq / (omega0 * omega0);
-    auto P1 =
-      C * C * q * q / (omega0 * omega0) * std::sin(2 * (theta_q - theta_s));
-    auto P3 =
-      -C * C * q * q / (omega0 * omega0) * std::cos(2 * (theta_q - theta_s));
+    auto P1 = C * C * q * q / (omega0 * omega0) * std::sin(2 * theta_q);
+    auto P3 = -C * C * q * q / (omega0 * omega0) * std::cos(2 * theta_q);
 
     return (Matrix2d() << P0 + P3, P1, P1, P0 - P3).finished();
   }
@@ -123,14 +119,14 @@ public:
    * \right]
    * \f]
    */
-  Matrix2d inv_gf(double omega, double qx, double qy, double theta_s) const
+  Matrix2d inv_gf(double omega, double q, double theta_q) const
   {
-    auto omega_q = this->omega(qx, qy);
+    auto omega_q = this->omega(q);
     auto prefactor = L() * std::pow(ALPHA, 2) *
                      (omega * omega - omega_q * omega_q) /
                      (32 * M_PI * std::pow(ALPHA * C, 3));
 
-    return prefactor * matrix_structure(qx, qy, theta_s);
+    return prefactor * matrix_structure(q, theta_q);
   }
 
   /**
@@ -146,12 +142,12 @@ public:
    *
    * \f[ \frac{\partial D^{-1}(\omega, \mathbf q)}{d\omega}\f]
    */
-  Matrix2d d_inv_gf(double omega, double qx, double qy, double theta_s) const
+  Matrix2d d_inv_gf(double omega, double q, double theta_q) const
   {
     auto prefactor =
       L() * std::pow(ALPHA, 2) * omega / (16 * M_PI * std::pow(C * ALPHA, 3));
 
-    return prefactor * matrix_structure(qx, qy, theta_s);
+    return prefactor * matrix_structure(q, theta_q);
   }
 
   /** The polarization vectors of the problem at \f$z=L/2\f$ in the basis where
@@ -162,13 +158,11 @@ public:
    *
    * \note this is not a unitary transformation.
    */
-  Matrix2d polarizations(double qx, double qy, double theta_s) const
+  Matrix2d polarizations(double q, double theta_q) const
   {
-    double e2_factor = omega0 / omega(qx, qy);
-    double theta_q = std::atan2(qy, qx);
+    double e2_factor = omega0 / omega(q);
 
-    auto q1 = std::cos(theta_q - theta_s);
-    auto q2 = std::sin(theta_q - theta_s);
+    auto [q1, q2] = gsl::polar_to_rect(1, theta_q);
 
     return (Matrix2d() << -q2, e2_factor * q1, -q1, e2_factor * -q2).finished();
   }

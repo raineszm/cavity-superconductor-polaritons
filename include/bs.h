@@ -102,7 +102,9 @@ public:
     double F1 =
       (std::tanh(Ep / (2 * state.T)) - std::tanh(Em / (2 * state.T))) /
       (omega * omega - 4 * l * l);
-    return F1 * (omega * omega / 2 + 2 * l * l * std::cos(4 * theta)) /
+    return F1 *
+           (omega * omega / 2 +
+            2 * l * l * std::cos(4 * (theta + state.sys.theta_s))) /
            (2 * std::sqrt(l * l - state.delta * state.delta));
   }
 
@@ -133,7 +135,8 @@ public:
       (std::tanh(Ep / (2 * state.T)) - std::tanh(Em / (2 * state.T))) /
       std::pow(omega * omega - 4 * l * l, 2);
 
-    double F2 = (omega * omega / 2 + 2 * l * l * std::cos(4 * theta));
+    double F2 = (omega * omega / 2 +
+                 2 * l * l * std::cos(4 * (theta + state.sys.theta_s)));
 
     double dF2 = omega;
 

@@ -11,7 +11,6 @@
 #include "utils.h"
 #include <cmath>
 #include <functional>
-#include <tuple>
 
 /**
  * @brief The material properties of the system
@@ -100,7 +99,7 @@ public:
    */
   double drift_theta(double k, double theta) const
   {
-    return vs * k * std::cos(theta - theta_s);
+    return vs * k * std::cos(theta);
   }
 
   /**
@@ -174,7 +173,7 @@ public:
   double v_comp(double k, double theta, int i) const
   {
     assert(i < 2 and i >= 0);
-    return gsl::polar_to_rect(k / m, theta - theta_s)[i];
+    return gsl::polar_to_rect(k / m, theta)[i];
   }
 };
 

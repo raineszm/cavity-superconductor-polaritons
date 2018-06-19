@@ -83,7 +83,7 @@ public:
    */
   double ImDA_int(double l, double theta, double omega) const
   {
-    double fd = std::sqrt(2) * std::cos(2 * theta);
+    double fd = std::sqrt(2) * std::cos(2 * (theta + state().sys.theta_s));
     double drift = state().sys.drift_theta(state().sys.kf(), theta);
     double Ep = drift + l;
     double Em = drift - l;
@@ -106,7 +106,7 @@ public:
    */
   double d_ImDA_int(double l, double theta, double omega) const
   {
-    double fd = std::sqrt(2) * std::cos(2 * theta);
+    double fd = std::sqrt(2) * std::cos(2 * (theta + state().sys.theta_s));
     double drift = state().sys.drift_theta(state().sys.kf(), theta);
     double Ep = drift + l;
     double Em = drift - l;
@@ -352,17 +352,23 @@ public:
 
   //! @cond
   double _photon_se_or_deriv(double omega,
-                             double qx,
-                             double qy,
+                             double q,
+                             double theta_q,
                              int i,
                              int j,
                              bool deriv) const
   {
     const auto& sys = state().sys;
     auto ret = gsl_angular_integrate(
-      [this, omega, qx, qy, i, j, deriv](double k, double theta) {
-        return photon_se_int(
-          k * std::cos(theta), k * std::sin(theta), omega, qx, qy, i, j, deriv);
+      [this, omega, q, theta_q, i, j, deriv](double k, double theta) {
+        return photon_se_int(k * std::cos(theta),
+                             k * std::sin(theta),
+                             omega,
+                             q * std::cos(theta_q),
+                             q * std::sin(theta_q),
+                             i,
+                             j,
+                             deriv);
       },
       sys.kf() - 2 * state().delta / sys.vf(),
       sys.kf() + 2 * state().delta / sys.vf());
@@ -420,12 +426,12 @@ public:
    * \int_0^{2\pi}\frac{d\theta}{2\pi} \left[ g(\xi, \theta, \mathbf{q}) +
    * g(-\xi, \theta, \mathbf{q})\right] \f]
    */
-  Matrix2d photon_se(double omega, double qx, double qy) const
+  Matrix2d photon_se(double omega, double q, double theta_q) const
   {
-    return (Matrix2d() << _photon_se_or_deriv(omega, qx, qy, 0, 0, false),
-            _photon_se_or_deriv(omega, qx, qy, 0, 1, false),
-            _photon_se_or_deriv(omega, qx, qy, 1, 0, false),
-            _photon_se_or_deriv(omega, qx, qy, 1, 1, false))
+    return (Matrix2d() << _photon_se_or_deriv(omega, q, theta_q, 0, 0, false),
+            _photon_se_or_deriv(omega, q, theta_q, 0, 1, false),
+            _photon_se_or_deriv(omega, q, theta_q, 1, 0, false),
+            _photon_se_or_deriv(omega, q, theta_q, 1, 1, false))
       .finished();
   }
 
@@ -439,12 +445,12 @@ public:
    *
    * \f[\frac{d\Pi(\omega, \mathbf{q})}{d\omega}\f]
    */
-  Matrix2d d_photon_se(double omega, double qx, double qy) const
+  Matrix2d d_photon_se(double omega, double q, double theta_q) const
   {
-    return (Matrix2d() << _photon_se_or_deriv(omega, qx, qy, 0, 0, true),
-            _photon_se_or_deriv(omega, qx, qy, 0, 1, true),
-            _photon_se_or_deriv(omega, qx, qy, 1, 0, true),
-            _photon_se_or_deriv(omega, qx, qy, 1, 1, true))
+    return (Matrix2d() << _photon_se_or_deriv(omega, q, theta_q, 0, 0, true),
+            _photon_se_or_deriv(omega, q, theta_q, 0, 1, true),
+            _photon_se_or_deriv(omega, q, theta_q, 1, 0, true),
+            _photon_se_or_deriv(omega, q, theta_q, 1, 1, true))
       .finished();
   }
 
@@ -467,14 +473,13 @@ public:
    * @param i which photon polarization
    * @return double
    */
-  double mode_coupling(double omega, double qx, double qy, int i) const
+  double mode_coupling(double omega, double q, double theta_q, int i) const
   {
     assert(i == 0 || i == 1);
     auto M = bs.M();
-    auto V = cav.polarizations(qx, qy, state().sys.theta_s);
+    auto V = cav.polarizations(q, theta_q);
     auto vsdoteps = V(0, i);
-    return 2 *
-           std::sqrt(M_PI * C / (ALPHA * M * bs.root() * cav.omega(qx, qy))) *
+    return 2 * std::sqrt(M_PI * C / (ALPHA * M * bs.root() * cav.omega(q))) *
            vsdoteps * ImDA(omega);
   }
 
@@ -487,14 +492,13 @@ public:
    * @param i which photon polarization
    * @return double
    */
-  double d_mode_coupling(double omega, double qx, double qy, int i) const
+  double d_mode_coupling(double omega, double q, double theta_q, int i) const
   {
     assert(i == 0 || i == 1);
     auto M = bs.M();
-    auto V = cav.polarizations(qx, qy, state().sys.theta_s);
+    auto V = cav.polarizations(q, theta_q);
     auto vsdoteps = V(0, i);
-    return 2 *
-           std::sqrt(M_PI * C / (ALPHA * M * bs.root() * cav.omega(qx, qy))) *
+    return 2 * std::sqrt(M_PI * C / (ALPHA * M * bs.root() * cav.omega(q))) *
            vsdoteps * d_ImDA(omega);
   }
 
@@ -542,16 +546,15 @@ public:
    * \tilde{\Pi} = \frac{2\pi c^2}{\omega_q}\frac{2}{L} V^T \Pi(q) V
    * \f]
    */
-  Matrix2d photon_se_mode(double omega, double qx, double qy) const
+  Matrix2d photon_se_mode(double omega, double q, double theta_q) const
   {
-    Matrix2d V = cav.polarizations(qx, qy, state().sys.theta_s);
+    Matrix2d V = cav.polarizations(q, theta_q);
 
-    return 4 * M_PI * C / (ALPHA * cav.L() * cav.omega(qx, qy)) *
-           V.transpose() *
-           (Matrix2d() << _photon_se_or_deriv(omega, qx, qy, 0, 0, false),
-            _photon_se_or_deriv(omega, qx, qy, 0, 1, false),
-            _photon_se_or_deriv(omega, qx, qy, 1, 0, false),
-            _photon_se_or_deriv(omega, qx, qy, 1, 1, false))
+    return 4 * M_PI * C / (ALPHA * cav.L() * cav.omega(q)) * V.transpose() *
+           (Matrix2d() << _photon_se_or_deriv(omega, q, theta_q, 0, 0, false),
+            _photon_se_or_deriv(omega, q, theta_q, 0, 1, false),
+            _photon_se_or_deriv(omega, q, theta_q, 1, 0, false),
+            _photon_se_or_deriv(omega, q, theta_q, 1, 1, false))
              .finished() *
            V;
   }
@@ -564,23 +567,22 @@ public:
    * @param qy component of momentum
    * @return Matrix2d
    */
-  Matrix2d d_photon_se_mode(double omega, double qx, double qy) const
+  Matrix2d d_photon_se_mode(double omega, double q, double theta_q) const
   {
-    Matrix2d V = cav.polarizations(qx, qy, state().sys.theta_s);
-    return 4 * M_PI * C / (ALPHA * cav.L() * cav.omega(qx, qy)) *
-           V.transpose() *
-           (Matrix2d() << _photon_se_or_deriv(omega, qx, qy, 0, 0, true),
-            _photon_se_or_deriv(omega, qx, qy, 0, 1, true),
-            _photon_se_or_deriv(omega, qx, qy, 1, 0, true),
-            _photon_se_or_deriv(omega, qx, qy, 1, 1, true))
+    Matrix2d V = cav.polarizations(q, theta_q);
+    return 4 * M_PI * C / (ALPHA * cav.L() * cav.omega(q)) * V.transpose() *
+           (Matrix2d() << _photon_se_or_deriv(omega, q, theta_q, 0, 0, true),
+            _photon_se_or_deriv(omega, q, theta_q, 0, 1, true),
+            _photon_se_or_deriv(omega, q, theta_q, 1, 0, true),
+            _photon_se_or_deriv(omega, q, theta_q, 1, 1, true))
              .finished() *
            V;
   }
 
-  auto wf_renorm(double qx, double qy, double paraX) const
+  auto wf_renorm(double q, double theta_q, double paraX) const
   {
     auto Z = Matrix2d::Identity() -
-             paraX * paraX * d_photon_se_mode(cav.omega0, qx, qy);
+             paraX * paraX * d_photon_se_mode(cav.omega0, q, theta_q);
     return Z.llt();
   }
 

@@ -81,11 +81,11 @@ public:
    * D^{-1}(i\Omega_m, \mathbf{q}) = D_0^{-1}((i\Omega_m)^2, \mathbf q) -
    * \Pi(i\Omega_m, \mathbf{q})\f]
    */
-  Matrix2d photon_sector(double omega, double qx, double qy) const
+  Matrix2d photon_sector(double omega, double q, double theta_q) const
   {
 
-    Matrix2d se = paraX * paraX * coupling.photon_se(omega, qx, qy);
-    Matrix2d cav_igf = cav().inv_gf(omega, qx, qy, sys().theta_s);
+    Matrix2d se = paraX * paraX * coupling.photon_se(omega, q, theta_q);
+    Matrix2d cav_igf = cav().inv_gf(omega, q, theta_q);
     cav_igf -= se;
     return cav_igf;
   }
@@ -93,16 +93,16 @@ public:
   /**
    * @brief Derivative of the photon sector w.r.t frequency
    * @param omega photon frequency
-   * @param qx component of photon momentum
-   * @param qy component of photon momentum
+   * @param q component of photon momentum
+   * @param theta_q component of photon momentum
    * @return Matrix2d
    * @see photon_sector()
    */
-  Matrix2d d_photon_sector(double omega, double qx, double qy) const
+  Matrix2d d_photon_sector(double omega, double q, double theta_q) const
   {
 
-    Matrix2d d_se = paraX * paraX * coupling.d_photon_se(omega, qx, qy);
-    Matrix2d d_cav_igf = cav().d_inv_gf(omega, qx, qy, sys().theta_s);
+    Matrix2d d_se = paraX * paraX * coupling.d_photon_se(omega, q, theta_q);
+    Matrix2d d_cav_igf = cav().d_inv_gf(omega, q, theta_q);
     d_cav_igf -= d_se;
     return d_cav_igf;
   }
@@ -111,8 +111,8 @@ public:
    * @brief The inverse inv_gf of the polariton
    *
    * @param omega frequency
-   * @param qx component of momentum
-   * @param qy component of momentum
+   * @param q component of momentum
+   * @param theta_q component of momentum
    * @return Matrix3cd
    * @see Coupling::ImDA(), Coupling::photon_se(), BS::inv_gf(),
    * Cavity::inv_gf(), photon_sector()
@@ -135,7 +135,7 @@ public:
    * are the components of \f$\mathbf{A}\f$ parallel and perpendicular to the
    * supercurrent.
    */
-  virtual Matrix3cd inv_gf(double omega, double qx, double qy) const
+  virtual Matrix3cd inv_gf(double omega, double q, double theta_q) const
   {
     std::complex<double> c(0., paraX * dipoleX * coupling.ImDA(omega));
 
@@ -144,7 +144,7 @@ public:
     act(0, 1) = c;
     act(1, 0) = -c;
     act.bottomRightCorner<2, 2>() =
-      photon_sector(omega, qx, qy).cast<std::complex<double>>();
+      photon_sector(omega, q, theta_q).cast<std::complex<double>>();
     return act;
   }
 
@@ -152,26 +152,26 @@ public:
    * @brief The determinant of the inverse Green's function of the fields
    *
    * @param omega frequnecy
-   * @param qx momentum
-   * @param qy momentum
+   * @param q momentum
+   * @param theta_q momentum
    * @return double
    * @see det_and_d()
    */
-  double det_inv_gf(double omega, double qx, double qy) const
+  double det_inv_gf(double omega, double q, double theta_q) const
   {
-    return std::real(inv_gf(omega, qx, qy).determinant());
+    return std::real(inv_gf(omega, q, theta_q).determinant());
   }
 
   /**
    * @brief The derivative of the inverse GF w.r.t frequency
    *
    * @param omega frequnecy
-   * @param qx momentum
-   * @param qy momentum
+   * @param q momentum
+   * @param theta_q momentum
    * @return Matrix3cd
    * @see inv_gf()
    */
-  virtual Matrix3cd d_inv_gf(double omega, double qx, double qy) const
+  virtual Matrix3cd d_inv_gf(double omega, double q, double theta_q) const
   {
     std::complex<double> c(0., paraX * dipoleX * coupling.d_ImDA(omega));
 
@@ -180,7 +180,7 @@ public:
     act(0, 1) = c;
     act(1, 0) = -c;
     act.bottomRightCorner<2, 2>() =
-      d_photon_sector(omega, qx, qy).cast<std::complex<double>>();
+      d_photon_sector(omega, q, theta_q).cast<std::complex<double>>();
     return act;
   }
 
@@ -188,16 +188,19 @@ public:
    * @brief The determinant of the inverse GF and it's derivative
    *
    * @param omega frequency
-   * @param qx momentum
-   * @param qy momentum
+   * @param q momentum
+   * @param theta_q momentum
    * @return std::tuple<double, double> (det, deriv)
    * @see det_inv_gf(), d_det_inv_gf()
    */
-  std::tuple<double, double> det_and_d(double omega, double qx, double qy) const
+  std::tuple<double, double> det_and_d(double omega,
+                                       double q,
+                                       double theta_q) const
   {
 
-    auto A = inv_gf(omega, qx, qy);
-    double d_det = std::real((adjugate(A) * d_inv_gf(omega, qx, qy)).trace());
+    auto A = inv_gf(omega, q, theta_q);
+    double d_det =
+      std::real((adjugate(A) * d_inv_gf(omega, q, theta_q)).trace());
     return std::tuple<double, double>(std::real(A.determinant()), d_det);
   }
 
@@ -205,35 +208,35 @@ public:
    * @brief The derivative of the determinant of the inverse GF w.r.t frequency
    *
    * @param omega frequency
-   * @param qx momentum
-   * @param qy momentum
+   * @param q momentum
+   * @param theta_q momentum
    * @return double
    *
    * @see inv_gf(), d_inv_gf()
    */
-  double d_det_inv_gf(double omega, double qx, double qy) const
+  double d_det_inv_gf(double omega, double q, double theta_q) const
   {
-    return std::get<1>(det_and_d(omega, qx, qy));
+    return std::get<1>(det_and_d(omega, q, theta_q));
   }
 
   /**
    * @brief The eigenvalues of inv_gf()
    *
    * @param omega frequency
-   * @param qx momentum
-   * @param qy momentum
+   * @param q momentum
+   * @param theta_q momentum
    * @return Vector3d
    */
-  Vector3d eigval(double omega, double qx, double qy) const
+  Vector3d eigval(double omega, double q, double theta_q) const
   {
-    return inv_gf(omega, qx, qy).eigenvalues().real();
+    return inv_gf(omega, q, theta_q).eigenvalues().real();
   }
 
   /**
    * @brief Find the frequencies at which inv_gf() has a zero eigenvalue
    *
-   * @param qx momentum
-   * @param qy momentum
+   * @param q momentum
+   * @param theta_q momentum
    * @param ftol the tolerance in the derivative to be considered an extremum
    * @param double_root_tol the cutoff below which to declare something a double
    * root
@@ -245,15 +248,15 @@ public:
    * @note this returns a NaN if for those modes which are not found within the
    * chosen interval
    */
-  std::array<double, 3> find_modes(double qx,
-                                   double qy,
+  std::array<double, 3> find_modes(double q,
+                                   double theta_q,
                                    double ftol /* = 1e-10*/,
                                    double double_root_tol /* = 1e-17*/) const
   {
 
     // Define functions to be used in root finding
-    auto det = [this, qx, qy](double omega) {
-      return det_inv_gf(omega, qx, qy);
+    auto det = [this, q, theta_q](double omega) {
+      return det_inv_gf(omega, q, theta_q);
     };
 
     // Here we use the fact that our functions has two local extrema (since it
@@ -269,7 +272,7 @@ public:
     const double xl = 0.6 * bs().root();
     const double xu = 1.9 * state().delta;
     // 1.99 * coupling.state.delta;
-    auto extrema = _extrema(qx, qy, xl, xu, ftol);
+    auto extrema = _extrema(q, theta_q, xl, xu, ftol);
 
     FSolver fsolver(gsl_root_fsolver_brent);
     size_t count = 0;
@@ -322,8 +325,8 @@ public:
   /**
    * @brief Find the local extrema of the determinant
    *
-   * @param qx momentum
-   * @param qy momentum
+   * @param q momentum
+   * @param theta_q momentum
    * @param xl lower frequency bound
    * @param xu upper frequency bound
    * @param ftol the tolerance in the derivative to be considered an extremum
@@ -331,15 +334,15 @@ public:
    *
    * This is used in the rootfinding algorithm
    */
-  std::array<double, 2> _extrema(double qx,
-                                 double qy,
+  std::array<double, 2> _extrema(double q,
+                                 double theta_q,
                                  double xl,
                                  double xu,
                                  double ftol /*= 1e-10*/) const
   {
 
-    auto d_det = [this, qx, qy](double omega) {
-      return d_det_inv_gf(omega, qx, qy);
+    auto d_det = [this, q, theta_q](double omega) {
+      return d_det_inv_gf(omega, q, theta_q);
     };
 
     auto gsl_d_det = make_gsl_function(d_det);
@@ -395,8 +398,8 @@ public:
    * @brief The inverse inv_gf of the polariton
    *
    * @param omega frequency
-   * @param qx component of momentum
-   * @param qy component of momentum
+   * @param q component of momentum
+   * @param theta_q component of momentum
    * @return Matrix3cd
    * @see Coupling::mode_coupling(), Coupling::photon_se_mode(),
    * BS::hamiltonian(), Cavity::omega()
@@ -417,10 +420,12 @@ public:
    * defines an inverse Greens' function which we analytically continue to real
    * frequency
    */
-  virtual Matrix3cd inv_gf(double omega, double qx, double qy) const override
+  virtual Matrix3cd inv_gf(double omega,
+                           double q,
+                           double theta_q) const override
   {
-    double c0 = paraX * dipoleX * coupling.mode_coupling(omega, qx, qy, 0);
-    double c1 = paraX * dipoleX * coupling.mode_coupling(omega, qx, qy, 1);
+    double c0 = paraX * dipoleX * coupling.mode_coupling(omega, q, theta_q, 0);
+    double c1 = paraX * dipoleX * coupling.mode_coupling(omega, q, theta_q, 1);
 
     Matrix3d igf = Matrix3d::Zero();
     igf(0, 0) = omega - bs().hamiltonian();
@@ -429,8 +434,8 @@ public:
     igf(0, 2) = -c1;
     igf(2, 0) = -c1;
     igf.bottomRightCorner<2, 2>() =
-      (omega - cav().omega(qx, qy)) * Matrix2d::Identity() -
-      paraX * paraX * coupling.photon_se_mode(omega, qx, qy);
+      (omega - cav().omega(q)) * Matrix2d::Identity() -
+      paraX * paraX * coupling.photon_se_mode(omega, q, theta_q);
     return igf.cast<std::complex<double>>();
   }
 
@@ -438,15 +443,19 @@ public:
    * @brief The derivative of the inverse GF w.r.t frequency
    *
    * @param omega frequnecy
-   * @param qx momentum
-   * @param qy momentum
+   * @param q momentum
+   * @param theta_q momentum
    * @return Matrix3cd
    * @see inv_gf()
    */
-  virtual Matrix3cd d_inv_gf(double omega, double qx, double qy) const override
+  virtual Matrix3cd d_inv_gf(double omega,
+                             double q,
+                             double theta_q) const override
   {
-    double c0 = paraX * dipoleX * coupling.d_mode_coupling(omega, qx, qy, 0);
-    double c1 = paraX * dipoleX * coupling.d_mode_coupling(omega, qx, qy, 1);
+    double c0 =
+      paraX * dipoleX * coupling.d_mode_coupling(omega, q, theta_q, 0);
+    double c1 =
+      paraX * dipoleX * coupling.d_mode_coupling(omega, q, theta_q, 1);
     Matrix3d igf = Matrix3d::Zero();
     igf(0, 0) = 1.;
     igf(0, 1) = -c0;
@@ -455,17 +464,17 @@ public:
     igf(2, 0) = -c1;
     igf.bottomRightCorner<2, 2>() =
       Matrix2d::Identity() -
-      paraX * paraX * coupling.d_photon_se_mode(omega, qx, qy);
+      paraX * paraX * coupling.d_photon_se_mode(omega, q, theta_q);
     return igf.cast<std::complex<double>>();
   }
 
-  Matrix3d hamiltonian(double qx, double qy) const
+  Matrix3d hamiltonian(double q, double theta_q) const
   {
-    Vector2d g{ coupling.mode_coupling(bs().root(), qx, qy, 0),
-                coupling.mode_coupling(bs().root(), qx, qy, 1) };
+    Vector2d g{ coupling.mode_coupling(bs().root(), q, theta_q, 0),
+                coupling.mode_coupling(bs().root(), q, theta_q, 1) };
     g *= paraX * dipoleX;
 
-    auto LLT = coupling.wf_renorm(qx, qy, paraX);
+    auto LLT = coupling.wf_renorm(q, theta_q, paraX);
     auto L = LLT.matrixL();
     auto L_ = L.adjoint();
     L.solveInPlace(g);
@@ -475,11 +484,11 @@ public:
     H.block<1, 2>(0, 1) = g.adjoint();
     H.block<2, 1>(1, 0) = g;
     H.bottomRightCorner<2, 2>() =
-      cav().omega(qx, qy) * Matrix2d::Identity() +
-      paraX * paraX * coupling.photon_se_mode(cav().omega0, qx, qy);
-    H.bottomRightCorner<2, 2>() = L_.solve<Eigen::OnTheRight>(
-      L.solve(cav().omega(qx, qy) * Matrix2d::Identity() +
-              paraX * paraX * coupling.photon_se_mode(cav().omega0, qx, qy)));
+      cav().omega(q) * Matrix2d::Identity() +
+      paraX * paraX * coupling.photon_se_mode(cav().omega0, q, theta_q);
+    H.bottomRightCorner<2, 2>() = L_.solve<Eigen::OnTheRight>(L.solve(
+      cav().omega(q) * Matrix2d::Identity() +
+      paraX * paraX * coupling.photon_se_mode(cav().omega0, q, theta_q)));
     return H;
   }
 };
