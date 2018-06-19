@@ -2,6 +2,8 @@
 #include <Eigen/Core>
 #include <cmath>
 #include <gsl/gsl_deriv.h>
+#include <gsl/gsl_sf_trig.h>
+#include <tuple>
 
 using Eigen::Matrix2cd;
 using Eigen::Matrix3cd;
@@ -59,3 +61,22 @@ deriv_gsl(const gsl_function& f, double x, double h)
   gsl_deriv_central(&f, x, h, &deriv, &err);
   return deriv;
 }
+
+namespace gsl {
+
+inline std::tuple<double, double>
+rect_to_polar(double x, double y)
+{
+  gsl_sf_result r, theta;
+  gsl_sf_rect_to_polar(x, y, &r, &theta);
+  return { r.val, theta.val };
+}
+
+inline std::tuple<double, double>
+polar_to_rect(double r, double theta)
+{
+  gsl_sf_result x, y;
+  gsl_sf_polar_to_rect(r, theta, &x, &y);
+  return { x.val, y.val };
+}
+};
