@@ -6,6 +6,7 @@
  * @date 2018-06-12
  */
 #pragma once
+#include <Eigen/Cholesky>
 #include <Eigen/Core>
 #include <array>
 #include <cmath>
@@ -358,9 +359,13 @@ public:
                              bool deriv) const
   {
     const auto& sys = state().sys;
+    auto ret = gsl_angular_integrate(
+      [this, omega, qx, qy, i, j, deriv](double k, double theta) {
         return photon_se_int(
-        },
-        0);
+          k * std::cos(theta), k * std::sin(theta), omega, qx, qy, i, j, deriv);
+      },
+      sys.kf() - 2 * state().delta / sys.vf(),
+      sys.kf() + 2 * state().delta / sys.vf());
 
     // Diamagnetic?
     // if (i == j && !deriv) {
@@ -573,6 +578,12 @@ public:
             _photon_se_or_deriv(omega, qx, qy, 1, 1, true))
              .finished() *
            V;
+  }
+
+  auto wf_renorm(double qx, double qy) const
+  {
+    auto Z = Matrix2d::Identity() + d_photon_se_mode(cav.omega0, qx, qy);
+    return Z.llt();
   }
 
   /**

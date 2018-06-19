@@ -20,6 +20,7 @@
 using Eigen::Matrix2d;
 using Eigen::Matrix3cd;
 using Eigen::Matrix3d;
+using Eigen::Vector2d;
 using Eigen::Vector3d;
 
 #include "bs.h"
@@ -460,20 +461,25 @@ public:
 
   Matrix3d hamiltonian(double qx, double qy) const
   {
-    double c0 =
-      paraX * dipoleX * coupling.mode_coupling(bs().root(), qx, qy, 0);
-    double c1 =
-      paraX * dipoleX * coupling.mode_coupling(bs().root(), qx, qy, 1);
+    Vector2d g{ coupling.mode_coupling(bs().root(), qx, qy, 0),
+                coupling.mode_coupling(bs().root(), qx, qy, 1) };
+    g *= paraX * dipoleX;
+
+    auto LLT = coupling.wf_renorm(qx, qy);
+    auto L = LLT.matrixL();
+    auto L_ = L.adjoint();
+    L.solveInPlace(g);
 
     Matrix3d H = Matrix3d::Zero();
     H(0, 0) = bs().hamiltonian();
-    H(0, 1) = c0;
-    H(1, 0) = c0;
-    H(0, 2) = c1;
-    H(2, 0) = c1;
+    H.block<1, 2>(0, 1) = g.adjoint();
+    H.block<2, 1>(1, 0) = g;
     H.bottomRightCorner<2, 2>() =
       cav().omega(qx, qy) * Matrix2d::Identity() +
       paraX * paraX * coupling.photon_se_mode(cav().omega0, qx, qy);
+    H.bottomRightCorner<2, 2>() = L_.solve<Eigen::OnTheRight>(
+      L.solve(cav().omega(qx, qy) * Matrix2d::Identity() +
+              paraX * paraX * coupling.photon_se_mode(cav().omega0, qx, qy)));
     return H;
   }
 };
