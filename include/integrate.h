@@ -5,8 +5,8 @@
 
 #include <gsl/gsl_integration.h>
 
-const double EPSABS = 1e-8;
-const double EPSREL = 1e-5;
+const double EPSABS = 1e-9;
+const double EPSREL = 1e-6;
 
 // https://stackoverflow.com/a/43636411/267610
 class IntegrationWorkspace
