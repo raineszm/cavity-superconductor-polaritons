@@ -33,7 +33,7 @@ def data(fname, qs, thetas):
     )
 
     with open(fname, "w") as f:
-        writer = csv.DictWriter(f, ["q", "theta", "omega"])
+        writer = csv.DictWriter(f, ["q", "theta", "omega", "i"])
         writer.writeheader()
         for (theta, q) in tqdm.tqdm_notebook(
             it.product(thetas, qs), total=len(thetas) * len(qs)
@@ -43,5 +43,5 @@ def data(fname, qs, thetas):
 
             H = p.hamiltonian(qx, qy)
             modes = np.linalg.eigvalsh(H)
-            for m in modes:
-                writer.writerow({"q": q, "theta": theta, "omega": m})
+            for (i, m) in enumerate(sorted(modes)):
+                writer.writerow({"q": q, "theta": theta, "omega": m, "i": i})
