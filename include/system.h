@@ -54,10 +54,7 @@ public:
            theta_s == rhs.theta_s;
   }
 
-  double xi(double kx, double ky) const
-  {
-    return (kx * kx + ky * ky) / (2 * m) - mu + 0.5 * m * vs * vs;
-  }
+  double xi(double kx, double ky) const { return xi_k(std::hypot(kx, ky)); }
 
   /**
    * @brief The "bare" energy plus the superfluid term
@@ -89,7 +86,8 @@ public:
 
   double drift(double kx, double ky) const
   {
-    return drift_theta(std::hypot(kx, ky), std::atan2(ky, kx));
+    auto [k, theta] = gsl::rect_to_polar(kx, ky);
+    return drift_theta(k, theta);
   }
 
   /**
@@ -175,12 +173,11 @@ public:
   double v_comp(double kx, double ky, int i) const
   {
     assert(i < 2 and i >= 0);
-    auto v = std::hypot(kx, ky) / m;
-    auto theta = std::atan2(ky, kx);
+    auto [k, theta] = gsl::rect_to_polar(kx, ky);
     if (i == 0) {
-      return v * std::cos(theta - theta_s);
+      return k / m * std::cos(theta - theta_s);
     } else
-      return v * std::sin(theta - theta_s);
+      return k / m * std::sin(theta - theta_s);
   }
 };
 
