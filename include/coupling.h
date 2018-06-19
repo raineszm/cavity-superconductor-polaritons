@@ -256,19 +256,19 @@ public:
                        int j,
                        bool deriv) const
   {
-    auto xp = state().sys.xi(kx + qx / 2, ky + qy / 2);
-    auto xm = state().sys.xi(kx - qx / 2, ky - qy / 2);
-
-    // We've rotated our axes so the 'x'-axis is along vs
     const System& sys = state().sys;
-    auto vi = sys.v_comp(kx, ky, i);
-    auto vj = sys.v_comp(kx, ky, j);
+    auto xp = sys.xi(kx + qx / 2, ky + qy / 2);
+    auto xm = sys.xi(kx - qx / 2, ky - qy / 2);
+
+    auto [k, theta_k] = gsl::rect_to_polar(kx, ky);
+    auto vi = sys.v_comp(k, theta_k, i);
+    auto vj = sys.v_comp(k, theta_k, j);
     auto vsi = sys.vs_comp(i);
     auto vsj = sys.vs_comp(j);
 
     auto T0 = state().l2(xp, xm) * vi * vj + state().n2(xp, xm) * vsi * vsj;
     auto T1 = state().p2(xp, xm) * vi * vj + state().m2(xp, xm) * vsi * vsj;
-    auto iT2 = state().mp(xp, xm) * (vsi * vj + vi * vsj);
+    auto iT2 = -state().mp(xp, xm) * (vsi * vj + vi * vsj);
     auto T3 = state().ln(xp, xm) * (vsi * vj + vi * vsj);
 
     auto lp = std::hypot(xp, state().delta);

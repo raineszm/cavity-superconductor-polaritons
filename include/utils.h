@@ -1,9 +1,9 @@
 #pragma once
 #include <Eigen/Core>
+#include <array>
 #include <cmath>
 #include <gsl/gsl_deriv.h>
 #include <gsl/gsl_sf_trig.h>
-#include <tuple>
 
 using Eigen::Matrix2cd;
 using Eigen::Matrix3cd;
@@ -64,19 +64,19 @@ deriv_gsl(const gsl_function& f, double x, double h)
 
 namespace gsl {
 
-inline std::tuple<double, double>
+inline std::array<double, 2>
 rect_to_polar(double x, double y)
 {
   gsl_sf_result r, theta;
   gsl_sf_rect_to_polar(x, y, &r, &theta);
-  return { r.val, theta.val };
+  return { { r.val, theta.val } };
 }
 
-inline std::tuple<double, double>
+inline std::array<double, 2>
 polar_to_rect(double r, double theta)
 {
   gsl_sf_result x, y;
   gsl_sf_polar_to_rect(r, theta, &x, &y);
-  return { x.val, y.val };
+  return { { x.val, y.val } };
 }
 };

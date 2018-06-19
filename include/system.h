@@ -11,6 +11,7 @@
 #include "utils.h"
 #include <cmath>
 #include <functional>
+#include <tuple>
 
 /**
  * @brief The material properties of the system
@@ -170,14 +171,10 @@ public:
    * @return double
    * @see vs_comp()
    */
-  double v_comp(double kx, double ky, int i) const
+  double v_comp(double k, double theta, int i) const
   {
     assert(i < 2 and i >= 0);
-    auto [k, theta] = gsl::rect_to_polar(kx, ky);
-    if (i == 0) {
-      return k / m * std::cos(theta - theta_s);
-    } else
-      return k / m * std::sin(theta - theta_s);
+    return gsl::polar_to_rect(k / m, theta - theta_s)[i];
   }
 };
 
