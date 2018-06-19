@@ -28,8 +28,8 @@ main(int argc, char** argv)
   auto bs = BS(state.delta / 10, state);
   auto p = Polariton(Coupling(bs, Cavity(1.04 * bs.root())));
 
-  // auto modes = p.find_modes(0, 0);
-  // std::cout << modes[0] << ", " << modes[1] << modes[2] << std::endl;
+  auto modes = p.find_modes(state.delta * 0.2 / C, 0, 1e-10, 1e-17);
+  std::cout << modes[0] << ", " << modes[1] << modes[2] << std::endl;
 
   return 0;
 }
