@@ -23,6 +23,21 @@ public:
   operator gsl_integration_workspace*() { return wsp.get(); }
 };
 
+class IntegrationCquadWorkspace
+{
+  std::unique_ptr<gsl_integration_cquad_workspace,
+                  decltype(&gsl_integration_cquad_workspace_free)>
+    wsp;
+
+public:
+  IntegrationCquadWorkspace(const size_t n = 1000)
+    : wsp(gsl_integration_cquad_workspace_alloc(n),
+          &gsl_integration_cquad_workspace_free)
+  {}
+
+  operator gsl_integration_cquad_workspace*() { return wsp.get(); }
+};
+
 template<typename F>
 double
 gsl_xi_integrate(const F& f, double a)
@@ -52,4 +67,54 @@ gsl_xi_integrate(const F& f, double a)
     outer, a, EPSABS, EPSREL, limit, wsp2, &result, &abserr);
 
   return result;
+}
+
+template<typename F>
+double
+gsl_angular_integrate(const F& f, double k1, double k2)
+{
+  double total = 0;
+  double result, abserr, inner_result, inner_abserr;
+
+  const size_t limit = 1000;
+
+  IntegrationWorkspace wsp1(limit);
+  IntegrationWorkspace wsp2(limit);
+  IntegrationCquadWorkspace cwsp(limit);
+
+  auto outer = make_gsl_function([&](double k) {
+    auto inner = make_gsl_function([&](double theta) { return f(k, theta); });
+    gsl_integration_qag(inner,
+                        0,
+                        2 * M_PI,
+                        EPSABS,
+                        EPSREL,
+                        limit,
+                        GSL_INTEG_GAUSS21,
+                        wsp1,
+                        &inner_result,
+                        &inner_abserr);
+    return k * inner_result;
+  });
+
+  size_t nevals;
+  gsl_integration_cquad(
+    outer, k1, k2, EPSABS, EPSREL, cwsp, &result, &abserr, &nevals);
+  total += result;
+  gsl_integration_qag(outer,
+                      0,
+                      k1,
+                      EPSABS,
+                      EPSREL,
+                      limit,
+                      GSL_INTEG_GAUSS21,
+                      wsp2,
+                      &result,
+                      &abserr);
+  total += result;
+  gsl_integration_qagiu(
+    outer, k2, EPSABS, EPSREL, limit, wsp2, &result, &abserr);
+  total += result;
+
+  return total / (4 * M_PI * M_PI);
 }

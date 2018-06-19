@@ -358,31 +358,7 @@ public:
                              bool deriv) const
   {
     const auto& sys = state().sys;
-    auto ret =
-      sys.dos() *
-      gsl_xi_integrate(
-        [this, sys, omega, qx, qy, i, j, deriv](double x, double theta) {
-          auto k1 =
-            std::sqrt(2 * sys.m * (x + sys.mu - 0.5 * sys.m * sys.vs * sys.vs));
-          auto k2 = std::sqrt(2 * sys.m *
-                              (-x + sys.mu - 0.5 * sys.m * sys.vs * sys.vs));
-          return photon_se_int(k1 * std::cos(theta),
-                               k1 * std::sin(theta),
-                               omega,
-                               qx,
-                               qy,
-                               i,
-                               j,
-                               deriv) +
-                 photon_se_int(k2 * std::cos(theta),
-                               k2 * std::sin(theta),
-                               omega,
-                               qx,
-                               qy,
-                               i,
-                               j,
-                               deriv);
-          ;
+        return photon_se_int(
         },
         0);
 
