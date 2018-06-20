@@ -267,8 +267,8 @@ public:
     auto vsj = sys.vs_comp(j);
 
     auto T0 = state().l2(xp, xm) * vi * vj + state().n2(xp, xm) * vsi * vsj;
-    auto T1 = state().p2(xp, xm) * vi * vj + state().m2(xp, xm) * vsi * vsj;
-    auto iT2 = -state().mp(xp, xm) * (vsi * vj + vi * vsj);
+    auto T1 = -state().p2(xp, xm) * vi * vj + state().m2(xp, xm) * vsi * vsj;
+    auto iT2 = state().mp(xp, xm) * (vi * vsj - vsi * vj);
     auto T3 = state().ln(xp, xm) * (vsi * vj + vi * vsj);
 
     auto lp = std::hypot(xp, state().delta);
@@ -279,7 +279,7 @@ public:
 
     auto pl = pi0_elems(dp, dm, lp, lm, omega, deriv);
 
-    return T0 * pl[0] + T1 * pl[1] + iT2 * pl[2] + T3 * pl[3];
+    return T0 * pl[0] + T1 * pl[1] - iT2 * pl[2] + T3 * pl[3];
   }
 
   /**
