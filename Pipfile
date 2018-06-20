@@ -9,6 +9,8 @@ numpy = "*"
 pendulum = "*"
 pyinvoke = "*"
 pint = "*"
+dataclasses = "*"
+tqdm = "*"
 
 [dev-packages]
 
