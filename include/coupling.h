@@ -387,8 +387,8 @@ public:
    * @brief Evaluates the photon self-energy
    *
    * @param omega photon frequency
-   * @param qx component of photon momentum
-   * @param qy component of photon momentum
+   * @param q photon momentum
+   * @param theta_q angle of photon momentum w.r.t \f$v_s\f$
    * @param i left index of self-energy
    * @param j right index of self-energy
    * @return double
@@ -439,8 +439,8 @@ public:
    * @brief The derivative of the photon self energy w.r.t frequency
    *
    * @param omega photon frequency
-   * @param qx coponenet of photon momentum
-   * @param qy coponenet of photon momentum
+   * @param q photon momentum
+   * @param theta_q angle of photon momentum w.r.t \f$v_s\f$
    * @return Matrix2d
    *
    * \f[\frac{d\Pi(\omega, \mathbf{q})}{d\omega}\f]
@@ -468,8 +468,8 @@ public:
    * photon mode operator
    *
    * @param omega the frequency of the modes
-   * @param qx x component of photon momentum
-   * @param qy y component of photon momentum
+   * @param q photon momentum
+   * @param theta_q angle of photon momentum w.r.t \f$v_s\f$
    * @param i which photon polarization
    * @return double
    */
@@ -487,8 +487,8 @@ public:
    * @brief The derivative of the mode coupling \f$dg/d\omega\f$
    *
    * @param omega the frequency of the modes
-   * @param qx x component of photon momentum
-   * @param qy y component of photon momentum
+   * @param q photon momentum
+   * @param theta_q angle of photon momentum w.r.t \f$v_s\f$
    * @param i which photon polarization
    * @return double
    */
@@ -515,8 +515,8 @@ public:
    * @brief The self-energy as experienced by the photon mode operators
    *
    * @param omega photon frequency
-   * @param qx component of momentum
-   * @param qy component of momentum
+   * @param q photon momentum
+   * @param theta_q angle of photon momentum w.r.t \f$v_s\f$
    * @return Matrix2d
    *
    * The action is
@@ -563,8 +563,8 @@ public:
    * @brief The derivative of the mode self energy w.r.t frequency
    *
    * @param omega photon frequency
-   * @param qx component of momentum
-   * @param qy component of momentum
+   * @param q photon momentum
+   * @param theta_q angle of photon momentum w.r.t \f$v_s\f$
    * @return Matrix2d
    */
   Matrix2d d_photon_se_mode(double omega, double q, double theta_q) const

@@ -34,16 +34,16 @@ bind_polariton(py::module& m)
     .def("_extrema",
          &Polariton::_extrema,
          "find extrema",
-         "qx"_a,
-         "qy"_a,
+         "q"_a,
+         "theta_q"_a,
          "xl"_a,
          "xu"_a,
          "ftol"_a = 1e-10)
     .def("find_modes",
          &Polariton::find_modes,
          "find the modes",
-         "qx"_a,
-         "qy"_a,
+         "q"_a,
+         "theta_q"_a,
          "ftol"_a = 1e-10,
          "double_root_tol"_a = 1e-17);
 

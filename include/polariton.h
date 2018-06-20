@@ -69,8 +69,8 @@ public:
    * @brief The inverse Green's function of the photon sector
    *
    * @param omega photon frequency
-   * @param qx component of photon momentum
-   * @param qy component of photon momentum
+   * @param q photon momentum
+   * @param theta_q angle of photon momentum w.r.t \f$v_s\f$
    * @return Matrix2d
    * @see Cavity::inv_gf(), Coupling::photon_se()
    *

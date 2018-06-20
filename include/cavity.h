@@ -8,8 +8,8 @@
  * We use Gaussian Hartree Units
  */
 #pragma once
-#include <Eigen/Core>
 #include "utils.h"
+#include <Eigen/Core>
 #include <cmath>
 
 using Eigen::Matrix2d;
@@ -67,9 +67,8 @@ public:
    * @brief The matrix structure of the inverse photon Green's function in the
    * \f$\parallel-\perp\f$ field basis.
    *
-   * @param qx momentum along \f$v_s\f$
-   * @param qy momentum along \f$\hat z \times v_s\f$
-   * @param theta_s the angle that the supercurrent makes with system \f$x\f$
+   * @param q photon momentum
+   * @param theta_q angle of the momentum w.r.t to \f$v_s\f$
    * axis
    * @return Matrix2d
    * @sa inv_gf()
@@ -77,7 +76,7 @@ public:
    * \f[
    * \left(1 +\frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
    * - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin
-   * 2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
+   * 2(\theta_q )\sigma_1 - \cos 2(\theta_q)\sigma_3\right)
    * \f]
    */
   Matrix2d matrix_structure(double q, double theta_q) const
@@ -99,9 +98,8 @@ public:
    * @endverbatim
    *
    * @param omega the frequency
-   * @param qx momentum along \f$v_s\f$
-   * @param qy momentum along \f$\hat z \times v_s\f$
-   * @param theta_s the angle that the supercurrent makes with system \f$x\f$
+   * @param q photon momentum
+   * @param theta_q angle of the momentum w.r.t \f$v_s\f$
    * @return Matrix2d
    * @see matrix_structure()
    *
@@ -115,7 +113,7 @@ public:
    * )^2 - \omega_\mathbf{q}^2\right] \left[ \left(1 +
    * \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
    * - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin
-   * 2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
+   * 2(\theta_q)\sigma_1 - \cos 2(\theta_q)\sigma_3\right)
    * \right]
    * \f]
    */
@@ -134,9 +132,8 @@ public:
    * frequency
    *
    * @param omega the frequency
-   * @param qx momentum along \f$v_s\f$
-   * @param qy momentum along \f$\hat z \times v_s\f$
-   * @param theta_s the angle that the supercurrent makes with system \f$x\f$
+   * @param q photon momentum
+   * @param theta_q angle of the momentum w.r.t \f$v_s\f$
    * @return Matrix2d
    * @see inv_gf()
    *
