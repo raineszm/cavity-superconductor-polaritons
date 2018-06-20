@@ -279,7 +279,7 @@ public:
 
     auto pl = pi0_elems(dp, dm, lp, lm, omega, deriv);
 
-    return T0 * pl[0] + T1 * pl[1] - iT2 * pl[2] + T3 * pl[3];
+    return T0 * pl[0] + T1 * pl[1] + iT2 * pl[2] + T3 * pl[3];
   }
 
   /**
