@@ -196,11 +196,11 @@ public:
   /**
    * @brief The photon self-energy due to renormalization by the s-wave state
    *
-   * @param kx x component of electron momentum
-   * @param ky y component of electron momentum
+   * @param k electron momentum
+   * @param theta_k electron angle
    * @param omega photon frequency
-   * @param qx x component of photon momentum
-   * @param qy y component of photon momentum
+   * @param q photon momentum
+   * @param theta_q photon angle
    * @param i left index
    * @param j right index
    * @param deriv is this the self enregy or its derivative?
@@ -228,20 +228,23 @@ public:
    *
    * @notes We take the \f$x\f$ axis to be defined by the supercurrent
    */
-  double photon_se_int(double kx,
-                       double ky,
+  double photon_se_int(double k,
+                       double theta_k,
                        double omega,
-                       double qx,
-                       double qy,
+                       double q,
+                       double theta_q,
                        int i,
                        int j,
                        bool deriv) const
   {
     const System& sys = state().sys;
-    auto xp = sys.xi(kx + qx / 2, ky + qy / 2);
-    auto xm = sys.xi(kx - qx / 2, ky - qy / 2);
+    auto theta_qk = theta_q - theta_k;
+    auto kp = std::sqrt(k * k + q * q / 4 + k * q * std::cos(theta_qk));
+    auto km = std::sqrt(k * k + q * q / 4 - k * q * std::cos(theta_qk));
 
-    auto [k, theta_k] = gsl::rect_to_polar(kx, ky);
+    auto xp = sys.xi_k(kp);
+    auto xm = sys.xi_k(km);
+
     auto vi = sys.v_comp(k, theta_k, i);
     auto vj = sys.v_comp(k, theta_k, j);
     auto vsi = sys.vs_comp(i);
@@ -255,8 +258,12 @@ public:
     auto lp = std::hypot(xp, state().delta);
     auto lm = std::hypot(xm, state().delta);
 
-    auto dp = sys.doppler(kx + qx / 2, ky + qy / 2);
-    auto dm = sys.doppler(kx - qx / 2, ky - qy / 2);
+    auto theta_p = theta_k + std::atan2(q / 2 * std::sin(theta_qk),
+                                        k + q / 2 * std::cos(theta_qk));
+    auto theta_m = theta_k + std::atan2(-q / 2 * std::sin(theta_qk),
+                                        k - q / 2 * std::cos(theta_qk));
+    auto dp = sys.doppler_theta(kp, theta_p);
+    auto dm = sys.doppler_theta(km, theta_m);
 
     auto pl = pi0_elems(dp, dm, lp, lm, omega, deriv);
 
@@ -342,14 +349,7 @@ public:
     const auto& sys = state().sys;
     auto ret = gsl_angular_integrate(
       [this, omega, q, theta_q, i, j, deriv](double k, double theta) {
-        return photon_se_int(k * std::cos(theta),
-                             k * std::sin(theta),
-                             omega,
-                             q * std::cos(theta_q),
-                             q * std::sin(theta_q),
-                             i,
-                             j,
-                             deriv);
+        return photon_se_int(k, theta, omega, q, theta_q, i, j, deriv);
       },
       sys.kf() - 2 * state().delta / sys.vf(),
       sys.kf() + 2 * state().delta / sys.vf());
