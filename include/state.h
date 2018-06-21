@@ -28,9 +28,9 @@ public:
   /**
    * @brief Construct a new State object
    *
-   * @param sys_
-   * @param T_
-   * @param D
+   * @param sys_ #sys
+   * @param T_ #T
+   * @param D #delta
    */
   State(const System& sys_, double T_, double D)
     : T(T_)
@@ -45,15 +45,14 @@ public:
 
   bool operator!=(const State& rhs) const { return !((*this) == rhs); }
 
-  //! Solve the mean field problem for System sys at temperature \f$T\f$
-
-  //! This includes the effects of the superfluid velocity \f$v_s\f$
   /**
    * @brief Solve for the gap given a system and a temperature
    *
    * @param sys the system being studied
    * @param T temperature
    * @return State
+   *
+   * This includes the effects of the superfluid velocity \f$v_s\f$
    */
   inline static State solve(const System& sys, double T)
   {
@@ -79,6 +78,9 @@ public:
     n = u u' - v v'\\
     p = u v' - v u'
     \f]
+
+    @param x1 \f$\xi\f$
+    @param x2 \f$\xi'\f$
 
     @{
   */
