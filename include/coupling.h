@@ -517,14 +517,23 @@ public:
   {
     Matrix2d V = cav.polarizations(q, theta_q);
 
-    return 8 * M_PI * C * C * (C * ALPHA) / (cav.L() * cav.omega(q)) *
-           V.transpose() *
-           (Matrix2d() << _photon_se_or_deriv(omega, q, theta_q, 0, 0, false),
-            _photon_se_or_deriv(omega, q, theta_q, 0, 1, false),
-            _photon_se_or_deriv(omega, q, theta_q, 1, 0, false),
-            _photon_se_or_deriv(omega, q, theta_q, 1, 1, false))
-             .finished() *
-           V;
+    auto Piq =
+      (Matrix2d() << _photon_se_or_deriv(omega, q, theta_q, 0, 0, false),
+       _photon_se_or_deriv(omega, q, theta_q, 0, 1, false),
+       _photon_se_or_deriv(omega, q, theta_q, 1, 0, false),
+       _photon_se_or_deriv(omega, q, theta_q, 1, 1, false))
+        .finished();
+
+    auto Pi_qT = (Matrix2d() << _photon_se_or_deriv(
+                    -omega, q, theta_q + M_PI, 0, 0, false),
+                  _photon_se_or_deriv(-omega, q, theta_q + M_PI, 0, 1, false),
+                  _photon_se_or_deriv(-omega, q, theta_q + M_PI, 1, 0, false),
+                  _photon_se_or_deriv(-omega, q, theta_q + M_PI, 1, 1, false))
+                   .finished()
+                   .transpose();
+
+    return 4 * M_PI * C * C * (C * ALPHA) / (cav.L() * cav.omega(q)) *
+           V.transpose() * (Piq + Pi_qT) * V;
   }
 
   /**
@@ -538,14 +547,29 @@ public:
   Matrix2d d_photon_se_mode(double omega, double q, double theta_q) const
   {
     Matrix2d V = cav.polarizations(q, theta_q);
-    return 8 * M_PI * C * C * (C * ALPHA) / (cav.L() * cav.omega(q)) *
-           V.transpose() *
-           (Matrix2d() << _photon_se_or_deriv(omega, q, theta_q, 0, 0, true),
-            _photon_se_or_deriv(omega, q, theta_q, 0, 1, true),
-            _photon_se_or_deriv(omega, q, theta_q, 1, 0, true),
-            _photon_se_or_deriv(omega, q, theta_q, 1, 1, true))
-             .finished() *
-           V;
+    auto Piq =
+      (Matrix2d() << _photon_se_or_deriv(omega, q, theta_q, 0, 0, true),
+       _photon_se_or_deriv(omega, q, theta_q, 0, 1, true),
+       _photon_se_or_deriv(omega, q, theta_q, 1, 0, true),
+       _photon_se_or_deriv(omega, q, theta_q, 1, 1, true))
+        .finished();
+
+    auto Pi_qT =
+      (Matrix2d() << _photon_se_or_deriv(-omega, q, theta_q + M_PI, 0, 0, true),
+       _photon_se_or_deriv(-omega, q, theta_q + M_PI, 0, 1, true),
+       _photon_se_or_deriv(-omega, q, theta_q + M_PI, 1, 0, true),
+       _photon_se_or_deriv(-omega, q, theta_q + M_PI, 1, 1, true))
+        .finished()
+        .transpose();
+
+    return 4 * M_PI * C * C * (C * ALPHA) / (cav.L() * cav.omega(q)) *
+           V.transpose() * (Piq + Pi_qT) * V;
+  }
+
+  Matrix2d Z(double q, double theta_q, double paraX) const
+  {
+    return Matrix2d::Identity() -
+           paraX * paraX * d_photon_se_mode(cav.omega0, q, theta_q);
   }
 
   /**
@@ -558,9 +582,7 @@ public:
    */
   auto wf_renorm(double q, double theta_q, double paraX) const
   {
-    auto Z = Matrix2d::Identity() -
-             paraX * paraX * d_photon_se_mode(cav.omega0, q, theta_q);
-    return Z.llt();
+    return Z(q, theta_q, paraX).llt();
   }
 
   /**

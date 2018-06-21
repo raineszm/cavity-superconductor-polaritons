@@ -52,5 +52,6 @@ bind_polariton(py::module& m)
          "coupling"_a,
          "paraX"_a = 1.,
          "dipoleX"_a = 1.)
-    .def("hamiltonian", &ModePolariton::hamiltonian);
+    .def("hamiltonian", &ModePolariton::hamiltonian)
+    .def("bands", &ModePolariton::bands);
 }

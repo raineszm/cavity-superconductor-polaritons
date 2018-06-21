@@ -34,5 +34,7 @@ bind_coupling(py::module& m)
     .def("d_photon_se", &Coupling::d_photon_se)
     .def("photon_se_int", &Coupling::photon_se_int)
     .def("photon_se_mode", &Coupling::photon_se_mode)
-    .def("d_photon_se_mode", &Coupling::d_photon_se_mode);
+    .def("d_photon_se_mode", &Coupling::d_photon_se_mode)
+    .def("Z", &Coupling::Z)
+    .def("wf_renorm", &Coupling::wf_renorm);
 }
