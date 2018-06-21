@@ -20,7 +20,7 @@
 class BS
 {
 private:
-  mutable double _mass = NAN;
+  mutable double _mass = std::numeric_limits<double>::quiet_NaN();
   mutable size_t _state_hash;
   mutable double _root;
 
@@ -34,8 +34,8 @@ public:
    * where \f$I(\Omega^2)\f$ is the integrand described by
    * inv_gf_int()
    *
-   * @note That we define this variable such that \f$m_0 = \nu M\f$
-   * where \f$M\f$ is the mass defined here and \f$\nu\f$ is the
+   * @note That we define this variable such that \f$m_0 = \nu \tilde{m}_0\f$
+   * where \f$\tilde{m}_0\f$ is the mass defined here and \f$\nu\f$ is the
    * density of states @ref System::dos().
    *
    * @see inv_gf_int()
@@ -47,8 +47,8 @@ public:
   /**
    * @brief Construct a new BS object
    *
-   * @param mass_
-   * @param state_
+   * @param mass_ #mass
+   * @param state_ #state
    */
   BS(double mass_, const State& state_)
     : mass(mass_)
@@ -59,7 +59,7 @@ public:
    * @brief The integrand of the function \f$I(\omega^2)\f$ appearing in
    * the BS mode mass eqn.
    *
-   * @param l the BDG quasiparticle energy (without the dopplershift)
+   * @param l the BDG quasiparticle energy (without the Doppler shift)
    * \f$\lambda\f$
    * @param theta the angle along the Gap minimum
    * @param omega the frequency
@@ -67,7 +67,7 @@ public:
    * @see inv_gf()
    *
    * This integrand defines the function \f$I((i\Omega_m)^2) = \sum_\mathbf{k}
-   * f(i\Omega, \mathbf{k})\f$ appearing in the BS mode action \f[ f((i
+   * f((i\Omega)^2, \mathbf{k})\f$ appearing in the BS mode action \f[ f((i
    * \Omega_m)^2, \mathbf{k}) = (i\Omega_m)^2 \frac{1}{2\lambda_k}
    * \frac{n_F(E^-_\mathbf{k}) -
    * n_F(E^+_\mathbf{k})}{(i\Omega_m)^2-(2\lambda_k)^2} + 2\lambda_k
@@ -112,7 +112,7 @@ public:
    * @brief The integrand of the derivative of \f$I((i\Omega)^2)\f$ w.r.t
    * frequency
    *
-   * @param l the BDG quasiparticle energy (without the dopplershift)
+   * @param l the BDG quasiparticle energy (without the Doppler shift)
    * \f$\lambda\f$
    * @param theta the angle along the Gap minimum
    * @param omega the frequency
@@ -175,7 +175,12 @@ public:
                          state.delta));
   }
 
-  //! Derivative of the BS mode inverse inv_gf wrt \f$\Omega\f$
+  /**
+   * @brief Derivative of the BS mode inverse inv_gf() wrt \f$\Omega\f$
+   *
+   * @param omega frequency
+   * @return double
+   */
   double d_inv_gf(double omega) const
   {
     return -2 * state.sys.dos() *
@@ -186,9 +191,13 @@ public:
              state.delta);
   }
 
-  //! The pole of the Bardasis Schrieffer mode inv_gf
-
-  //! Obtained by solving for where inv_gf() is zero
+  /**
+   * @brief The pole of the Bardasis Schrieffer mode inv_gf
+   *
+   * @return double \f$\Omega_\text{BS}\f$
+   *
+   * Obtained by solving for where inv_gf() is zero
+   */
   double root() const
   {
     // If the cached value is still good return it
