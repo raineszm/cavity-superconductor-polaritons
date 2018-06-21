@@ -29,16 +29,14 @@ We also make use of the BS mode operators (c.f. :doc:`bs`)
 
 .. math::
 
-    d_q = \frac{b_q + b^\dagger_{-q}}{\sqrt{2 M \Omega_\text{bs}}}
-    = \frac{b_q + b^\dagger_{-q}}{\sqrt{4 I_0(\Omega_\text{BS}) \Omega_\text{BS}}}
-    = \frac{1}{2}\sqrt{\frac{\Omega_\text{BS}}{m_0}}\left(b_q + b^\dagger_{-q}\right)
+    d_q = \frac{b_q + b^\dagger_{-q}}{\sqrt{2 M_\text{BS} \Omega_\text{bs}}}
 
 
 Substituting into the coupling term
 
  .. math::
 
-   2i\sqrt{\frac{\Omega_\text{BS} \pi c^2}{2 m_0}} \sum_q i g(i \Omega, \mathbf{q})\frac{1}{\sqrt{\omega_\mathbf{q}}}
+   \sqrt{\frac{\pi c^2}{M \Omega_\text{BS}}} \sum_q i g(i \Omega, \mathbf{q})\frac{1}{\sqrt{\omega_\mathbf{q}}}
    \sum_\alpha
    \left[
      \left(b_{-q} + b^\dagger_{q}\right)\mathbf{v}_s \cdot \left(\bm{\epsilon}_\alpha(q, L/2) a_{\alpha,q} + \bm{\epsilon}_\alpha(-q, L/2)^* a^\dagger_{-q, \alpha}\right)
@@ -52,7 +50,7 @@ Throwing out counter-rotating terms
 
  .. math::
 
-   2i\sqrt{\frac{\Omega_\text{BS} \pi c^2}{2 m_0}} \sum_q i g(i \Omega_m, \mathbf{q})\frac{1}{\sqrt{\omega_\mathbf{q}}}
+   \sqrt{\frac{\pi c^2}{M \Omega_\text{BS}}} \sum_q i g(i \Omega_m, \mathbf{q})\frac{1}{\sqrt{\omega_\mathbf{q}}}
    \sum_\alpha
    \left[
      b^\dagger_{q}\mathbf{v}_s \cdot \bm{\epsilon}_\alpha(q, L/2) a_{\alpha,q}
@@ -63,7 +61,7 @@ Using the properties of :math:`\bm{\epsilon}` this can be written
 
 
 .. math::
-   \sqrt{\frac{2\pi c^2\Omega_\text{BS} }{m_0}} \sum_q  g(i \Omega_m, \mathbf{q})\frac{1}{\sqrt{\omega_\mathbf{q}}}
+   \sqrt{\frac{\pi c^2 }{M \Omega_\text{BS}}} \sum_q  g(i \Omega_m, \mathbf{q})\frac{1}{\sqrt{\omega_\mathbf{q}}}
    \sum_\alpha
    \left[
      b^\dagger_{q}\mathbf{v}_s \cdot i\bm{\epsilon}_\alpha(q, L/2) a_{\alpha,q}
@@ -74,7 +72,7 @@ We may then extract the effective coupling
 
 .. math::
 
-    g_\text{eff}(i\Omega_m, \mathbf{q}, \alpha) = \sqrt{\frac{2\pi c^2\Omega_\text{BS} }{m_0\omega_{\mathbf{q}}}}
+    g_\text{eff}(i\Omega_m, \mathbf{q}, \alpha) = \sqrt{\frac{\pi c^2 }{M \Omega_\text{BS}\omega_{\mathbf{q}}}}
     \mathbf{v}_s\cdot i\bm{\epsilon}_{\alpha,\mathbf{q}}\left(\frac{L}{2}\right)g(i\Omega_m, \mathbf{q})
 
 or explicitly
@@ -82,7 +80,7 @@ or explicitly
 .. math::
 
    g_\text{eff}(i\Omega_m, q) \approx -2i \Omega_m e \mathbf{v}_s\cdot i\bm{\epsilon}_{\alpha,\mathbf{q}}
-   \nu \Delta \sqrt{\frac{2\pi \Omega_\text{BS} }{m_0\omega_{\mathbf{q}}}}
+   \nu \Delta \sqrt{\frac{\pi}{M \Omega_\text{BS}\omega_{\mathbf{q}}}}
     \int_\Delta^\infty
    \frac{d\lambda}{\sqrt{\lambda^2 - \Delta^2}}
    \int_0^{2\pi}\frac{d\theta}{2\pi}
@@ -194,14 +192,15 @@ This makes the photonic Lagrangian
 .. math::
 
     \bar{a}_{q, \alpha}
-    \left(-i\Omega_m + \omega_\mathbf{q}Z^{-1}(\mathbf q) + \hat{L}^{-1}\hat{\tilde{\Pi}}(\omega_r, \mathbf{q})(\hat{L}^{\dagger})^{-1}
+    \left(-i\Omega_m + \hat{L}^{-1}\left(\omega_\mathbf{q} +\hat{\tilde{\Pi}}(\omega_r, \mathbf{q})\right)(\hat{L}^{\dagger})^{-1}
     \right) a_{q, \alpha}
 
 allowing us to define the effective Hamiltonian
 
 .. math::
 
-    \hat{H}_\text{phot} = \omega_{\mathbf{q}}Z^{-1}(\mathbf q) + \hat{L}^{-1}\hat{\tilde{\Pi}}(\omega_r, \mathbf{q}){(\hat{L}^\dagger)}^{-1}
+    \hat{H}_\text{phot} = 
+    \hat{L}^{-1}\left(\omega_\mathbf{q} +\hat{\tilde{\Pi}}(\omega_r, \mathbf{q})\right)(\hat{L}^{\dagger})^{-1}
 
 Similarly, the coupling to the Bardasis-Schrieffer mode becomes
 
@@ -210,7 +209,7 @@ Similarly, the coupling to the Bardasis-Schrieffer mode becomes
 
    g_\text{eff}(i\Omega_m, q) \approx -2i \Omega_m e \mathbf{v}_s\cdot i\bm{\epsilon}_{\alpha',\mathbf{q}} 
    \left[(L^\dagger)^{-1}\right]_{\alpha',\alpha}
-   \nu \Delta \sqrt{\frac{2\pi \Omega_\text{BS} }{m_0\omega_{\mathbf{q}}}}
+   \nu \Delta \sqrt{\frac{\pi }{M \Omega_\text{BS}\omega_{\mathbf{q}}}}
     \int_\Delta^\infty
    \frac{d\lambda}{\sqrt{\lambda^2 - \Delta^2}}
    \int_0^{2\pi}\frac{d\theta}{2\pi}

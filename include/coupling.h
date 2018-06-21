@@ -220,32 +220,13 @@ public:
    *
    * In this notation \f[
    * T^{ij}_0 =\ell_\mathbf{k,q}^2 v^i v^j + n_\mathbf{k,q}^2\, v_s^i v_s^j\\
-   * T^{ij}_1 = p_\mathbf{k,q}^2 v^i v^j + m_\mathbf{k,q}^2\, v_s^i v_s^j\\
-   * T^{ij}_2 = -i p_\mathbf{k,q}m_\mathbf{k,q}\left(v_s^i v^j + v^i
-   * v_s^j\right)\\
+   * T^{ij}_1 = -p_\mathbf{k,q}^2 v^i v^j + m_\mathbf{k,q}^2\, v_s^i v_s^j\\
+   * iT^{ij}_2 = p_\mathbf{k,q}m_\mathbf{k,q}\left(v^i v_s^j - v_s^i
+   * v^j\right)\\
    * T^{ij}_3 = \ell_\mathbf{k,q}n_\mathbf{k,q}\left(v_s^i v^j +
    * v^i v_s^j\right) \f]
    *
-   * For covenience we take the the components \f$i=\{0,1\}\f$ to be along and
-   * perpendicular to \f$\mathbf{v}_s\f$ respectively. Specifically, if
-   * \f$\theta_s\f$ is the angle that \f$\mathbf{v}_s\f$ makes with the
-   * \f$x\f$-axis, we define the new photon operators \f[ \begin{pmatrix}
-   * A_\parallel\\
-   * A_\perp
-   * \end{pmatrix}
-   * = \hat{R}(\theta_s)
-   * \begin{pmatrix}
-   * A_x\\
-   * A_y
-   * \end{pmatrix}
-   * \f]
-   * where \f$\hat{R}\f$ is a rotation matrix.
-   * This induces the transformation \f$\mathbf{v} \to
-   * R^{-1}(\theta_s)\mathbf{v}\f$ on the velocities. Concretely then \f[
-   * \mathbf{v}_s &\to (v_s, 0)^T\\
-   * \mathbf{v} &\to \frac{k}{m} (\cos(\theta - \theta_s),
-   * \sin(\theta-\theta_s))^T \f]
-   *
+   * @notes We take the \f$x\f$ axis to be defined by the supercurrent
    */
   double photon_se_int(double kx,
                        double ky,
@@ -403,28 +384,6 @@ public:
    * \mathbf{q}) \f]
    * as described in photon_se_int().
    *
-   * Numerically it is convenient to evaluate this integral in polar coordinates
-   * via the change of variables \f$k=\sqrt{2m(\xi + \mu - \frac{1}{2}m
-   * v_s^2)}\f$
-   *
-   * \f[ \Pi^{ij}(\mathbf{q}, \Omega) =
-   *  \frac{e^2}{2c^2} \nu \int_{-\mu + \frac{1}{2}m
-   * v_s^2}^\infty d\xi \int_0^{2\pi}\frac{d\theta}{2\pi} \sum_l
-   * \operatorname{tr}\left[\hat\pi_0(\mathbf{k} + \mathbf{q}/2, \mathbf{k} -
-   * \mathbf{q}/2, \Omega) \hat\tau_l\right]T^{ij}_l(\mathbf{k}, \mathbf{q}) \f]
-   *
-   * We then make use of the fact that \f$\mu\f$ is the largest energy scale in
-   * the problem and take the lower limit of the \f$\xi\f$ integral to
-   * \f$-\infty\f$ and symmetrize in \f$\xi\f$. Defining \f[ g(\xi, \theta,
-   * \mathbf{q}) = \sum_l \operatorname{tr}\left[\hat\pi_0(\mathbf{k} +
-   * \mathbf{q}/2, \mathbf{k} - \mathbf{q}/2, \Omega)
-   * \hat\tau_l\right]T^{ij}_l(\mathbf{k}, \mathbf{q}) \f] i.e. photon_se_int(),
-   * we can express the integral as
-   *
-   * \f[ \Pi^{ij}(\mathbf{q}, \Omega)\approx
-   * \frac{e^2}{2c^2} \nu \int_0^\infty d\xi
-   * \int_0^{2\pi}\frac{d\theta}{2\pi} \left[ g(\xi, \theta, \mathbf{q}) +
-   * g(-\xi, \theta, \mathbf{q})\right] \f]
    */
   Matrix2d photon_se(double omega, double q, double theta_q) const
   {
@@ -479,7 +438,9 @@ public:
     auto M = bs.M();
     auto V = cav.polarizations(q, theta_q);
     auto vsdoteps = V(0, i);
-    return 2 * std::sqrt(M_PI * C / (ALPHA * M * bs.root() * cav.omega(q))) *
+    return 2 *
+           std::sqrt(M_PI * C * C * (C * ALPHA) /
+                     (M * bs.root() * cav.omega(q))) *
            vsdoteps * ImDA(omega);
   }
 
@@ -498,7 +459,9 @@ public:
     auto M = bs.M();
     auto V = cav.polarizations(q, theta_q);
     auto vsdoteps = V(0, i);
-    return 2 * std::sqrt(M_PI * C / (ALPHA * M * bs.root() * cav.omega(q))) *
+    return 2 *
+           std::sqrt(M_PI * C * C * (C * ALPHA) /
+                     (M * bs.root() * cav.omega(q))) *
            vsdoteps * d_ImDA(omega);
   }
 
@@ -539,18 +502,23 @@ public:
    * \frac{2\pi c^2}{\omega_q} \epsilon(L/2)^* \Pi(q) \epsilon(L/2)
    * \f]
    * Our code implements the polarization vectors as \f$i\sqrt{\tfrac{2}{L}}V\f$
-   * where $V$ is a real matrix describing the polarization vectors (c.f.
+   * where \f$V\f$ is a real matrix describing the polarization vectors (c.f.
    * \ref Cavity::polarizations()) so the final expresion is
    *
    * \f[
-   * \tilde{\Pi} = \frac{2\pi c^2}{\omega_q}\frac{2}{L} V^T \Pi(q) V
+   * \tilde{\Pi} = \frac{4\pi c^2}{\omega_q}\frac{2}{L} V^T \Pi(q) V
    * \f]
+   *
+   * @note that previously we absorbed a factor of \f$e\f$ into the photon
+   * fields when defining \f$\pi\f$ so we must restore a factor of \f$e^2 =
+   * c\alpha\f$. Thankfully in our units, \f$e=1\f$.
    */
   Matrix2d photon_se_mode(double omega, double q, double theta_q) const
   {
     Matrix2d V = cav.polarizations(q, theta_q);
 
-    return 4 * M_PI * C / (ALPHA * cav.L() * cav.omega(q)) * V.transpose() *
+    return 8 * M_PI * C * C * (C * ALPHA) / (cav.L() * cav.omega(q)) *
+           V.transpose() *
            (Matrix2d() << _photon_se_or_deriv(omega, q, theta_q, 0, 0, false),
             _photon_se_or_deriv(omega, q, theta_q, 0, 1, false),
             _photon_se_or_deriv(omega, q, theta_q, 1, 0, false),
@@ -570,7 +538,8 @@ public:
   Matrix2d d_photon_se_mode(double omega, double q, double theta_q) const
   {
     Matrix2d V = cav.polarizations(q, theta_q);
-    return 4 * M_PI * C / (ALPHA * cav.L() * cav.omega(q)) * V.transpose() *
+    return 8 * M_PI * C * C * (C * ALPHA) / (cav.L() * cav.omega(q)) *
+           V.transpose() *
            (Matrix2d() << _photon_se_or_deriv(omega, q, theta_q, 0, 0, true),
             _photon_se_or_deriv(omega, q, theta_q, 0, 1, true),
             _photon_se_or_deriv(omega, q, theta_q, 1, 0, true),
@@ -579,6 +548,14 @@ public:
            V;
   }
 
+  /**
+   * @brief Calculate the wavefunction renormalization due to the self energy
+   *
+   * @param q momentum
+   * @param theta_q angle
+   * @param paraX enhancement of paramagnetic couping
+   * @return auto LLT decomposition of Z
+   */
   auto wf_renorm(double q, double theta_q, double paraX) const
   {
     auto Z = Matrix2d::Identity() -
