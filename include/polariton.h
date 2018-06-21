@@ -468,6 +468,13 @@ public:
     return igf.cast<std::complex<double>>();
   }
 
+  /**
+   * @brief The hamiltonian of the coupled system
+   *
+   * @param q momentum
+   * @param theta_q angle w.r.t \f$\mathbf{v}_s\f$
+   * @return Matrix3d
+   */
   Matrix3d hamiltonian(double q, double theta_q) const
   {
     Vector2d g{ coupling.mode_coupling(bs().root(), q, theta_q, 0),
