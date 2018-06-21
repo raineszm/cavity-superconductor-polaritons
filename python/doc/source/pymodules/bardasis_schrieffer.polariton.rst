@@ -1,5 +1,5 @@
-polariton
-=========
+bardasis\_schrieffer.polariton
+==============================
 
 .. automodule:: bardasis_schrieffer.polariton
 
@@ -10,7 +10,6 @@ polariton
    .. autosummary::
    
       build_polariton
-      niobium
    
    
 

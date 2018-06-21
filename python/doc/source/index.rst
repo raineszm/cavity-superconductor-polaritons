@@ -67,11 +67,16 @@ Code
 
 .. toctree::
     :caption: Python modules
-    :glob:
-
-    pymodules/*
 
 
+.. autosummary::
+    :toctree: pymodules
+
+    bardasis_schrieffer
+    bardasis_schrieffer.materials
+    bardasis_schrieffer.polariton
+    bardasis_schrieffer.units
+    bardasis_schrieffer.runner
 
 Indices and tables
 ==================

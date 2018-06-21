@@ -39,6 +39,8 @@ extensions = [
     "breathe",
 ]
 
+autosummary_generate = True
+
 # imgmath settings
 
 imgmath_latex_preamble = r"""
