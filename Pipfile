@@ -11,6 +11,7 @@ pyinvoke = "*"
 pint = "*"
 dataclasses = "*"
 tqdm = "*"
+meson = "*"
 
 [dev-packages]
 

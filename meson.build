@@ -14,8 +14,8 @@ gsl = dependency('gsl')
 
 #pybind11 stuff
 pymod = import('python')
-py = pymod.find_installation()
-pybind_dirs = run_command('python', '-c',
+py = pymod.find_installation('python3')
+pybind_dirs = run_command(py, '-c',
       'import pybind11; print(pybind11.get_include())').stdout().strip()
 
 if get_option('buildtype') == 'release'
@@ -26,7 +26,9 @@ include_dirs = include_directories('include', pybind_dirs)
 
 if meson.get_compiler('cpp').get_id() == 'gcc'
     add_project_arguments('-Wno-int-in-bool-context', language : 'cpp')
-    add_project_link_arguments('-undefined', 'dynamic_lookup', language : 'cpp')
+    if build_machine.system() == 'darwin'
+        add_project_link_arguments('-undefined', 'dynamic_lookup', language : 'cpp')
+    endif
 endif
 
 subdir('src')
