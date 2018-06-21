@@ -14,7 +14,7 @@ gsl = dependency('gsl')
 
 #pybind11 stuff
 pymod = import('python')
-py = pymod.find_installation('python3')
+py = pymod.find_installation('python3', required: true)
 pybind_dirs = run_command(py, '-c',
       'import pybind11; print(pybind11.get_include())').stdout().strip()
 
@@ -36,7 +36,8 @@ subdir('src')
 deps = [
     m_dep,
     eigen,
-    gsl
+    gsl,
+    py.dependency()
     ]
 
 py.extension_module('_bardasis_schrieffer',
