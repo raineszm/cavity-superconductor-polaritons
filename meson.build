@@ -31,14 +31,26 @@ if meson.get_compiler('cpp').get_id() == 'gcc'
     endif
 endif
 
+if build_machine.system() == 'darwin'
+    pydep = declare_dependency(
+    include_directories: include_directories([
+    py.get_variable('INCLUDEPY'),
+    py.get_path('include'),
+    py.get_path('platinclude')
+    ]))   
+elif build_machine.system() == 'linux'
+    pydep = py.dependency()
+endif
+
 subdir('src')
 
 deps = [
     m_dep,
     eigen,
     gsl,
-    py.dependency()
+    pydep
     ]
+
 
 py.extension_module('_bardasis_schrieffer',
     ext_files,
