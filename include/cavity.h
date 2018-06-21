@@ -76,7 +76,7 @@ public:
    * \f[
    * \left(1 +\frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
    * - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin
-   * 2(\theta_q )\sigma_1 - \cos 2(\theta_q)\sigma_3\right)
+   * 2\theta_q \sigma_1 - \cos 2\theta_q\sigma_3\right)
    * \f]
    */
   Matrix2d matrix_structure(double q, double theta_q) const
@@ -113,7 +113,7 @@ public:
    * )^2 - \omega_\mathbf{q}^2\right] \left[ \left(1 +
    * \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
    * - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin
-   * 2(\theta_q)\sigma_1 - \cos 2(\theta_q)\sigma_3\right)
+   * 2\theta_q\sigma_1 - \cos 2\theta_q\sigma_3\right)
    * \right]
    * \f]
    */
@@ -151,7 +151,7 @@ public:
    * \f$\theta_s\f$ defines the \f$x\f$-axis.
    *
    * The vectors are along the columns
-   * The factor \f$i\sqrt{\tfrac{2}{L}}\f$ is not includes.
+   * The factor \f$i\sqrt{\tfrac{2}{L}}\f$ is not included.
    *
    * \note this is not a unitary transformation.
    */

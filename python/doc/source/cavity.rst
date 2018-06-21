@@ -5,7 +5,9 @@ Cavity
 Vector Potential and Mode Operators
 --------------------------------------
 
-In this code we use Gaussian (unrationalized) units.
+.. note::
+
+    In this code we use Gaussian (unrationalized) units.
 
 In the cavity our field can be expressed in terms of mode operators as
 
@@ -74,6 +76,9 @@ So the relation between mode operators and the A field is
 
 Thermal Photon Action
 ----------------------
+
+Free Photon Action
+""""""""""""""""""
 
 Beginning with the mode action we have
 
@@ -148,6 +153,10 @@ We may then immediately invert this to obtain the action
 
     S_A = -\frac{1}{8 \pi c^2}\sum_q A_\alpha(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]A_{\alpha'}(q)
 
+
+Paramagnetic Coupling
+"""""""""""""""""""""
+
 The question then remains how these :math:`A_\alpha` fields couple to fermions.
 
 We recall
@@ -182,63 +191,47 @@ Suppose we wish to write the theory such that the paramagnetic coupling is
 
 .. math::
 
-    \frac{e}{c}\sqrt{\frac{2}{L}}\mathbf{v} \cdot \begin{pmatrix}A_x(q)\\A_y(q)\end{pmatrix}
+    \frac{e}{c}\sqrt{\frac{2}{L}}\mathbf{v} \cdot \begin{pmatrix}A_\parallel(q)\\A_\perp(q)\end{pmatrix}
 
 We can do this by defining the transformation
 
 .. math::
 
-    \begin{pmatrix}
-    A_x
-    A_y
-    \end{pmatrix} = \underbrace{-i
-    \begin{pmatrix}
-    \sin \theta_q& \frac{\omega_0}{\omega_\mathbf{q}} \cos \theta_q \\
-    -\cos \theta_q&  \frac{\omega_0}{\omega_\mathbf{q}} \sin\theta_q
-    \end{pmatrix}}_{U(q)}
-    \begin{pmatrix}
-    A_1(q)\\
-    A_2(q)
-    \end{pmatrix}
+    A_\parallel = \mathbf{v}_s \cdot \sum_\alpha \bm{\epsilon}_\alpha(\mathbf{q}, L/2) A_\alpha\\
+    A_\perp = (\hat{z} \times \mathbf{v}_s) \cdot \sum_\alpha \bm{\epsilon}_\alpha(\mathbf{q}, L/2) A_\alpha
+
 
 This is a non-unitary transformation but since it is linear the contribution to the Jacobian cancels out in any expectation value.
+One can see that the components of the transformation matrix are just the elements of the polarization vectors
+We then define the matrix
+
+.. math::
+
+    V_{i\alpha}(\mathbf q) = (\epsilon(\mathbf{q}, L/2)_\alpha)_i
+
+so that
+
+.. math::
+
+    A_i = V_{i\alpha}A_\alpha
+
 However, the cavity action in this basis becomes
 
 .. math::
 
-    S_A = -\frac{1}{8 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right](U^{-1}(-\mathbf q))^T U^{-1}(\mathbf q)\mathbf{A}(q)\\
+    S_A = -\frac{1}{8 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right](V^{-1}(-\mathbf q))^T V^{-1}(\mathbf q)\mathbf{A}(q)\\
     = -\frac{1}{8 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
-    \begin{pmatrix}
-    \left(\frac{\omega_q}{\omega_0}\right)^2 \cos^2 \theta_q + \sin^2 \theta_q& \left(\frac{\omega_q^2}{\omega_0^2} -1\right)\sin\theta_q \cos\theta_q\\
-    \left(\frac{\omega_q^2}{\omega_0^2} -1\right)\sin\theta_q \cos\theta_q&\left(\frac{\omega_q}{\omega_0}\right)^2 \sin^2 \theta_q + \cos^2 \theta_q
-    \end{pmatrix}
+    \sum_\alpha \bm{\epsilon}^*(\mathbf{q}, L/2)_\alpha\bm{\epsilon}(\mathbf{q}, L/2)_\alpha
     \mathbf{A}(q)
 
-Finally if we wish to transform to the basis along and perpendicular to the supercurrent
-
-.. math::
-
-    \begin{pmatrix}
-    A^x\\
-    A^y\\
-    \end{pmatrix}
-    = \underbrace{\begin{pmatrix}
-    \cos \theta_s& -\sin\theta_s\\
-    \sin\theta_s& \cos\theta_s
-    \end{pmatrix}}_R
-    \begin{pmatrix}
-    A_\parallel\\
-    A_\perp
-    \end{pmatrix}
-
-Upon this transformation the photon action becomes
+Picking the :math:`x` axis to be along the supercurrent gives.
 
 .. math::
 
     S_A = -\frac{1}{16 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
     \left[
     \left(1 + \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
-    - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin 2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
+    - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin 2\theta_q\sigma_1 - \cos 2\theta_q\sigma_3\right)
     \right]
     \mathbf{A}(q)
 
@@ -258,7 +251,7 @@ By inspection the units of this term are
 .. math::
     [g_q] = [e \nu \frac{v_s}{c}/\sqrt{L}]
 
-By inspecting the BS action (c.f. :cpp:func:`BS::action`) one can see that the Bardasis-Schrieffer inverse inv_gf
+The units of the BS inverse GF (c.f. :cpp:func:`BS::inv_gf`) one can see that the Bardasis-Schrieffer inverse gf
 has the same units as :math:`\nu`.
 As such it makes sense to absorb the factor :math:`\sqrt{\tfrac{2}{L}}e` into the photon fields.
 This makes the paramagnetic coupling
@@ -284,7 +277,7 @@ and the photon action
     S_A = -\frac{L}{32\pi e^2 c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
     \left[
     \left(1 + \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
-    - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin 2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
+    - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin 2\theta_q\sigma_1 - \cos 2\theta_q\sigma_3\right)
     \right]
     \mathbf{A}(q)
 
