@@ -84,9 +84,9 @@ public:
   double ImDA_int(double l, double theta, double omega) const
   {
     double fd = std::sqrt(2) * std::cos(2 * (theta + state().sys.theta_s));
-    double drift = state().sys.drift_theta(state().sys.kf(), theta);
-    double Ep = drift + l;
-    double Em = drift - l;
+    double doppler = state().sys.doppler_theta(state().sys.kf(), theta);
+    double Ep = doppler + l;
+    double Em = doppler - l;
 
     return fd *
            (std::tanh(Ep / (2 * state().T)) - std::tanh(Em / (2 * state().T))) /
@@ -107,9 +107,9 @@ public:
   double d_ImDA_int(double l, double theta, double omega) const
   {
     double fd = std::sqrt(2) * std::cos(2 * (theta + state().sys.theta_s));
-    double drift = state().sys.drift_theta(state().sys.kf(), theta);
-    double Ep = drift + l;
-    double Em = drift - l;
+    double doppler = state().sys.doppler_theta(state().sys.kf(), theta);
+    double Ep = doppler + l;
+    double Em = doppler - l;
 
     return -omega * fd *
            (std::tanh(Ep / (2 * state().T)) - std::tanh(Em / (2 * state().T))) /
@@ -274,8 +274,8 @@ public:
     auto lp = std::hypot(xp, state().delta);
     auto lm = std::hypot(xm, state().delta);
 
-    auto dp = sys.drift(kx + qx / 2, ky + qy / 2);
-    auto dm = sys.drift(kx - qx / 2, ky - qy / 2);
+    auto dp = sys.doppler(kx + qx / 2, ky + qy / 2);
+    auto dm = sys.doppler(kx - qx / 2, ky - qy / 2);
 
     auto pl = pi0_elems(dp, dm, lp, lm, omega, deriv);
 

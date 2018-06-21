@@ -94,10 +94,10 @@ public:
    */
   double inv_gf_int(double l, double theta, double omega) const
   {
-    double drift = state.sys.drift_theta(state.sys.kf(), theta);
+    double doppler = state.sys.doppler_theta(state.sys.kf(), theta);
 
-    double Ep = drift + l;
-    double Em = drift - l;
+    double Ep = doppler + l;
+    double Em = doppler - l;
 
     double F1 =
       (std::tanh(Ep / (2 * state.T)) - std::tanh(Em / (2 * state.T))) /
@@ -121,10 +121,10 @@ public:
    */
   double d_inv_gf_int(double l, double theta, double omega) const
   {
-    double drift = state.sys.drift_theta(state.sys.kf(), theta);
+    double doppler = state.sys.doppler_theta(state.sys.kf(), theta);
 
-    double Ep = drift + l;
-    double Em = drift - l;
+    double Ep = doppler + l;
+    double Em = doppler - l;
 
     double F1 =
       (std::tanh(Ep / (2 * state.T)) - std::tanh(Em / (2 * state.T))) /

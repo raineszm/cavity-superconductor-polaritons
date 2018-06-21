@@ -34,11 +34,11 @@ public:
   /**
    * @brief Construct a new System object
    *
-   * @param m_
-   * @param mu_
-   * @param Tc_
-   * @param vs_
-   * @param theta_s_
+   * @param m_ #m
+   * @param mu_ #mu
+   * @param Tc_ #Tc
+   * @param vs_ #vs
+   * @param theta_s_ #theta_s
    */
   System(double m_, double mu_, double Tc_, double vs_, double theta_s_)
     : m(m_)
@@ -54,7 +54,18 @@ public:
            theta_s == rhs.theta_s;
   }
 
+  /**
+   * @brief Bare qp energy in cartesian coordinates
+   *
+   * @param kx
+   * @param ky
+   * @return double
+   */
   double xi(double kx, double ky) const { return xi_k(std::hypot(kx, ky)); }
+
+  /** @name Dispersion
+   * @{
+   */
 
   /**
    * @brief The "bare" energy plus the superfluid term
@@ -75,7 +86,13 @@ public:
   double vf() const { return kf() / m; }
   //! The density of states per spin in 2D \f[\nu=\frac{m}{2\pi}\f]
   constexpr double dos() const { return m / (2 * M_PI); }
-  /** The density of electrons.
+
+  /** @} */
+
+  /**
+   * @brief The density of electrons.
+   *
+   * @return constexpr double
    *
    * For low temperatures we can neglect the distinction between \f$E_f\f$ and
    * \f$\mu\f$. In that case the density is \f[ n = 2 \int
@@ -84,10 +101,23 @@ public:
    */
   constexpr double n() const { return 2 * dos() * mu; }
 
-  double drift(double kx, double ky) const
+  /**
+   * @name Doppler shift
+   *
+   * @{
+   */
+
+  /**
+   * @brief The doppler shift in cartesian coordinates
+   *
+   * @param kx momentum
+   * @param ky momentum
+   * @return double
+   */
+  double doppler(double kx, double ky) const
   {
     auto [k, theta] = gsl::rect_to_polar(kx, ky);
-    return drift_theta(k, theta);
+    return doppler_theta(k, theta);
   }
 
   /**
@@ -97,10 +127,18 @@ public:
    * @param theta the angle the momentum makes with the x axis
    * @return double
    */
-  double drift_theta(double k, double theta) const
+  double doppler_theta(double k, double theta) const
   {
     return vs * k * std::cos(theta);
   }
+
+  /**
+   * @}
+   */
+
+  /** @name Gap Equation
+   * @{
+   */
 
   /**
    * @brief The gap equation for the s-wave state written in the form
@@ -137,9 +175,11 @@ public:
   {
 
     double l = std::hypot(x, delta);
-    double d = drift_theta(kf(), theta);
+    double d = doppler_theta(kf(), theta);
     return c(l, d, T) - tanh_over(x, Tc) / 2;
   }
+
+  /** @} */
 
   /**
    * @brief Select the \f$i\f$ components of \f$\mathbf{v}_s\f$
