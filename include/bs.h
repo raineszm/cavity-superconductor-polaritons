@@ -94,7 +94,7 @@ public:
    */
   double inv_gf_int(double l, double theta, double omega) const
   {
-    double doppler = state.sys.doppler_theta(state.sys.kf(), theta);
+    double doppler = state.sys.doppler(state.sys.kf(), theta);
 
     double Ep = doppler + l;
     double Em = doppler - l;
@@ -121,7 +121,7 @@ public:
    */
   double d_inv_gf_int(double l, double theta, double omega) const
   {
-    double doppler = state.sys.doppler_theta(state.sys.kf(), theta);
+    double doppler = state.sys.doppler(state.sys.kf(), theta);
 
     double Ep = doppler + l;
     double Em = doppler - l;

@@ -84,7 +84,7 @@ public:
   double ImDA_int(double l, double theta, double omega) const
   {
     double fd = std::sqrt(2) * std::cos(2 * (theta + state().sys.theta_s));
-    double doppler = state().sys.doppler_theta(state().sys.kf(), theta);
+    double doppler = state().sys.doppler(state().sys.kf(), theta);
     double Ep = doppler + l;
     double Em = doppler - l;
 
@@ -107,7 +107,7 @@ public:
   double d_ImDA_int(double l, double theta, double omega) const
   {
     double fd = std::sqrt(2) * std::cos(2 * (theta + state().sys.theta_s));
-    double doppler = state().sys.doppler_theta(state().sys.kf(), theta);
+    double doppler = state().sys.doppler(state().sys.kf(), theta);
     double Ep = doppler + l;
     double Em = doppler - l;
 
@@ -262,8 +262,8 @@ public:
                                         k + q / 2 * std::cos(theta_qk));
     auto theta_m = theta_k + std::atan2(-q / 2 * std::sin(theta_qk),
                                         k - q / 2 * std::cos(theta_qk));
-    auto dp = sys.doppler_theta(kp, theta_p);
-    auto dm = sys.doppler_theta(km, theta_m);
+    auto dp = sys.doppler(kp, theta_p);
+    auto dm = sys.doppler(km, theta_m);
 
     auto pl = pi0_elems(dp, dm, lp, lm, omega, deriv);
 

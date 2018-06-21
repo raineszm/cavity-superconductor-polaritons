@@ -108,26 +108,13 @@ public:
    */
 
   /**
-   * @brief The doppler shift in cartesian coordinates
-   *
-   * @param kx momentum
-   * @param ky momentum
-   * @return double
-   */
-  double doppler(double kx, double ky) const
-  {
-    auto [k, theta] = gsl::rect_to_polar(kx, ky);
-    return doppler_theta(k, theta);
-  }
-
-  /**
    * @brief The Doppler shift term \f$\mathbf{v}_s \cdot \mathbf{k}\f$
    *
    * @param k the magnitude of the electron momentum
    * @param theta the angle the momentum makes with the x axis
    * @return double
    */
-  double doppler_theta(double k, double theta) const
+  double doppler(double k, double theta) const
   {
     return vs * k * std::cos(theta);
   }
@@ -175,7 +162,7 @@ public:
   {
 
     double l = std::hypot(x, delta);
-    double d = doppler_theta(kf(), theta);
+    double d = doppler(kf(), theta);
     return c(l, d, T) - tanh_over(x, Tc) / 2;
   }
 
