@@ -1,12 +1,12 @@
 from dataclasses import dataclass, asdict, field
-from typing import Dict, Type
+from typing import Mapping, Type
 from ..materials import NIOBIUM
 from .. import _bardasis_schrieffer as bsm
 
 
-@dataclass
+@dataclass(frozen=True)
 class Params:
-    material: Dict[str, float] = field(default_factory=lambda: NIOBIUM)
+    material: Mapping[str, float] = field(default_factory=lambda: NIOBIUM)
     Trel: float = 0.4
     vrel: float = 0.6
     theta_s: float = 0.
@@ -15,8 +15,16 @@ class Params:
     root_rel: float = 1
     cls: Type[bsm.Polariton] = bsm.ModePolariton
 
-    def as_args(self, vc):
+    def as_args(self):
         pdict = asdict(self)
         vrel = pdict.pop("vrel")
-        pdict["vs"] = vrel * vc
+        pdict["vs"] = vrel * self.vc()
         return pdict
+
+    def vc(self):
+        sys0 = bsm.System(vs=0., **self.material)
+        state0 = bsm.State.solve(sys0, self.Trel * self.material["Tc"])
+        return (
+            state0.delta / sys0.kf
+        )  # The critical superfluid velocity via Landau's argument
+

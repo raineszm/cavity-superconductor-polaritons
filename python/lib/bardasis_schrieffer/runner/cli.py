@@ -22,7 +22,9 @@ class Method(enum.Enum):
     "--method", type=click.Choice(list(Method.__members__)), default="HAMILTONIAN"
 )
 @click.option("-r", "--root_rel", type=float, default=1.)
-def main(qs, thetas, method, root_rel):
+@click.option("--dipole", type=float, default=1.)
+@click.option("--para", type=float, default=1.)
+def main(qs, thetas, method, root_rel, dipole, para):
     m = Method[method]
 
     if m == Method.ACTION:
@@ -30,7 +32,7 @@ def main(qs, thetas, method, root_rel):
     else:
         cls = bsm.ModePolariton
 
-    params = Params(cls=cls, root_rel=root_rel)
+    params = Params(cls=cls, root_rel=root_rel, dipoleX=dipole, paraX=para)
 
     hamiltonian = m == Method.HAMILTONIAN
 
