@@ -163,4 +163,9 @@ public:
 
     return (Matrix2d() << -q2, e2_factor * q1, -q1, e2_factor * -q2).finished();
   }
+
+  using pickle_type = double;
+
+  pickle_type pickle() const { return omega0; }
+  static inline Cavity unpickle(pickle_type omega0) { return Cavity(omega0); }
 };

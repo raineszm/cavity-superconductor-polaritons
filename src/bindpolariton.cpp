@@ -45,7 +45,24 @@ bind_polariton(py::module& m)
          "q"_a,
          "theta_q"_a,
          "ftol"_a = 1e-10,
-         "double_root_tol"_a = 1e-17);
+         "double_root_tol"_a = 1e-17)
+    .def(py::pickle(
+      [](const Polariton& p) {
+        auto sysp = p.coupling.bs.state.sys.pickle();
+        auto statep = p.coupling.bs.state.pickle();
+        auto bsp = p.coupling.bs.pickle();
+        auto cavp = p.coupling.cav.pickle();
+        return py::make_tuple(sysp, statep, bsp, cavp, p.pickle());
+      },
+      [](py::tuple t) {
+        auto sys = System::unpickle(t[0].cast<System::pickle_type>());
+        auto state = State::unpickle(sys, t[1].cast<State::pickle_type>());
+        auto bs = BS::unpickle(state, t[2].cast<BS::pickle_type>());
+        auto cav = Cavity::unpickle(t[3].cast<Cavity::pickle_type>());
+        auto c = Coupling(bs, cav);
+        return Polariton::unpickle(c, t[4].cast<Polariton::pickle_type>());
+      }));
+  ;
 
   py::class_<ModePolariton>(m, "ModePolariton", polariton)
     .def(py::init<const Coupling&, double, double>(),
@@ -53,5 +70,21 @@ bind_polariton(py::module& m)
          "paraX"_a = 1.,
          "dipoleX"_a = 1.)
     .def("hamiltonian", &ModePolariton::hamiltonian)
-    .def("bands", &ModePolariton::bands);
+    .def("bands", &ModePolariton::bands)
+    .def(py::pickle(
+      [](const ModePolariton& p) {
+        auto sysp = p.coupling.bs.state.sys.pickle();
+        auto statep = p.coupling.bs.state.pickle();
+        auto bsp = p.coupling.bs.pickle();
+        auto cavp = p.coupling.cav.pickle();
+        return py::make_tuple(sysp, statep, bsp, cavp, p.pickle());
+      },
+      [](py::tuple t) {
+        auto sys = System::unpickle(t[0].cast<System::pickle_type>());
+        auto state = State::unpickle(sys, t[1].cast<State::pickle_type>());
+        auto bs = BS::unpickle(state, t[2].cast<BS::pickle_type>());
+        auto cav = Cavity::unpickle(t[3].cast<Cavity::pickle_type>());
+        auto c = Coupling(bs, cav);
+        return ModePolariton::unpickle(c, t[4].cast<Polariton::pickle_type>());
+      }));
 }

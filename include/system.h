@@ -9,6 +9,7 @@
 
 #include "integrate.h"
 #include "utils.h"
+#include <array>
 #include <cmath>
 #include <functional>
 
@@ -201,6 +202,15 @@ public:
   {
     assert(i < 2 and i >= 0);
     return gsl::polar_to_rect(k / m, theta)[i];
+  }
+
+  using pickle_type = std::array<double, 5>;
+
+  pickle_type pickle() const { return { { m, mu, Tc, vs, theta_s } }; }
+
+  static inline System unpickle(const pickle_type& a)
+  {
+    return std::make_from_tuple<System, decltype(a)>(a);
   }
 };
 

@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #include "system.h"
 
@@ -33,15 +34,9 @@ bind_system(py::module& m)
     .def_property_readonly("dos", &System::dos)
     .def_property_readonly("n", &System::n)
     // Pickle
-    .def(py::pickle(
-      [](const System& sys) {
-        return py::make_tuple(sys.m, sys.mu, sys.Tc, sys.vs, sys.theta_s);
-      },
-      [](py::tuple t) {
-        return new System(t[0].cast<double>(),
-                          t[1].cast<double>(),
-                          t[2].cast<double>(),
-                          t[3].cast<double>(),
-                          t[4].cast<double>());
-      }));
+    .def(
+      py::pickle([](const System& sys) { return py::make_tuple(sys.pickle()); },
+                 [](py::tuple t) {
+                   return System::unpickle(t[0].cast<System::pickle_type>());
+                 }));
 }

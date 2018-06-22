@@ -10,6 +10,7 @@
 #include "roots.h"
 #include "state.h"
 #include "system.h"
+#include <array>
 #include <cmath>
 #include <functional>
 
@@ -234,4 +235,12 @@ public:
   /** The kinetic mass of the BS mode
    */
   double M() const { return 2 * d_inv_gf(root()); }
+
+  using pickle_type = double;
+
+  pickle_type pickle() const { return mass; }
+  static inline BS unpickle(const State& state, pickle_type mass)
+  {
+    return BS(mass, state);
+  }
 };

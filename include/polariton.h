@@ -382,6 +382,14 @@ public:
     std::sort(extrema.begin(), extrema.end());
     return extrema;
   }
+
+  using pickle_type = std::array<double, 2>;
+
+  pickle_type pickle() const { return { { paraX, dipoleX } }; }
+  static inline Polariton unpickle(const Coupling& c, pickle_type a)
+  {
+    return Polariton(c, a[0], a[1]);
+  }
 };
 
 /**
@@ -502,5 +510,10 @@ public:
     return hamiltonian(q, theta_q)
       .selfadjointView<Eigen::Upper>()
       .eigenvalues();
+  }
+
+  static inline ModePolariton unpickle(const Coupling& c, pickle_type a)
+  {
+    return ModePolariton(c, a[0], a[1]);
   }
 };

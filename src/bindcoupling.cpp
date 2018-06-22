@@ -36,5 +36,20 @@ bind_coupling(py::module& m)
     .def("photon_se_mode", &Coupling::photon_se_mode)
     .def("d_photon_se_mode", &Coupling::d_photon_se_mode)
     .def("Z", &Coupling::Z)
-    .def("wf_renorm", &Coupling::wf_renorm);
+    .def("wf_renorm", &Coupling::wf_renorm)
+    .def(py::pickle(
+      [](const Coupling& c) {
+        auto sysp = c.bs.state.sys.pickle();
+        auto statep = c.bs.state.pickle();
+        auto bsp = c.bs.pickle();
+        auto cavp = c.cav.pickle();
+        return py::make_tuple(sysp, statep, bsp, cavp);
+      },
+      [](py::tuple t) {
+        auto sys = System::unpickle(t[0].cast<System::pickle_type>());
+        auto state = State::unpickle(sys, t[1].cast<State::pickle_type>());
+        auto bs = BS::unpickle(state, t[2].cast<BS::pickle_type>());
+        auto cav = Cavity::unpickle(t[3].cast<Cavity::pickle_type>());
+        return Coupling(bs, cav);
+      }));
 }

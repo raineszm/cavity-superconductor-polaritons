@@ -1,7 +1,9 @@
 #include <functional>
+#include <tuple>
 
 #include <pybind11/functional.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #include "state.h"
 
@@ -19,5 +21,11 @@ bind_state(py::module& m)
     .def_readonly("sys", &State::sys, "The associated system")
     // Functions
     .def_static(
-      "solve", &State::solve, "solve the gap equations at temperature T");
+      "solve", &State::solve, "solve the gap equations at temperature T")
+    .def(py::pickle(
+      [](const State& s) { return py::make_tuple(s.sys.pickle(), s.pickle()); },
+      [](py::tuple t) {
+        auto sys = System::unpickle(t[0].cast<System::pickle_type>());
+        return State::unpickle(sys, t[1].cast<State::pickle_type>());
+      }));
 }

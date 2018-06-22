@@ -9,6 +9,7 @@
 
 #include "roots.h"
 #include "system.h"
+#include <array>
 #include <cmath>
 
 /**
@@ -133,6 +134,14 @@ public:
   }
 
   //! @}
+
+  using pickle_type = std::array<double, 2>;
+  pickle_type pickle() const { return { { T, delta } }; }
+
+  static inline State unpickle(const System& sys, const pickle_type& a)
+  {
+    return State(sys, a[0], a[1]);
+  }
 };
 
 namespace std {

@@ -19,5 +19,16 @@ bind_bs(py::module& m)
     .def("inv_gf", &BS::inv_gf)
     .def("d_inv_gf", &BS::d_inv_gf)
     .def_property_readonly("root", &BS::root)
-    .def_property_readonly("M", &BS::M);
+    .def_property_readonly("M", &BS::M)
+    .def(py::pickle(
+      [](const BS& bs) {
+        auto sysp = bs.state.sys.pickle();
+        auto statep = bs.state.pickle();
+        return py::make_tuple(sysp, statep, bs.pickle());
+      },
+      [](py::tuple t) {
+        auto sys = System::unpickle(t[0].cast<System::pickle_type>());
+        auto state = State::unpickle(sys, t[1].cast<State::pickle_type>());
+        return BS::unpickle(state, t[2].cast<BS::pickle_type>());
+      }));
 }
