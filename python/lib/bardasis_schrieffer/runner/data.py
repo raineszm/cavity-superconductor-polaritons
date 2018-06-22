@@ -1,6 +1,7 @@
 import csv
 import itertools as it
 from pathlib import Path
+from multiprocessing import Pool
 
 import numpy as np
 import tqdm
@@ -8,6 +9,23 @@ import tqdm
 from .. import _bardasis_schrieffer as bsm
 from ..materials import NIOBIUM
 from ..polariton import build_polariton
+
+
+class Runner:
+    def __init__(self, p, hamiltonian):
+        self.p = p
+        self.hamiltonian = hamiltonian
+
+    def __call__(self, args):
+        (q, theta) = args
+        if self.hamiltonian:
+            modes = self.p.bands(q, theta)
+        else:
+            modes = self.p.find_modes(q, theta)
+        return [
+            {"q": q, "theta": theta, "omega": m, "i": i}
+            for (i, m) in enumerate(sorted(modes))
+        ]
 
 
 def data(fname, qs, thetas, params, hamiltonian=None):
@@ -18,16 +36,13 @@ def data(fname, qs, thetas, params, hamiltonian=None):
 
     qs *= p.state.delta / bsm.C
 
+    pool = Pool()
+    runner = Runner(p, hamiltonian)
     with open(fname, "w") as f:
         writer = csv.DictWriter(f, ["q", "theta", "omega", "i"])
         writer.writeheader()
-        for (theta, q) in tqdm.tqdm(
-            it.product(thetas, qs), total=len(thetas) * len(qs)
+        for rows in tqdm.tqdm(
+            pool.imap_unordered(runner, it.product(thetas, qs)),
+            total=len(thetas) * len(qs),
         ):
-            if hamiltonian:
-                H = p.hamiltonian(q, theta)
-                modes = np.linalg.eigvalsh(H)
-            else:
-                modes = p.find_modes(q, theta)
-            for (i, m) in enumerate(sorted(modes)):
-                writer.writerow({"q": q, "theta": theta, "omega": m, "i": i})
+            writer.writerows(rows)
