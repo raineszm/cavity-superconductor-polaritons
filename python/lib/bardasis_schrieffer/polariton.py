@@ -4,11 +4,21 @@ from .materials import NIOBIUM
 
 
 def _build_polariton(
-    m, mu, Tc, vs, theta_s, Trel, root_rel, paraX, dipoleX, cls=bsm.Polariton
+    m,
+    mu,
+    Tc,
+    vs,
+    theta_s,
+    Trel,
+    root_rel,
+    paraX,
+    dipoleX,
+    bsmass=0.3,
+    cls=bsm.Polariton,
 ):
     sys = bsm.System(m, mu, Tc, vs, theta_s)
     state = bsm.State.solve(sys, Trel * Tc)
-    bs = bsm.BS(0.3, state)
+    bs = bsm.BS(bsmass, state)
     return cls(
         coupling=bsm.Coupling(cav=bsm.Cavity(bs.root * root_rel), bs=bs),
         paraX=paraX,
