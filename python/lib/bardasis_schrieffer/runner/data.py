@@ -17,7 +17,8 @@ class Runner:
         self.hamiltonian = hamiltonian
 
     def __call__(self, args):
-        (q, theta) = args
+        (theta, q) = args
+        print(q, theta)
         if self.hamiltonian:
             modes = self.p.bands(q, theta)
         else:
