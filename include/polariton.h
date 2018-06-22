@@ -482,19 +482,18 @@ public:
     g *= paraX * dipoleX;
 
     auto LLT = coupling.wf_renorm(q, theta_q, paraX);
-    Matrix2d L = LLT.matrixL();
+    auto L = LLT.matrixL();
     Matrix2d L_ = LLT.matrixU();
-    g = L.inverse() * g;
+    L.solveInPlace(g);
 
     Matrix3d H = Matrix3d::Zero();
     H(0, 0) = bs().hamiltonian();
     H.block<1, 2>(0, 1) = g.adjoint();
     H.block<2, 1>(1, 0) = g;
-    H.bottomRightCorner<2, 2>() =
-      L.inverse() *
+    H.bottomRightCorner<2, 2>() = L.solve(
       (cav().omega(q) * Matrix2d::Identity() +
        paraX * paraX * coupling.photon_se_mode(cav().omega0, q, theta_q)) *
-      L_.inverse();
+      L_.inverse());
     return H;
   }
 
