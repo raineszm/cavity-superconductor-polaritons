@@ -438,8 +438,7 @@ public:
     auto M = bs.M();
     auto V = cav.polarizations(q, theta_q);
     auto vsdoteps = V(0, i);
-    return 2 *
-           std::sqrt(M_PI * C * C * (C * ALPHA) /
+    return std::sqrt(M_PI * C * C * (C * ALPHA) /
                      (M * bs.root() * cav.omega(q))) *
            vsdoteps * ImDA(omega);
   }

@@ -233,8 +233,16 @@ public:
   double hamiltonian() const { return root(); }
 
   /** The kinetic mass of the BS mode
+   *
+   * \f[\frac{1}{2} M = \left.\frac{\partial I(\Omega^2)}{\partial
+   * \Omega^2}\right|_{\Omega=\Omega_\text{BS}}\f]
+   *
+   * Note that \f$\tfrac{\partial I(\Omega^2)}{\partial \Omega} = I'(\Omega^2)2
+   * \Omega\f$.
+   *
+   * So \f$M = I'(\Omega_\text{BS}^2)/\Omega_\text{BS}\f$.
    */
-  double M() const { return 2 * d_inv_gf(root()); }
+  double M() const { return d_inv_gf(root()) / root(); }
 
   using pickle_type = double;
 
