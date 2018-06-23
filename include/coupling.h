@@ -438,8 +438,8 @@ public:
     auto M = bs.M();
     auto V = cav.polarizations(q, theta_q);
     auto vsdoteps = V(0, i);
-    return std::sqrt(M_PI * C * C * (C * ALPHA) /
-                     (M * bs.root() * cav.omega(q))) *
+    return std::sqrt(2 * M_PI * C * C /
+                     (M * bs.root() * cav.omega(q) * cav.L())) *
            vsdoteps * ImDA(omega);
   }
 
@@ -458,9 +458,8 @@ public:
     auto M = bs.M();
     auto V = cav.polarizations(q, theta_q);
     auto vsdoteps = V(0, i);
-    return 2 *
-           std::sqrt(M_PI * C * C * (C * ALPHA) /
-                     (M * bs.root() * cav.omega(q))) *
+    return std::sqrt(2 * M_PI * C * C /
+                     (M * bs.root() * cav.omega(q) * cav.L())) *
            vsdoteps * d_ImDA(omega);
   }
 
@@ -531,8 +530,8 @@ public:
                    .finished()
                    .transpose();
 
-    return 4 * M_PI * C * C * (C * ALPHA) / (cav.L() * cav.omega(q)) *
-           V.transpose() * (Piq + Pi_qT) * V;
+    return 4 * M_PI * C * C / (cav.L() * cav.omega(q)) * V.transpose() *
+           (Piq + Pi_qT) * V;
   }
 
   /**
@@ -561,8 +560,8 @@ public:
         .finished()
         .transpose();
 
-    return 4 * M_PI * C * C * (C * ALPHA) / (cav.L() * cav.omega(q)) *
-           V.transpose() * (Piq + Pi_qT) * V;
+    return 4 * M_PI * C * C / (cav.L() * cav.omega(q)) * V.transpose() *
+           (Piq + Pi_qT) * V;
   }
 
   Matrix2d Z(double q, double theta_q, double paraX) const

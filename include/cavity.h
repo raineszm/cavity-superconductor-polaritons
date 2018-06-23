@@ -5,7 +5,7 @@
  * @author Zach Raines
  * @date 2018-06-12
  *
- * We use Gaussian Hartree Units
+ * We use Gaussian natural units
  */
 #pragma once
 #include "utils.h"
@@ -18,10 +18,10 @@ using Eigen::Matrix2d;
 const double ALPHA = 7.2973525664e-3;
 
 //! The speed of light
-const double C = 1 / ALPHA;
+const double C = 1;
 
 //! The paramagnetic coupling strength
-const double GPAR = 1 / C;
+const double GPAR = std::sqrt(ALPHA / C);
 
 /**
  * @brief The physics of the cavity modes
@@ -108,7 +108,7 @@ public:
    *
    *
    * \f[
-   * D^{-1}(\omega, \mathbf{q}) = \frac{L \alpha^2}{32 \pi (c\alpha)^3}\left[
+   * D^{-1}(\omega, \mathbf{q}) = \frac{L}{32 \pi c^2}\left[
    * (\omega + i0^+
    * )^2 - \omega_\mathbf{q}^2\right] \left[ \left(1 +
    * \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
@@ -120,9 +120,8 @@ public:
   Matrix2d inv_gf(double omega, double q, double theta_q) const
   {
     auto omega_q = this->omega(q);
-    auto prefactor = L() * std::pow(ALPHA, 2) *
-                     (omega * omega - omega_q * omega_q) /
-                     (32 * M_PI * std::pow(ALPHA * C, 3));
+    auto prefactor =
+      L() * (omega * omega - omega_q * omega_q) / (32 * M_PI * C * C);
 
     return prefactor * matrix_structure(q, theta_q);
   }
@@ -141,8 +140,7 @@ public:
    */
   Matrix2d d_inv_gf(double omega, double q, double theta_q) const
   {
-    auto prefactor =
-      L() * std::pow(ALPHA, 2) * omega / (16 * M_PI * std::pow(C * ALPHA, 3));
+    auto prefactor = L() * omega / (16 * M_PI * C * C);
 
     return prefactor * matrix_structure(q, theta_q);
   }

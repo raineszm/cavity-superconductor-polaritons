@@ -253,18 +253,18 @@ By inspection the units of this term are
 
 The units of the BS inverse GF (c.f. :cpp:func:`BS::inv_gf`) one can see that the Bardasis-Schrieffer inverse gf
 has the same units as :math:`\nu`.
-As such it makes sense to absorb the factor :math:`\sqrt{\tfrac{2}{L}}e` into the photon fields.
+As such it makes sense to absorb the factor :math:`\sqrt{\tfrac{2}{L}}` into the photon fields.
 This makes the paramagnetic coupling
 
 .. math::
 
-    \frac{\mathbf{v}}{c} \cdot \mathbf{A}
+    \frac{\mathbf{e v}}{c} \cdot \mathbf{A}
 
 and the coupling between the excitations
 
 .. math::
 
-    g_q \approx -2 \frac{v_s}{c} \nu i\Omega_m\Delta \int_\Delta^\infty
+    g_q \approx -2 \frac{e v_s}{c} \nu i\Omega_m\Delta \int_\Delta^\infty
    \frac{d\lambda}{\sqrt{\lambda^2 - \Delta^2}}
    \int_0^{2\pi}\frac{d\theta}{2\pi}
    \frac{n_F(E^-(\lambda))-n_F(E^+(\lambda))}{(i \Omega_m)^2 -
@@ -274,14 +274,13 @@ and the photon action
 
 .. math::
 
-    S_A = -\frac{L}{32\pi e^2 c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
+    S_A = -\frac{L}{32\pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
     \left[
     \left(1 + \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
     - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin 2\theta_q\sigma_1 - \cos 2\theta_q\sigma_3\right)
     \right]
     \mathbf{A}(q)
 
-or using :math:`\alpha=\frac{e^2}{c}`
 
 .. _photon-action:
 
@@ -290,10 +289,10 @@ Photon Action in Supercurrent Basis
 
 .. math::
 
-    S_A = -\frac{\alpha^2 L}{32\pi (\alpha c)^3}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
+    S_A = -\frac{L}{32\pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
     \left[
     \left(1 + \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right)\sigma_0
-    - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin 2(\theta_q - \theta_s)\sigma_1 - \cos 2(\theta_q - \theta_s)\sigma_3\right)
+    - \left(1 - \frac{\omega_\mathbf{q}^2}{\omega_0^2}\right) \left(\sin 2\theta_q\sigma_1 - \cos 2\theta_q\sigma_3\right)
     \right]
     \mathbf{A}(q)
 
