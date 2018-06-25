@@ -117,6 +117,20 @@ public:
             std::sqrt(l * l - state().delta * state().delta));
   }
 
+  /**
+   * @brief The integral appearing in the definition of coupling
+   *
+   * @param omega frequency
+   * @return double
+   * @see ImDA(), mode_coupling()
+   *
+   *
+   * \f[
+   * 2\nu \int_\Delta^\infty d\lambda
+   * \int_0^{2\pi}\frac{d\theta}{2\pi}\frac{1}{\sqrt{\lambda^2 - \Delta^2}}
+   * \frac{n_F(E^-(\lambda))-n_F(E^+(\lambda))}{(i\Omega_m)^2 -
+   * (2\lambda)^2}f_d(\theta) \f]
+   */
   double coupling_I(double omega) const
   {
     return 2 * state().sys.dos() *
@@ -374,8 +388,6 @@ public:
    * @param omega photon frequency
    * @param q photon momentum
    * @param theta_q angle of photon momentum w.r.t \f$v_s\f$
-   * @param i left index of self-energy
-   * @param j right index of self-energy
    * @return double
    * @see photon_se_int(), System::xi_k(), System::n()
    *
