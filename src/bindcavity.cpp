@@ -17,6 +17,7 @@ bind_cavity(py::module& m)
     .def("d_inv_gf", &Cavity::d_inv_gf)
     .def("omega", &Cavity::omega)
     .def("polarizations", &Cavity::polarizations)
+    .def_property_readonly("L", &Cavity::L)
     .def(py::pickle([](const Cavity& c) { return py::make_tuple(c.pickle()); },
                     [](py::tuple t) {
                       return Cavity::unpickle(t[0].cast<Cavity::pickle_type>());
