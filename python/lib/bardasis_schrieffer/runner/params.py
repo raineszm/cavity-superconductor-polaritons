@@ -1,12 +1,12 @@
 from dataclasses import dataclass, asdict, field
 from typing import Mapping, Type
-from ..materials import NIOBIUM
+from ..materials import *
 from .. import _bardasis_schrieffer as bsm
 
 
 @dataclass(frozen=True)
 class Params:
-    material: Mapping[str, float] = field(default_factory=lambda: NIOBIUM)
+    material: Mapping[str, float] = field(default_factory=lambda: PNICTIDE)
     Trel: float = 0.4
     vrel: float = 0.6
     theta_s: float = 0.
