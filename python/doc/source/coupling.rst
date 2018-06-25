@@ -75,12 +75,12 @@ We may then extract the effective coupling
     g_\text{eff}(i\Omega_m, \mathbf{q}, \alpha) = \sqrt{\frac{\pi c^2 }{M \Omega_\text{BS}\omega_{\mathbf{q}}}}
     \mathbf{v}_s\cdot i\bm{\epsilon}_{\alpha,\mathbf{q}}\left(\frac{L}{2}\right)g(i\Omega_m, \mathbf{q})
 
-or explicitly
+or explicitly using :math:`e = \sqrt{\alpha c}`
 
 .. math::
 
-   g_\text{eff}(i\Omega_m, q) \approx -2i \Omega_m e \mathbf{v}_s\cdot i\bm{\epsilon}_{\alpha,\mathbf{q}}
-   \nu \Delta \sqrt{\frac{\pi}{M \Omega_\text{BS}\omega_{\mathbf{q}}}}
+   g_\text{eff}(i\Omega_m, q) \approx -i \Omega_m \mathbf{v}_s\cdot i\bm{\epsilon}_{\alpha,\mathbf{q}}
+   \nu \Delta \sqrt{\frac{4\pi\alpha c}{M \Omega_\text{BS}\omega_{\mathbf{q}}}}
     \int_\Delta^\infty
    \frac{d\lambda}{\sqrt{\lambda^2 - \Delta^2}}
    \int_0^{2\pi}\frac{d\theta}{2\pi}
@@ -207,9 +207,9 @@ Similarly, the coupling to the Bardasis-Schrieffer mode becomes
 
 .. math::
 
-   g_\text{eff}(i\Omega_m, q) \approx -2i \Omega_m e \mathbf{v}_s\cdot i\bm{\epsilon}_{\alpha',\mathbf{q}} 
+   g_\text{eff}(i\Omega_m, q) \approx -i \Omega_m \mathbf{v}_s\cdot i\bm{\epsilon}_{\alpha',\mathbf{q}} 
    \left[(L^\dagger)^{-1}\right]_{\alpha',\alpha}
-   \nu \Delta \sqrt{\frac{\pi }{M \Omega_\text{BS}\omega_{\mathbf{q}}}}
+   \nu \Delta \sqrt{\frac{4\pi \alpha c}{M \Omega_\text{BS}\omega_{\mathbf{q}}}}
     \int_\Delta^\infty
    \frac{d\lambda}{\sqrt{\lambda^2 - \Delta^2}}
    \int_0^{2\pi}\frac{d\theta}{2\pi}

@@ -145,6 +145,16 @@ public:
            (2 * std::sqrt(l * l - state.delta * state.delta));
   }
 
+  double I(double omega) const
+  {
+    return -state.sys.dos() * 2 *
+           gsl_xi_integrate(
+             [this, omega](double l, double theta) {
+               return inv_gf_int(l, theta, omega);
+             },
+             state.delta);
+  }
+
   /**
    * @brief The Bardasis-Schrieffer inverse Green's function
    *
@@ -168,12 +178,7 @@ public:
    */
   double inv_gf(double omega) const
   {
-    return -state.sys.dos() *
-           (mass + 2 * gsl_xi_integrate(
-                         [this, omega](double l, double theta) {
-                           return inv_gf_int(l, theta, omega);
-                         },
-                         state.delta));
+    return -state.sys.dos() * mass + I(omega);
   }
 
   /**

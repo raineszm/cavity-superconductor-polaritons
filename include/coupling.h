@@ -117,6 +117,16 @@ public:
             std::sqrt(l * l - state().delta * state().delta));
   }
 
+  double coupling_I(double omega) const
+  {
+    return 2 * state().sys.dos() *
+           gsl_xi_integrate(
+             [this, omega](double l, double theta) {
+               return ImDA_int(l, theta, omega);
+             },
+             state().delta);
+  }
+
   /**
    * @brief The coupling between the Bardasis Schrieffer mode and photons
    * appearing in the inverse Green's function
@@ -152,13 +162,7 @@ public:
    */
   double ImDA(double omega) const
   {
-    return -2 * omega * state().delta * GPAR * state().sys.vs *
-           state().sys.dos() *
-           gsl_xi_integrate(
-             [this, omega](double l, double theta) {
-               return ImDA_int(l, theta, omega);
-             },
-             state().delta);
+    return -omega * state().delta * GPAR * state().sys.vs * coupling_I(omega);
   }
 
   /**
@@ -437,10 +441,11 @@ public:
     assert(i == 0 || i == 1);
     auto M = bs.M();
     auto V = cav.polarizations(q, theta_q);
-    auto vsdoteps = V(0, i);
-    return std::sqrt(2 * M_PI * C * C /
-                     (M * bs.root() * cav.omega(q) * cav.L())) *
-           vsdoteps * ImDA(omega);
+    auto ivsdoteps = state().sys.vs * std::sqrt(2 / cav.L()) * V(0, i);
+    auto I = coupling_I(omega);
+    return -0.5 * ivsdoteps * state().delta *
+           std::sqrt((4 * M_PI * ALPHA * C * bs.root()) / (M * cav.omega(q))) *
+           I;
   }
 
   /**
