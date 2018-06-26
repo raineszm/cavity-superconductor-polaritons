@@ -16,6 +16,6 @@ NIOBIUM = dict(  # eV
 """Material parameters for a model of pnictides"""
 PNICTIDE = dict(  # eV
     Tc=Q_(35, "kelvin").to("eV", "boltzmann").magnitude,
-    mu=Q_(0.001, "eV").magnitude,
+    mu=Q_(100, "meV").to("eV").magnitude,
     m=Q_(0.7, "m_e*c^2").to("eV").magnitude,
 )
