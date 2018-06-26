@@ -28,8 +28,9 @@ class Method(enum.Enum):
 @click.option("-r", "--root_rel", type=float, default=1.)
 @click.option("--dipole", type=float, default=1.)
 @click.option("--para", type=float, default=1.)
+@click.option("-v", "--vrel", type=float, default=0.6)
 @click.option("--notify/--no-notify", default=False)
-def main(qs, thetas, method, root_rel, dipole, para, notify):
+def main(qs, thetas, method, root_rel, dipole, para, notify, vrel):
     m = Method[method]
 
     if m == Method.ACTION:
@@ -37,7 +38,7 @@ def main(qs, thetas, method, root_rel, dipole, para, notify):
     else:
         cls = bsm.ModePolariton
 
-    params = Params(cls=cls, root_rel=root_rel, dipoleX=dipole, paraX=para)
+    params = Params(cls=cls, root_rel=root_rel, dipoleX=dipole, paraX=para, vrel=vrel)
 
     hamiltonian = m == Method.HAMILTONIAN
 
