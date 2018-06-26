@@ -12,6 +12,7 @@ pint = "*"
 dataclasses = "*"
 tqdm = "*"
 meson = "*"
+"pushbullet.py" = "*"
 
 [dev-packages]
 
