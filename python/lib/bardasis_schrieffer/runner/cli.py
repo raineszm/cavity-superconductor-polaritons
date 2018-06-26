@@ -26,6 +26,7 @@ class Method(enum.Enum):
     "--method", type=click.Choice(list(Method.__members__)), default="HAMILTONIAN"
 )
 @click.option("--notify/--no-notify", default=False)
+@click.option("--data-dir", type=click.Path(exists=True), default=None)
 @click.option("-r", "--root_rel", type=float, default=Params().root_rel)
 @click.option("--dipole", type=float, default=Params().dipole)
 @click.option("--para", type=float, default=Params().para)
@@ -33,7 +34,7 @@ class Method(enum.Enum):
 @click.option("--xl", type=float, default=Params().xl)
 @click.option("--xu", type=float, default=Params().xu)
 @click.option("--ftol", type=float, default=Params().ftol)
-def main(qs, thetas, method, notify, **kwargs):
+def main(qs, thetas, method, notify, data_dir, **kwargs):
     m = Method[method]
 
     if m == Method.ACTION:
@@ -56,9 +57,17 @@ def main(qs, thetas, method, notify, **kwargs):
     meta_args = dict(method=method, params=params.as_args())
     del meta_args["params"]["cls"]
 
-    with open(fpath_root.with_suffix(".json"), "w") as json_file:
+    jsonpath = fpath_root.with_suffix(".json")
+    with open(jsonpath, "w") as json_file:
         json.dump(meta_args, json_file)
 
-    data.data(fpath_root.with_suffix(".csv"), qs, thetas, params, hamiltonian)
+    datapath = fpath_root.with_suffix(".csv")
+    data.data(datapath, qs, thetas, params, hamiltonian)
     if notify:
         push_notification(fname, len(qs) * len(thetas))
+
+    if data_dir:
+        import shutil
+
+        shutil.copy(datapath, data_dir)
+        shutil.copy(jsonpath, data_dir)
