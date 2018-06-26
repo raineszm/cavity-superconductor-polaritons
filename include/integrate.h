@@ -40,7 +40,7 @@ public:
 
 template<typename F>
 double
-gsl_xi_integrate(const F& f, double a)
+gsl_xi_integrate(const F& f, double a, double epsrel = EPSREL)
 {
   double result, abserr, inner_result, inner_abserr;
 
@@ -55,7 +55,7 @@ gsl_xi_integrate(const F& f, double a)
                         0,
                         2 * M_PI,
                         EPSABS,
-                        EPSREL,
+                        epsrel,
                         limit,
                         GSL_INTEG_GAUSS21,
                         wsp1,
@@ -64,7 +64,7 @@ gsl_xi_integrate(const F& f, double a)
     return inner_result / (2 * M_PI);
   });
   gsl_integration_qagiu(
-    outer, a, EPSABS, EPSREL, limit, wsp2, &result, &abserr);
+    outer, a, EPSABS, epsrel, limit, wsp2, &result, &abserr);
 
   return result;
 }

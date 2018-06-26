@@ -28,8 +28,6 @@ bind_polariton(py::module& m)
     .def("inv_gf", &Polariton::inv_gf)
     .def("det_inv_gf", &Polariton::det_inv_gf)
     .def("d_inv_gf", &Polariton::d_inv_gf)
-    .def("d_det_inv_gf", &Polariton::d_det_inv_gf)
-    .def("det_and_d", &Polariton::det_and_d)
     .def("eigval", &Polariton::eigval)
     .def("_extrema",
          &Polariton::_extrema,
@@ -44,6 +42,8 @@ bind_polariton(py::module& m)
          "find the modes",
          "q"_a,
          "theta_q"_a,
+         "xl"_a,
+         "xu"_a,
          "ftol"_a = 1e-10,
          "double_root_tol"_a = 1e-17)
     .def(py::pickle(

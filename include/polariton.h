@@ -155,7 +155,6 @@ public:
    * @param q momentum
    * @param theta_q momentum
    * @return double
-   * @see det_and_d()
    */
   double det_inv_gf(double omega, double q, double theta_q) const
   {
@@ -182,41 +181,6 @@ public:
     act.bottomRightCorner<2, 2>() =
       d_photon_sector(omega, q, theta_q).cast<std::complex<double>>();
     return act;
-  }
-
-  /**
-   * @brief The determinant of the inverse GF and it's derivative
-   *
-   * @param omega frequency
-   * @param q momentum
-   * @param theta_q momentum
-   * @return std::tuple<double, double> (det, deriv)
-   * @see det_inv_gf(), d_det_inv_gf()
-   */
-  std::tuple<double, double> det_and_d(double omega,
-                                       double q,
-                                       double theta_q) const
-  {
-
-    auto A = inv_gf(omega, q, theta_q);
-    double d_det =
-      std::real((adjugate(A) * d_inv_gf(omega, q, theta_q)).trace());
-    return std::tuple<double, double>(std::real(A.determinant()), d_det);
-  }
-
-  /**
-   * @brief The derivative of the determinant of the inverse GF w.r.t frequency
-   *
-   * @param omega frequency
-   * @param q momentum
-   * @param theta_q momentum
-   * @return double
-   *
-   * @see inv_gf(), d_inv_gf()
-   */
-  double d_det_inv_gf(double omega, double q, double theta_q) const
-  {
-    return std::get<1>(det_and_d(omega, q, theta_q));
   }
 
   /**
@@ -250,6 +214,8 @@ public:
    */
   std::array<double, 3> find_modes(double q,
                                    double theta_q,
+                                   double xl,
+                                   double xu,
                                    double ftol /* = 1e-10*/,
                                    double double_root_tol /* = 1e-17*/) const
   {
@@ -269,9 +235,6 @@ public:
     std::array<double, 3> roots; // The return array
     roots.fill(std::numeric_limits<double>::quiet_NaN());
 
-    const double xl = 0.6 * bs().root();
-    const double xu = 1.9 * state().delta;
-    // 1.99 * coupling.state.delta;
     auto extrema = _extrema(q, theta_q, xl, xu, ftol);
 
     FSolver fsolver(gsl_root_fsolver_brent);
@@ -341,13 +304,17 @@ public:
                                  double ftol /*= 1e-10*/) const
   {
 
-    auto d_det = [this, q, theta_q](double omega) {
-      return d_det_inv_gf(omega, q, theta_q);
+    auto gsl_det = make_gsl_function([this, q, theta_q](double omega) {
+      return det_inv_gf(omega, q, theta_q);
+    });
+
+    const double EPS = 1e-6 * bs().root();
+
+    auto d_det = [gsl_det, EPS](double omega) {
+      return deriv_gsl(gsl_det, omega, EPS);
     };
 
     auto gsl_d_det = make_gsl_function(d_det);
-
-    const double EPS = 1e-6 * bs().root();
 
     auto d_det_fdf = [EPS, gsl_d_det](double omega) {
       auto d_det_val = GSL_FN_EVAL(&gsl_d_det, omega);
