@@ -25,12 +25,15 @@ class Method(enum.Enum):
 @click.option(
     "--method", type=click.Choice(list(Method.__members__)), default="HAMILTONIAN"
 )
-@click.option("-r", "--root_rel", type=float, default=1.)
-@click.option("--dipole", type=float, default=1.)
-@click.option("--para", type=float, default=1.)
-@click.option("-v", "--vrel", type=float, default=0.6)
 @click.option("--notify/--no-notify", default=False)
-def main(qs, thetas, method, root_rel, dipole, para, notify, vrel):
+@click.option("-r", "--root_rel", type=float, default=Params().root_rel)
+@click.option("--dipole", type=float, default=Params().dipole)
+@click.option("--para", type=float, default=Params().para)
+@click.option("-v", "--vrel", type=float, default=Params().vrel)
+@click.option("--xl", type=float, default=Params().xl)
+@click.option("--xu", type=float, default=Params().xu)
+@click.option("--ftol", type=float, default=Params().ftol)
+def main(qs, thetas, method, notify, **kwargs):
     m = Method[method]
 
     if m == Method.ACTION:
@@ -38,9 +41,14 @@ def main(qs, thetas, method, root_rel, dipole, para, notify, vrel):
     else:
         cls = bsm.ModePolariton
 
-    params = Params(cls=cls, root_rel=root_rel, dipoleX=dipole, paraX=para, vrel=vrel)
+    params = Params(cls=cls, **kwargs)
 
     hamiltonian = m == Method.HAMILTONIAN
+
+    if hamiltonian:
+        for k in Params.REMOVE:
+            if k in kwargs:
+                click.secho(f"{k} will be ignored with method {m}", color="red")
 
     fname = pendulum.now().format("MM-DD-YY_HH:MM:SS")
     fpath_root = Path(f"notebooks/data/{fname}_{method}")

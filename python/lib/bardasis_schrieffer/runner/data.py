@@ -12,16 +12,19 @@ from ..polariton import build_polariton
 
 
 class Runner:
-    def __init__(self, p, hamiltonian):
+    def __init__(self, p, hamiltonian, params):
         self.p = p
         self.hamiltonian = hamiltonian
+        self.params = params
 
     def __call__(self, args):
         (theta, q) = args
         if self.hamiltonian:
             modes = self.p.bands(q, theta)
         else:
-            modes = self.p.find_modes(q, theta)
+            modes = self.p.find_modes(
+                q, theta, xl=self.params.xl, xu=self.params.xu, ftol=self.params.ftol
+            )
         return [
             {"q": q, "theta": theta, "omega": m, "i": i}
             for (i, m) in enumerate(sorted(modes))
