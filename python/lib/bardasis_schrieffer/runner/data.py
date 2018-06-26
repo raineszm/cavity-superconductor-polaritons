@@ -40,7 +40,7 @@ def data(fname, qs, thetas, params, hamiltonian=None):
     qs *= p.state.delta / bsm.C
 
     pool = Pool()
-    runner = Runner(p, hamiltonian)
+    runner = Runner(p, hamiltonian, params)
     with open(fname, "w") as f:
         writer = csv.DictWriter(f, ["q", "theta", "omega", "i"])
         writer.writeheader()
