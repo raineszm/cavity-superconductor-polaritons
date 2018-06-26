@@ -31,7 +31,7 @@ class Params:
         pdict["vs"] = vrel * self.vc()
 
         for k in self.REMOVE:
-            pdict.remove(k)
+            del pdict[k]
 
         return pdict
 
