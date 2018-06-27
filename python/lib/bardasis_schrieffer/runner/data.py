@@ -13,12 +13,13 @@ from ..polariton import build_polariton
 
 
 class Runner:
+    FAILURES = Value("i", 0)
+
     def __init__(self, p, hamiltonian, params, Nfail):
         self.p = p
         self.hamiltonian = hamiltonian
         self.params = params
         self.Nfail = Nfail
-        self.failures = Value("i", 0)
 
     def __call__(self, args):
         (theta, q) = args
@@ -47,7 +48,7 @@ class Runner:
         ]
 
 
-def data(fname, qs, thetas, params, hamiltonian=None, Nfail=int(1e8)):
+def data(fname, qs, thetas, params, hamiltonian=None, Nfail=int()):
     if hamiltonian is None:
         hamiltonian = params.cls == bsm.ModePolariton
 

@@ -73,9 +73,10 @@ def main(qs, thetas, method, notify, data_dir, nfail, **kwargs):
             hamiltonian=hamiltonian,
             Nfail=nfail,
         )
-    except Exception as exc:
+    except bsm.GSLException as exc:
         if notify:
             notify_failure(datapath, nfail, exc)
+
         sys.exit(-1)
 
     if notify:
