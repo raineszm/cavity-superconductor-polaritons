@@ -33,7 +33,8 @@
         "functional": "cpp",
         "locale": "cpp",
         "string": "cpp",
-        "core": "cpp"
+        "core": "cpp",
+        "cfenv": "cpp"
     },
     "python.pythonPath": "/Users/raineszm/anaconda3/bin/python"
 }

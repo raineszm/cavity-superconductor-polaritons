@@ -249,6 +249,64 @@ public:
    */
   double M() const { return d_inv_gf(root()) / root(); }
 
+  double inv_gf_int_q(double k,
+                      double theta_k,
+                      double omega,
+                      double q,
+                      double theta_q,
+                      bool deriv) const
+  {
+    const System& sys = state.sys;
+    auto theta_qk = theta_q - theta_k;
+    auto kp = std::sqrt(k * k + q * q / 4 + k * q * std::cos(theta_qk));
+    auto km = std::sqrt(k * k + q * q / 4 - k * q * std::cos(theta_qk));
+
+    auto xp = sys.xi_k(kp);
+    auto xm = sys.xi_k(km);
+    auto lp = std::hypot(xp, state.delta);
+    auto lm = std::hypot(xm, state.delta);
+
+    auto theta_p = theta_k + std::atan2(q / 2 * std::sin(theta_qk),
+                                        k + q / 2 * std::cos(theta_qk));
+    auto theta_m = theta_k + std::atan2(-q / 2 * std::sin(theta_qk),
+                                        k - q / 2 * std::cos(theta_qk));
+    auto dp = sys.doppler(kp, theta_p);
+    auto dm = sys.doppler(km, theta_m);
+
+    auto p0 = state.pi0(dp + lp, dm + lm, omega, deriv) +
+              state.pi0(dp - lp, dm - lm, omega, deriv);
+    auto p1 = state.pi0(dp + lp, dm - lm, omega, deriv) +
+              state.pi0(dp - lp, dm + lm, omega, deriv);
+
+    auto lk = std::hypot(sys.xi_k(k), state.delta);
+    return (p0 * state.p2(xp, xm) - p1 * state.l2(xp, xm)) *
+             std::pow(std::cos(2 * (theta_k + sys.theta_s)), 2) -
+           c(lk, sys.doppler(k, theta_k), state.T);
+  }
+
+  double Iq(double omega, double q, double theta_q, bool deriv) const
+  {
+    return gsl_angular_integrate(
+      [this, omega, q, theta_q, deriv](double k, double theta) {
+        return inv_gf_int_q(k, theta, omega, q, theta_q, deriv);
+      },
+      state.sys.kf() - 2 * state.delta / state.sys.vf(),
+      state.sys.kf() + 2 * state.delta / state.sys.vf());
+  }
+
+  double dispersion(double q, double theta_q) const
+  {
+    auto f = [this, q, theta_q](double x) {
+      return -state.sys.dos() * mass + Iq(x, q, theta_q, false);
+    };
+
+    auto gsl_f = gsl_function_pp<decltype(f)>(f);
+    auto solver = FSolver::create<decltype(f)>(
+      gsl_root_fsolver_brent, gsl_f, 1e-3 * state.delta, 1.99 * state.delta);
+
+    return (_root = solver.solve(1e-8 * state.delta, 0));
+  }
+
   using pickle_type = double;
 
   pickle_type pickle() const { return mass; }

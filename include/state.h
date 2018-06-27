@@ -142,6 +142,39 @@ public:
   {
     return State(sys, a[0], a[1]);
   }
+
+  /**
+   * @brief The polarization bubble
+   *
+   * @param E1 quasiparticle energy
+   * @param E2 quasiparticle energy
+   * @param omega photon frequency
+   * @param deriv is this the bubble or its derivative w.r.t Freq
+   * @return double
+   * @see Coupling::photon_se_int(), Coupling::photon_se()
+   *
+   * \f[\pi_0(E_1, E_2, \omega) =
+   * \frac{n_F(E_2) - n_F(E_1)}{i\Omega_m - E_1 + E_2}\f]
+   *
+   * For numerical convenience we make use of the relation
+   * \f$n_f = \tfrac{1 - \tanh}{2}\f$ to rewrite this as
+   * \f[\pi_0(E_1, E_2, \omega) =
+   * \frac{1}{2}\frac{\tanh\frac{E_1}{2T}- \tanh\frac{E_2}{2T}}{i\Omega_m-
+   * E_1 + E_2}\f]
+   *
+   * @note This is analytically continued to real frequency
+   */
+  double pi0(double E1, double E2, double omega, bool deriv) const
+  {
+    if (deriv) {
+      return -0.5 * (std::tanh(E1 / (2 * T)) - std::tanh(E2 / (2 * T))) /
+             std::pow(omega - E1 + E2, 2);
+
+    } else {
+      return 0.5 * (std::tanh(E1 / (2 * T)) - std::tanh(E2 / (2 * T))) /
+             (omega - E1 + E2);
+    }
+  }
 };
 
 namespace std {

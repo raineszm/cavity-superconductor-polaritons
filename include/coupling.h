@@ -289,43 +289,6 @@ public:
   }
 
   /**
-   * @brief The polarization bubble entering into the photon self energy
-   *
-   * @param E1 quasiparticle energy
-   * @param E2 quasiparticle energy
-   * @param omega photon frequency
-   * @param deriv is this the self-energy or its derivative w.r.t Freq
-   * @return double
-   * @see photon_se_int(), photon_se()
-   *
-   * \f[\pi_0(E_1, E_2, \omega) =
-   * \frac{n_F(E_2) - n_F(E_1)}{i\Omega_m - E_1 + E_2}\f]
-   *
-   * For numerical convenience we make use of the relation
-   * \f$n_f = \tfrac{1 - \tanh}{2}\f$ to rewrite this as
-   * \f[\pi_0(E_1, E_2, \omega) =
-   * \frac{1}{2}\frac{\tanh\frac{E_1}{2T}- \tanh\frac{E_2}{2T}}{i\Omega_m-
-   * E_1 + E_2}\f]
-   *
-   * @note This is analytically continued to real frequency
-   */
-  double pi0(double E1, double E2, double omega, bool deriv) const
-  {
-    if (deriv) {
-      return -0.5 *
-             (std::tanh(E1 / (2 * state().T)) -
-              std::tanh(E2 / (2 * state().T))) /
-             std::pow(omega - E1 + E2, 2);
-
-    } else {
-      return 0.5 *
-             (std::tanh(E1 / (2 * state().T)) -
-              std::tanh(E2 / (2 * state().T))) /
-             (omega - E1 + E2);
-    }
-  }
-
-  /**
    * @brief The traces of pi0() with the pauli matrices.
    *
    * @param d1 doppler shift
@@ -348,10 +311,11 @@ public:
                                   double omega,
                                   bool deriv) const
   {
-    auto p00 = pi0(d1 + l1, d2 + l2, omega, deriv);
-    auto p01 = pi0(d1 + l1, d2 - l2, omega, deriv);
-    auto p10 = pi0(d1 - l1, d2 + l2, omega, deriv);
-    auto p11 = pi0(d1 - l1, d2 - l2, omega, deriv);
+    const State& state_ = state();
+    auto p00 = state_.pi0(d1 + l1, d2 + l2, omega, deriv);
+    auto p01 = state_.pi0(d1 + l1, d2 - l2, omega, deriv);
+    auto p10 = state_.pi0(d1 - l1, d2 + l2, omega, deriv);
+    auto p11 = state_.pi0(d1 - l1, d2 - l2, omega, deriv);
 
     return { { p00 + p11, p01 + p10, p01 - p10, p00 - p11 } };
   }
