@@ -13,6 +13,7 @@ class Params:
     dipole: float = 1
     para: float = 1
     root_rel: float = 1
+    bsmass: float = 0.1
     cls: Type[bsm.Polariton] = bsm.ModePolariton
     xl: float = 0.8
     xu: float = 1.2
