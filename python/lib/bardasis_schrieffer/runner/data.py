@@ -30,8 +30,8 @@ class Runner:
                 modes = self.p.find_modes(
                     q,
                     theta,
-                    xl=self.params.xl * p.bs.root,
-                    xu=self.params.xu * p.bs.root,
+                    xl=self.params.xl * self.p.bs.root,
+                    xu=self.params.xu * self.p.bs.root,
                     ftol=self.params.ftol,
                 )
         except bsm.GSLException as exc:
