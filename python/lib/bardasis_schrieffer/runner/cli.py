@@ -36,7 +36,7 @@ class Method(enum.Enum):
 @click.option("--xl", type=float, default=Params().xl)
 @click.option("--xu", type=float, default=Params().xu)
 @click.option("--ftol", type=float, default=Params().ftol)
-def main(qs, thetas, method, notify, data_dir, Nfail, **kwargs):
+def main(qs, thetas, method, notify, data_dir, nfail, **kwargs):
     m = Method[method]
 
     if m == Method.ACTION:
@@ -71,11 +71,11 @@ def main(qs, thetas, method, notify, data_dir, Nfail, **kwargs):
             thetas=thetas,
             params=params,
             hamiltonian=hamiltonian,
-            Nfail=Nfail,
+            Nfail=nfail,
         )
     except Exception as exc:
         if notify:
-            notify_failure(datapath, Nfail, exc)
+            notify_failure(datapath, nfail, exc)
         sys.exit(-1)
 
     if notify:
