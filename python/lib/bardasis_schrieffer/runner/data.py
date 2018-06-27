@@ -35,9 +35,9 @@ class Runner:
                     ftol=self.params.ftol,
                 )
         except bsm.GSLException as exc:
-            with self.failures.get_lock():
-                self.failures.value += 1
-            if self.failures.value >= self.Nfail:
+            with self.FAILURES.get_lock():
+                self.FAILURES.value += 1
+            if self.FAILURES.value >= self.Nfail:
                 raise exc
             click.secho(f"{exc} raised", color="red")
             modes = np.array([np.nan] * 3)
