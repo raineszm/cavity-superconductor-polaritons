@@ -47,7 +47,7 @@ class Runner:
         ]
 
 
-def data(fname, qs, thetas, params, hamiltonian=None, Nfail=float("inf")):
+def data(fname, qs, thetas, params, hamiltonian=None, Nfail=int(1e8)):
     if hamiltonian is None:
         hamiltonian = params.cls == bsm.ModePolariton
 
