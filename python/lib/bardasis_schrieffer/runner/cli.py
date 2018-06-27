@@ -28,7 +28,7 @@ class Method(enum.Enum):
 )
 @click.option("--notify/--no-notify", default=False)
 @click.option("--data-dir", type=click.Path(exists=True), default=None)
-@click.option("--Nfail", type=int, default=int(1e8)))
+@click.option("--Nfail", type=int, default=int(1e8))
 @click.option("-r", "--root_rel", type=float, default=Params().root_rel)
 @click.option("--dipole", type=float, default=Params().dipole)
 @click.option("--para", type=float, default=Params().para)
