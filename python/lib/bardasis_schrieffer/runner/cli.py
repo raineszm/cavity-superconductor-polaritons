@@ -1,5 +1,6 @@
 import enum
 import json
+import sys
 from pathlib import Path
 
 import click
@@ -8,7 +9,7 @@ import pendulum
 
 from . import data
 from .. import _bardasis_schrieffer as bsm
-from .notify import push_notification
+from .notify import notify_failure, notify_success
 from .params import Params
 from .ranges import Range
 
@@ -27,6 +28,7 @@ class Method(enum.Enum):
 )
 @click.option("--notify/--no-notify", default=False)
 @click.option("--data-dir", type=click.Path(exists=True), default=None)
+@click.option("--Nfail", type=int, default=float("inf"))
 @click.option("-r", "--root_rel", type=float, default=Params().root_rel)
 @click.option("--dipole", type=float, default=Params().dipole)
 @click.option("--para", type=float, default=Params().para)
@@ -34,7 +36,7 @@ class Method(enum.Enum):
 @click.option("--xl", type=float, default=Params().xl)
 @click.option("--xu", type=float, default=Params().xu)
 @click.option("--ftol", type=float, default=Params().ftol)
-def main(qs, thetas, method, notify, data_dir, **kwargs):
+def main(qs, thetas, method, notify, data_dir, Nfail, **kwargs):
     m = Method[method]
 
     if m == Method.ACTION:
@@ -62,9 +64,22 @@ def main(qs, thetas, method, notify, data_dir, **kwargs):
         json.dump(meta_args, json_file)
 
     datapath = fpath_root.with_suffix(".csv")
-    data.data(datapath, qs, thetas, params, hamiltonian)
+    try:
+        data.data(
+            fname=datapath,
+            qs=qs,
+            thetas=thetas,
+            params=params,
+            hamiltonian=hamiltonian,
+            Nfail=Nfail,
+        )
+    except Exception as exc:
+        if notify:
+            notify_failure(datapath, Nfail, exc)
+        sys.exit(-1)
+
     if notify:
-        push_notification(fname, len(qs) * len(thetas))
+        notify_success(datapath, len(qs) * len(thetas))
 
     if data_dir:
         import shutil
