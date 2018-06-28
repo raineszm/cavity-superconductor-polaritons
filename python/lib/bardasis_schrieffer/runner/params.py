@@ -22,6 +22,9 @@ class Params:
     RENAME: ClassVar[Mapping[str, str]] = {"dipole": "dipoleX", "para": "paraX"}
     REMOVE: ClassVar[List[str]] = ["xl", "xu", "ftol"]
 
+    def asdict(self):
+        return asdict(self)
+
     def as_args(self):
         pdict = asdict(self)
 
