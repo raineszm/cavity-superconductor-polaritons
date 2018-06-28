@@ -21,7 +21,7 @@ class Runner:
         self.params = params
         self.Nfail = Nfail
         self.failures = failures
-        self.log = lq.MultiProcessingHandler(queue)
+        self.handler = lq.MultiProcessingHandler(queue)
 
     def __call__(self, args):
         (theta, q) = args
@@ -41,7 +41,9 @@ class Runner:
             if self.failures.value >= self.Nfail:
                 raise exc
             click.secho(f"{exc} raised", color="red")
-            self.log.error(exc)
+            with self.handler.applicationbound():
+                log = logbook.Logger('Runner')
+                log.error(exc)
             modes = np.array([np.nan] * 3)
 
         return [
