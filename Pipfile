@@ -13,6 +13,7 @@ dataclasses = "*"
 tqdm = "*"
 meson = "*"
 "pushbullet.py" = "*"
+logbook = "*"
 
 [dev-packages]
 

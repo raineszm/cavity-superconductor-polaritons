@@ -1,6 +1,8 @@
 import csv
 import itertools as it
-from multiprocessing import Pool, Value
+from multiprocessing import Pool, Value, Manager
+import logbook
+import logbook.queues as lq
 from pathlib import Path
 
 import click
@@ -13,13 +15,13 @@ from ..polariton import build_polariton
 
 
 class Runner:
-    FAILURES = Value("i", 0)
-
-    def __init__(self, p, hamiltonian, params, Nfail):
+    def __init__(self, p, hamiltonian, params, Nfail, failures, queue):
         self.p = p
         self.hamiltonian = hamiltonian
         self.params = params
         self.Nfail = Nfail
+        self.failures = failures
+        self.log = lq.MultiProcessingHandler(queue)
 
     def __call__(self, args):
         (theta, q) = args
@@ -35,11 +37,12 @@ class Runner:
                     ftol=self.params.ftol,
                 )
         except bsm.GSLException as exc:
-            with self.FAILURES.get_lock():
-                self.FAILURES.value += 1
-            if self.FAILURES.value >= self.Nfail:
+            with self.failures.get_lock():
+                self.failures.value += 1
+            if self.failures.value >= self.Nfail:
                 raise exc
             click.secho(f"{exc} raised", color="red")
+            self.log.error(exc)
             modes = np.array([np.nan] * 3)
 
         return [
@@ -56,13 +59,28 @@ def data(fname, qs, thetas, params, hamiltonian=None, Nfail=int()):
 
     qs *= p.state.delta / bsm.C
 
-    pool = Pool()
-    runner = Runner(p=p, hamiltonian=hamiltonian, params=params, Nfail=Nfail)
+    manager = Manager()
+    subscriber = lq.MultiProcessingSubscriber(manager.Queue(-1))
+    logfile = logbook.FileHandler(fname.with_suffix(".log"), delay=True)
+
+    runner = Runner(
+        p=p,
+        hamiltonian=hamiltonian,
+        params=params,
+        Nfail=Nfail,
+        failures=manager.Value("i", 0),
+        queue=subscriber.queue,
+    )
+    controller = subscriber.dispatch_in_background(logfile)
+
     with open(fname, "w") as f:
         writer = csv.DictWriter(f, ["q", "theta", "omega", "i"])
         writer.writeheader()
+
+        pool = Pool()
         for rows in tqdm.tqdm(
             pool.imap_unordered(runner, it.product(thetas, qs)),
             total=len(thetas) * len(qs),
         ):
             writer.writerows(rows)
+    controller.stop()
