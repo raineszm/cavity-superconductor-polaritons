@@ -71,7 +71,14 @@ def main(qs, thetas, method, notify, confirm, data_dir, nfail, **kwargs):
                 click.secho(f"{k} will be ignored with method {m}", color="red")
 
     if confirm:
-        get_confirmation(hamiltonian=hamiltonian, **params.asdict())
+        get_confirmation(
+            qs=qs,
+            thetas=thetas,
+            nfail=nfail,
+            hamiltonian=hamiltonian,
+            data_dir=data_dir,
+            **params.asdict(),
+        )
 
     fname = pendulum.now().format("MM-DD-YY_HH:MM:SS")
     fpath_root = Path(f"notebooks/data/{fname}_{method}")
