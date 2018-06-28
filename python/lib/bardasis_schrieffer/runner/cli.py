@@ -22,7 +22,7 @@ class Method(enum.Enum):
 
 
 def show_param(name, value):
-    if hasattr(value, "__len__"):
+    if isinstance(value, (list, np.ndarray)):
         return "{}: [{}, {}] x {}".format(name, min(value), max(value), len(value))
     else:
         return "{}: {}".format(name, value)
