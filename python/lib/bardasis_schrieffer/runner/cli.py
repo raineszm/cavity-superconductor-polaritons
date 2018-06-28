@@ -37,8 +37,9 @@ def get_confirmation(**params):
 
 @click.command()
 @click.version_option(__version__)
-@click.option("--qs", type=Range(), default="0:0.4:100")
-@click.option("--thetas", type=Range(), default=np.array([0.]))
+@click.option("-q", type=Range(), default="0:0.4:100")
+@click.option("--theta", type=Range(), default=np.array([0.]))
+@click.option("--theta-s", type=Range(), default=np.array([0.]))
 @click.option(
     "--method", type=click.Choice(list(Method.__members__)), default="HAMILTONIAN"
 )
@@ -53,7 +54,7 @@ def get_confirmation(**params):
 @click.option("--xl", type=float, default=Params().xl)
 @click.option("--xu", type=float, default=Params().xu)
 @click.option("--ftol", type=float, default=Params().ftol)
-def main(qs, thetas, method, notify, confirm, data_dir, nfail, **kwargs):
+def main(q, theta, theta_s, method, notify, confirm, data_dir, nfail, **kwargs):
     m = Method[method]
 
     if m == Method.ACTION:
@@ -71,13 +72,16 @@ def main(qs, thetas, method, notify, confirm, data_dir, nfail, **kwargs):
                 click.secho(f"{k} will be ignored with method {m}", color="red")
 
     if confirm:
+        pdict = params.asdict()
+        del pdict["theta_s"]
         get_confirmation(
-            qs=qs,
-            thetas=thetas,
+            q=q,
+            theta=theta,
+            theta_s=theta_s,
             nfail=nfail,
             hamiltonian=hamiltonian,
             data_dir=data_dir,
-            **params.asdict(),
+            **pdict,
         )
 
     fname = pendulum.now().format("MM-DD-YY_HH:MM:SS")
@@ -99,8 +103,9 @@ def main(qs, thetas, method, notify, confirm, data_dir, nfail, **kwargs):
     try:
         data.data(
             fname=datapath,
-            qs=qs,
-            thetas=thetas,
+            q=q,
+            theta=theta,
+            theta_s=theta_s,
             params=params,
             hamiltonian=hamiltonian,
             Nfail=nfail,
@@ -112,7 +117,7 @@ def main(qs, thetas, method, notify, confirm, data_dir, nfail, **kwargs):
         sys.exit(-1)
 
     if notify:
-        notify_success(datapath, len(qs) * len(thetas))
+        notify_success(datapath, len(theta_s) * len(q) * len(theta))
 
     if data_dir:
         import shutil
