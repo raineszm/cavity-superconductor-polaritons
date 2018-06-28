@@ -37,8 +37,7 @@ class Runner:
                     ftol=self.params.ftol,
                 )
         except bsm.GSLException as exc:
-            with self.failures.get_lock():
-                self.failures.value += 1
+            self.failures.value += 1
             if self.failures.value >= self.Nfail:
                 raise exc
             click.secho(f"{exc} raised", color="red")
