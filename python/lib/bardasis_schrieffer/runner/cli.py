@@ -91,7 +91,7 @@ def main(q, theta, theta_s, method, notify, confirm, data_dir, nfail, **kwargs):
             **pdict,
         )
 
-    fname = pendulum.now().format("MM-DD-YY_HH:MM:SS")
+    fname = pendulum.now().format("MM-DD-YY_HH:mm:ss")
     fpath_root = Path(f"notebooks/data/{fname}_{method}")
 
     meta_args = dict(
