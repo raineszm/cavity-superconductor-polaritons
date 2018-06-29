@@ -32,6 +32,22 @@ c(double x1, double x2, double T)
   }
 }
 
+inline double
+diff_of_tanh(double E1, double E2, double T, double cutoff = 1e-4)
+{
+  if (std::abs(E1) < cutoff * T && std::abs(E2) < cutoff * T) {
+    return (E1 - E2) / (2 * T);
+  } else if (T < cutoff * std::abs(E1) && T < cutoff * std::abs(E2)) {
+    if (E1 * E2 > 0) {
+      return 0.;
+    } else {
+      return std::copysign(2., E1);
+    }
+  } else {
+    return std::tanh(E1 / (2 * T)) - std::tanh(E2 / (2 * T));
+  }
+}
+
 inline Matrix2cd
 adjugate(const Matrix2cd& m)
 {

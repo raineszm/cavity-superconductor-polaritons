@@ -38,6 +38,24 @@ public:
   operator gsl_integration_cquad_workspace*() { return wsp.get(); }
 };
 
+class IntegrationQAWOTable
+{
+  std::unique_ptr<gsl_integration_qawo_table,
+                  decltype(&gsl_integration_qawo_table_free)>
+    table;
+
+public:
+  IntegrationQAWOTable(double omega,
+                       double L,
+                       enum gsl_integration_qawo_enum sine,
+                       size_t n)
+    : table(gsl_integration_qawo_table_alloc(omega, L, sine, n),
+            &gsl_integration_qawo_table_free)
+  {}
+
+  operator gsl_integration_qawo_table*() { return table.get(); }
+};
+
 template<typename F>
 double
 gsl_xi_integrate(const F& f, double a, double epsrel = EPSREL)
@@ -117,4 +135,32 @@ gsl_angular_integrate(const F& f, double k1, double k2)
   total += result;
 
   return total / (4 * M_PI * M_PI);
+}
+
+template<typename F>
+double
+gsl_xi_cos_integrate(const F& f,
+                     double a,
+                     double theta_s,
+                     double epsrel = EPSREL)
+{
+  double result, abserr, inner_result, inner_abserr;
+
+  const size_t limit = 1000;
+
+  IntegrationWorkspace wsp1(limit);
+  IntegrationWorkspace wsp2(limit);
+  IntegrationQAWOTable tbl(2., 2 * M_PI, GSL_INTEG_COSINE, limit);
+
+  auto outer = make_gsl_function([&](double x) {
+    auto inner =
+      make_gsl_function([&](double theta) { return f(x, theta - theta_s); });
+    gsl_integration_qawo(
+      inner, 0, EPSABS, epsrel, limit, wsp1, tbl, &inner_result, &inner_abserr);
+    return inner_result / (2 * M_PI);
+  });
+  gsl_integration_qagiu(
+    outer, a, EPSABS, epsrel, limit, wsp2, &result, &abserr);
+
+  return result;
 }

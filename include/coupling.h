@@ -83,13 +83,12 @@ public:
    */
   double ImDA_int(double l, double theta, double omega) const
   {
-    double fd = std::sqrt(2) * std::cos(2 * (theta + state().sys.theta_s));
+    double fd = std::sqrt(2); // * std::cos(2 * (theta + state().sys.theta_s));
     double doppler = state().sys.doppler(state().sys.kf(), theta);
     double Ep = doppler + l;
     double Em = doppler - l;
 
-    return fd *
-           (std::tanh(Ep / (2 * state().T)) - std::tanh(Em / (2 * state().T))) /
+    return fd * diff_of_tanh(Ep, Em, state().T) /
            ((omega * omega - 4 * l * l) * 2 *
             std::sqrt(l * l - state().delta * state().delta));
   }
@@ -106,7 +105,7 @@ public:
    */
   double d_ImDA_int(double l, double theta, double omega) const
   {
-    double fd = std::sqrt(2) * std::cos(2 * (theta + state().sys.theta_s));
+    double fd = std::sqrt(2); //* std::cos(2 * (theta + state().sys.theta_s));
     double doppler = state().sys.doppler(state().sys.kf(), theta);
     double Ep = doppler + l;
     double Em = doppler - l;
@@ -133,12 +132,13 @@ public:
    */
   double coupling_I(double omega) const
   {
-    return 2 * state().sys.dos() *
-           gsl_xi_integrate(
-             [this, omega](double l, double theta) {
-               return ImDA_int(l, theta, omega);
-             },
-             state().delta);
+    return state().sys.dos() * gsl_xi_cos_integrate(
+                                 [this, omega](double l, double theta) {
+                                   return ImDA_int(l, theta, omega) -
+                                          ImDA_int(l, M_PI_2 - theta, omega);
+                                 },
+                                 state().delta,
+                                 state().sys.theta_s);
   }
 
   /**
@@ -190,16 +190,18 @@ public:
   double d_ImDA(double omega) const
   {
     return -2 * state().delta * GPAR * state().sys.vs * state().sys.dos() *
-           (gsl_xi_integrate(
+           (gsl_xi_cos_integrate(
               [this, omega](double l, double theta) {
                 return ImDA_int(l, theta, omega);
               },
-              state().delta) +
-            omega * gsl_xi_integrate(
+              state().delta,
+              state().sys.theta_s) +
+            omega * gsl_xi_cos_integrate(
                       [this, omega](double l, double theta) {
                         return d_ImDA_int(l, theta, omega);
                       },
-                      state().delta));
+                      state().delta,
+                      state().sys.theta_s));
   }
 
   /** @}
