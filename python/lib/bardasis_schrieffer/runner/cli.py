@@ -38,8 +38,15 @@ def get_confirmation(**params):
 @click.command()
 @click.version_option(__version__)
 @click.option("-q", type=Range(), default="0:0.4:100")
-@click.option("--theta", type=Range(), default=np.array([0.]))
-@click.option("--theta-s", type=Range(), default=np.array([0.]))
+@click.option(
+    "--theta", type=Range(), default=np.array([0.]), help="angles for q in units of pi"
+)
+@click.option(
+    "--theta-s",
+    type=Range(),
+    default=np.array([0.]),
+    help="Supercurrent angles in units of pi",
+)
 @click.option(
     "--method", type=click.Choice(list(Method.__members__)), default="HAMILTONIAN"
 )

@@ -32,14 +32,14 @@ class Runner:
 
     def __call__(self, args):
         (theta_s, theta, q) = args
-        p = self.p(theta_s)
+        p = self.p(theta_s * np.pi)
         try:
             if self.hamiltonian:
-                modes = p.bands(q, theta)
+                modes = p.bands(q, theta * np.pi)
             else:
                 modes = p.find_modes(
                     q,
-                    theta,
+                    theta * np.pi,
                     xl=self.params.xl * p.bs.root,
                     xu=self.params.xu * p.bs.root,
                     ftol=self.params.ftol,
