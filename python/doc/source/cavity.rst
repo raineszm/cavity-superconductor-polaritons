@@ -219,10 +219,7 @@ However, the cavity action in this basis becomes
 
 .. math::
 
-    S_A = -\frac{1}{8 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right](V^{-1}(-\mathbf q))^T V^{-1}(\mathbf q)\mathbf{A}(q)\\
-    = -\frac{1}{8 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right]
-    \sum_\alpha \bm{\epsilon}^*(\mathbf{q}, L/2)_\alpha\bm{\epsilon}(\mathbf{q}, L/2)_\alpha
-    \mathbf{A}(q)
+    S_A = -\frac{1}{8 \pi c^2}\sum_q \mathbf{A}(-q) \left[ (i \omega_m)^2 - \omega_\mathbf{q}^2\right] V^{-1}(-\mathbf q)(V^{-1}(\mathbf q))^T\mathbf{A}(q)\\
 
 Picking the :math:`x` axis to be along the supercurrent gives.
 
