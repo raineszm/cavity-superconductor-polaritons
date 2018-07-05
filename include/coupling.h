@@ -421,7 +421,7 @@ public:
     auto V = cav.polarizations(q, theta_q);
     auto ivsdoteps = state().sys.vs * std::sqrt(2 / cav.L()) * V(0, i);
     auto I = coupling_I(omega);
-    return -0.5 * ivsdoteps * state().delta *
+    return -ivsdoteps * state().delta *
            std::sqrt((4 * M_PI * ALPHA * C * bs.root()) / (M * cav.omega(q))) *
            I;
   }
@@ -441,7 +441,8 @@ public:
     auto M = bs.M();
     auto V = cav.polarizations(q, theta_q);
     auto vsdoteps = V(0, i);
-    return std::sqrt(2 * M_PI * C * C /
+    return 2 *
+           std::sqrt(2 * M_PI * C * C /
                      (M * bs.root() * cav.omega(q) * cav.L())) *
            vsdoteps * d_ImDA(omega);
   }

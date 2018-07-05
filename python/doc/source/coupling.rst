@@ -36,7 +36,7 @@ Substituting into the coupling term
 
  .. math::
 
-   \sqrt{\frac{\pi c^2}{M \Omega_\text{BS}}} \sum_q i g(i \Omega, \mathbf{q})\frac{1}{\sqrt{\omega_\mathbf{q}}}
+   2\sqrt{\frac{\pi c^2}{M \Omega_\text{BS}}} \sum_q i g(i \Omega, \mathbf{q})\frac{1}{\sqrt{\omega_\mathbf{q}}}
    \sum_\alpha
    \left[
      \left(b_{-q} + b^\dagger_{q}\right)\mathbf{v}_s \cdot \left(\bm{\epsilon}_\alpha(q, L/2) a_{\alpha,q} + \bm{\epsilon}_\alpha(-q, L/2)^* a^\dagger_{-q, \alpha}\right)
@@ -50,7 +50,7 @@ Throwing out counter-rotating terms
 
  .. math::
 
-   \sqrt{\frac{\pi c^2}{M \Omega_\text{BS}}} \sum_q i g(i \Omega_m, \mathbf{q})\frac{1}{\sqrt{\omega_\mathbf{q}}}
+   2\sqrt{\frac{\pi c^2}{M \Omega_\text{BS}}} \sum_q i g(i \Omega_m, \mathbf{q})\frac{1}{\sqrt{\omega_\mathbf{q}}}
    \sum_\alpha
    \left[
      b^\dagger_{q}\mathbf{v}_s \cdot \bm{\epsilon}_\alpha(q, L/2) a_{\alpha,q}
@@ -61,7 +61,7 @@ Using the properties of :math:`\bm{\epsilon}` this can be written
 
 
 .. math::
-   \sqrt{\frac{\pi c^2 }{M \Omega_\text{BS}}} \sum_q  g(i \Omega_m, \mathbf{q})\frac{1}{\sqrt{\omega_\mathbf{q}}}
+   2\sqrt{\frac{\pi c^2 }{M \Omega_\text{BS}}} \sum_q  g(i \Omega_m, \mathbf{q})\frac{1}{\sqrt{\omega_\mathbf{q}}}
    \sum_\alpha
    \left[
      b^\dagger_{q}\mathbf{v}_s \cdot i\bm{\epsilon}_\alpha(q, L/2) a_{\alpha,q}
@@ -72,14 +72,14 @@ We may then extract the effective coupling
 
 .. math::
 
-    g_\text{eff}(i\Omega_m, \mathbf{q}, \alpha) = \sqrt{\frac{\pi c^2 }{M \Omega_\text{BS}\omega_{\mathbf{q}}}}
+    g_\text{eff}(i\Omega_m, \mathbf{q}, \alpha) = 2\sqrt{\frac{\pi c^2 }{M \Omega_\text{BS}\omega_{\mathbf{q}}}}
     \mathbf{v}_s\cdot i\bm{\epsilon}_{\alpha,\mathbf{q}}\left(\frac{L}{2}\right)g(i\Omega_m, \mathbf{q})
 
 or explicitly using :math:`e = \sqrt{\alpha c}`
 
 .. math::
 
-   g_\text{eff}(i\Omega_m, q) \approx -i \Omega_m \mathbf{v}_s\cdot i\bm{\epsilon}_{\alpha,\mathbf{q}}
+   g_\text{eff}(i\Omega_m, q) \approx -2i \Omega_m \mathbf{v}_s\cdot i\bm{\epsilon}_{\alpha,\mathbf{q}}
    \nu \Delta \sqrt{\frac{4\pi\alpha c}{M \Omega_\text{BS}\omega_{\mathbf{q}}}}
     \int_\Delta^\infty
    \frac{d\lambda}{\sqrt{\lambda^2 - \Delta^2}}
@@ -207,7 +207,7 @@ Similarly, the coupling to the Bardasis-Schrieffer mode becomes
 
 .. math::
 
-   g_\text{eff}(i\Omega_m, q) \approx -i \Omega_m \mathbf{v}_s\cdot i\bm{\epsilon}_{\alpha',\mathbf{q}} 
+   g_\text{eff}(i\Omega_m, q) \approx -2i \Omega_m \mathbf{v}_s\cdot i\bm{\epsilon}_{\alpha',\mathbf{q}} 
    \left[(L^\dagger)^{-1}\right]_{\alpha',\alpha}
    \nu \Delta \sqrt{\frac{4\pi \alpha c}{M \Omega_\text{BS}\omega_{\mathbf{q}}}}
     \int_\Delta^\infty
