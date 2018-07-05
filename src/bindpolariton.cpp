@@ -46,6 +46,13 @@ bind_polariton(py::module& m)
          "xu"_a,
          "ftol"_a = 1e-10,
          "double_root_tol"_a = 1e-17)
+    .def("crossing_point",
+         &Polariton::crossing_point,
+         "find the value of q where the anti-crossing happens",
+         "xl"_a,
+         "xu"_a,
+         "ftol"_a = 1e-10,
+         "double_root_tol"_a = 1e-17)
     .def(py::pickle(
       [](const Polariton& p) {
         auto sysp = p.coupling.bs.state.sys.pickle();

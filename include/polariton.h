@@ -26,6 +26,7 @@ using Eigen::Vector3d;
 #include "bs.h"
 #include "cavity.h"
 #include "coupling.h"
+#include "min.h"
 #include "roots.h"
 #include "utils.h"
 
@@ -348,6 +349,24 @@ public:
 
     std::sort(extrema.begin(), extrema.end());
     return extrema;
+  }
+
+  double crossing_point(double xl,
+                        double xu,
+                        double ftol,
+                        double double_root_tol) const
+  {
+
+    auto splitting = [this, xl, xu, ftol, double_root_tol](double q) {
+      auto roots = find_modes(q, 0, xl, xu, ftol, double_root_tol);
+      return std::abs(roots[1] - roots[0]);
+    };
+    auto gsl_splitting = make_gsl_function(splitting);
+
+    FMinimizer fmin(gsl_min_fminimizer_brent);
+    fmin.set(gsl_splitting, xl, xu);
+
+    return fmin.solve(1e-3 * (xu - xl), 1e-6);
   }
 
   using pickle_type = std::array<double, 2>;
