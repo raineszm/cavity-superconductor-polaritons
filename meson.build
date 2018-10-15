@@ -2,7 +2,7 @@ project('bardasis_schrieffer', 'cpp',
         default_options : ['cpp_std=c++17',
         'buildtype=release',
         'default_library=shared',
-        'b_lto=true',
+        'b_lto=false',
         'b_asneeded=false'])
 
 cc = meson.get_compiler('cpp')
@@ -37,7 +37,7 @@ if build_machine.system() == 'darwin'
     py.get_variable('INCLUDEPY'),
     py.get_path('include'),
     py.get_path('platinclude')
-    ]))   
+    ]))
 elif build_machine.system() == 'linux'
     pydep = py.dependency()
 endif
@@ -59,7 +59,7 @@ py.extension_module('_bardasis_schrieffer',
     install : true,
     install_dir : join_paths(meson.build_root(), '..', 'python', 'lib', 'bardasis_schrieffer'))
 
-executable('debug', debug_files, 
+executable('debug', debug_files,
     include_directories: include_dirs,
     dependencies : deps,
     build_by_default:false)

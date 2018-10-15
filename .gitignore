@@ -24,3 +24,5 @@ python/doc/xml
 python/doc/build
 lastfailed
 nodeids
+tags
+.direnv/*
