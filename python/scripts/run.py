@@ -9,4 +9,5 @@ sys.path.append(str(lib_dir))
 
 import bardasis_schrieffer.runner.cli
 
-bardasis_schrieffer.runner.cli.main()
+if __name__ == '__main__':
+    bardasis_schrieffer.runner.cli.main()
