@@ -15,8 +15,3 @@ pint = "^0.20"
 tqdm = "^4"
 "pushbullet.py" = "0.11"
 logbook = "^1.7"
-
-[tool.poetry.dev-dependencies]
-pytest = "^7.0"
-hypothesis = "^6.0"
-# hypothesis-pytest = "^0.19"
