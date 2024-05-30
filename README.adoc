@@ -1,22 +1,32 @@
 = README
 Zachary Raines <dev@zmraines.com>
+:source-highlighter: rouge
+
 
 == Build
 
+Before building make sure that the pybind11 submodule has been pulled
+
+[source,bash]
+----
+git submodule init
+git submodule update
+----
+
 To build the debug code, create an out of source cmake build with
 
-[.bash]
+[source,bash]
 ----
-cmake -B _build_debug -G Ninja -DCMAKE_BUILD_TYPE=Debug
+cmake -S . -B _build_debug -G Ninja -DCMAKE_BUILD_TYPE=Debug
 cd _build_debug
 ninja
 ----
 
-To compile the pybind11 module
+To compile the pybind11 module and install into the python project
 
-[.bash]
+[source,bash]
 ----
-cmake -B _build -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake -S . -B _build -G Ninja -DCMAKE_BUILD_TYPE=Release
 cd _build
-ninja
+ninja install
 ----
