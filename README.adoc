@@ -2,6 +2,28 @@
 Zachary Raines <dev@zmraines.com>
 :source-highlighter: rouge
 
+== What is this?
+
+This is the numerical code for the paper https://doi.org/10.1103/PhysRevB.99.020504[Cavity superconductor polaritons]
+
+[source,bibtex]
+----
+@article{PhysRevB.99.020504,
+  title = {Cavity superconductor-polaritons},
+  author = {Allocca, Andrew A. and Raines, Zachary M. and Curtis, Jonathan B. and Galitski, Victor M.},
+  journal = {Phys. Rev. B},
+  volume = {99},
+  issue = {2},
+  pages = {020504},
+  numpages = {5},
+  year = {2019},
+  month = {Jan},
+  publisher = {American Physical Society},
+  doi = {10.1103/PhysRevB.99.020504},
+  url = {https://link.aps.org/doi/10.1103/PhysRevB.99.020504}
+}
+----
+
 
 == Build
 
